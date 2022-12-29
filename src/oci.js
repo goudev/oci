@@ -4,6 +4,7 @@ const ociCommon = require("oci-common");
 const identity = require("oci-identity");
 const rs = require("oci-resourcesearch");
 var hash = require('object-hash');
+var BootVolumes = require("./bootVolumes")
 
 module.exports = class oci {
     
@@ -16,7 +17,6 @@ module.exports = class oci {
     #key = "";
     #inst = "";
     #provider = "";
-
 
     constructor(config) {
 
@@ -287,6 +287,14 @@ module.exports = class oci {
         })
     }
 
+    getBootVolume(volumeId){
+        
+        /**
+         * Retorna a promise
+         */
+        return new BootVolumes(this.#provider);
+    }
+
     /**
      * Retorna a lista de todos os bootVolumes
      */
@@ -502,7 +510,7 @@ module.exports = class oci {
                      */
                      var result = await searchClient.searchResources({
                         searchDetails: {
-                            query: `QUERY ${q}`,
+                            query: `QUERY ${q} where (lifecycleState = 'AVAILABLE')`,
                             type: "Structured",
                             matchingContextType: rs.models.SearchDetails.MatchingContextType.None
                         }
@@ -525,18 +533,18 @@ module.exports = class oci {
                      */
                     reject(error.message || error)
                 }
-
+                
                 /**
                  * Varre a lista de resultados e vai adicionando no array
                  */
-                result.resourceSummaryCollection.items.forEach(item => {
+                (result ? result.resourceSummaryCollection.items : []).forEach(item => {
                     resources.push(item)
                 });
 
                 /**
                  * Valida se tem mais dados para serem buscados
                  */
-                if(result.opcNextPage){
+                if(result && result.opcNextPage){
 
                     /**
                      * Define o nextPage para a próxima requisição
