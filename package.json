@@ -1,0 +1,26 @@
+{
+  "name": "oci",
+  "version": "1.0.0",
+  "description": "Biblioteca de abstração com OCI",
+  "main": "src/oci.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goudev/oci.git"
+  },
+  "author": "José Gouveia Júnior",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goudev/oci/issues"
+  },
+  "homepage": "https://github.com/goudev/oci#readme",
+  "dependencies": {
+    "object-hash": "^3.0.0",
+    "oci-common": "^2.50.0",
+    "oci-core": "^2.50.0",
+    "oci-identity": "^2.50.0",
+    "oci-resourcesearch": "^2.50.0"
+  }
+}
