@@ -1,4 +1,5 @@
 let Util = require("./util");
+const core = require('oci-core');
 
 class BootVolume {
 
