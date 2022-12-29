@@ -292,7 +292,7 @@ module.exports = class oci {
         /**
          * Retorna a promise
          */
-        return new BootVolumes(this.#provider);
+        return new BootVolumes(this.#provider).getBootVolume(volumeId);
     }
 
     /**
