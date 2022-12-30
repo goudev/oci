@@ -2,7 +2,8 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
-class BootVolume {
+
+class BlockVolume {
 
     #provider = "";
     #util = ""
@@ -16,7 +17,7 @@ class BootVolume {
     /**
      * Obtem um volume
      */
-    getBootVolume(volumeId){
+    getBlockVolume(volumeId){
         /**
          * Retorna a promise
          */
@@ -32,19 +33,19 @@ class BootVolume {
                 /**
                  * 
                  */
-                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getBootVolume({
-                     bootVolumeId: volumeId
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getVolume({
+                     volumeId: volumeId
                 }).then(result=>{
-
+                    
                     /**
                      * Habilita novamente o console
                      */
                     this.#util.enableConsole();
-
+                    
                     /**
                      * Retorna o bootVolume
                      */
-                    resolve(result.bootVolume)
+                    resolve(result.volume)
                 })
 
                  /**
@@ -70,7 +71,7 @@ class BootVolume {
     /**
      * Obtem a lista de todos os boot-volumes
      */
-    listBootVolumes(){
+    listBlockVolumes(){
         
         /**
          * Retorna a promise
@@ -85,13 +86,13 @@ class BootVolume {
             /**
              * Consulta a lista de bootVolumes
              */
-            new resourceSearch(this.#provider,"allRegions").find("bootvolume resources where (lifecycleState = 'AVAILABLE')").then(async bvs=>{
+            new resourceSearch(this.#provider).find("volume resources where (lifecycleState = 'AVAILABLE')").then(async bvs=>{
 
                 /**
                  * Varre a lista de boot volumes
                  */
                 for (const bv of bvs) {
-                    await this.getBootVolume(bv.identifier).then(b=>{
+                    await this.getBlockVolume(bv.identifier).then(b=>{
                         bootVolumes.push(b);
                     }).catch(error=>{
                         reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error.message || error)
@@ -109,9 +110,9 @@ class BootVolume {
     }
 
     /**
-     * Retorna a lista de todos os bootVolumesAttachments
+     * Retorna a lista de todos os blockVolumesAttachments
      */
-    listBootVolumeAttachments(compartmentId){
+    listBlockVolumeAttachments(compartmentId){
 
         /**
          * Retorna a promise
@@ -129,14 +130,14 @@ class BootVolume {
             if(compartmentId){
 
                 /**
-                 * Desabilita o console
+                 * Habilita o console
                  */
                 this.#util.disableConsole();
 
                 /**
                  * Realiza a consulta
                  */
-                new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).listBootVolumeAttachments({
+                new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).listVolumeAttachments({
                     compartmentId: compartmentId
                 }).then(result=>{
 
@@ -159,8 +160,9 @@ class BootVolume {
                     /**
                      * Rejeita a promise
                      */
-                    reject("Erro ao obter a lista de Boot Volume Attachments. \n\n" + error.message || error);
-                })
+                    reject("Erro ao obter a lista de Block Volume Attachments. \n\n" + error.message || error);
+                });
+
             }else{
 
                 /**
@@ -172,7 +174,7 @@ class BootVolume {
                         /**
                          * Obtem a lista de compartimentos
                          */
-                        await this.listBootVolumeAttachments(compartment.id).then(result=>{
+                        await this.listBlockVolumeAttachments(compartment.id).then(result=>{
                             result.forEach(b => {
                                 bva.push(b)
                             });
@@ -193,4 +195,4 @@ class BootVolume {
     }
 }
 
-module.exports = BootVolume
+module.exports = BlockVolume

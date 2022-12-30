@@ -1,10 +1,11 @@
 const fs = require('fs').promises;
-const core = require('oci-core');
 const ociCommon = require("oci-common");
-const identity = require("oci-identity");
-const rs = require("oci-resourcesearch");
 var hash = require('object-hash');
 var BootVolumes = require("./bootVolumes")
+var BlockVolumes = require("./blockVolumes")
+var ResourceSearch = require("./resourceSearch")
+var Compartments = require("./compartments")
+var Regions = require("./regions")
 
 module.exports = class oci {
     
@@ -104,6 +105,11 @@ module.exports = class oci {
              * Habilita o console
              */
             this.#enableConsole();
+
+            /**
+             * Retorna
+             */
+            return this;
         } catch (error) {
 
              /**
@@ -118,542 +124,44 @@ module.exports = class oci {
         }        
     }
 
-    /**
-     * Retorna a lista de todos os bootVolumesAttachments
-     */
-    getBootVolumeAttachments(compartmentId){
+    
 
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
+    
 
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var bva = [];
-
-            /**
-             * Se foi passado um compartimento
-             */
-            if(compartmentId){
-
-                /**
-                 * Desabilita o console
-                 */
-                this.#disableConsole();
-
-                /**
-                 * Realiza a consulta
-                 */
-                new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).listBootVolumeAttachments({
-                    compartmentId: compartmentId
-                }).then(result=>{
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * retorna a promise
-                     */
-                    resolve(result.items);
-
-                }).catch(error=>{
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject("Erro ao obter a lista de Boot Volume Attachments. \n\n" + error.message || error);
-                })
-            }else{
-
-                /**
-                 * Obtem a lista de compartimentos
-                 */
-                this.getCompartments().then(async compartments=>{
-                    for (const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.getBootVolumeAttachments(compartment.id).then(result=>{
-                            result.forEach(b => {
-                                bva.push(b)
-                            });
-                        }).catch(error=>{
-                            reject(error.message || error)
-                        })
-                    }
-                    resolve(bva)
-                }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
-                })
-            }
-        })
+    searchResource(queryString, AllRegions){
+        return new ResourceSearch(this.#provider).find(queryString,AllRegions)
     }
 
-    /**
-     * Retorna a lista de todos os blockVolumesAttachments
-     */
-    getBlockVolumeAttachments(compartmentId){
+    getBlockVolume(volumeId){
+        return new BlockVolumes(this.#provider).getBlockVolume(volumeId);
+    }
 
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
-
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var bva = [];
-
-            /**
-             * Se foi passado um compartimento
-             */
-            if(compartmentId){
-
-                /**
-                 * Habilita o console
-                 */
-                this.#disableConsole();
-
-                /**
-                 * Realiza a consulta
-                 */
-                new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).listVolumeAttachments({
-                    compartmentId: compartmentId
-                }).then(result=>{
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * retorna a promise
-                     */
-                    resolve(result.items);
-
-                }).catch(error=>{
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject("Erro ao obter a lista de Block Volume Attachments. \n\n" + error.message || error);
-                });
-
-            }else{
-
-                /**
-                 * Obtem a lista de compartimentos
-                 */
-                this.getCompartments().then(async compartments=>{
-                    for (const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.getBlockVolumeAttachments(compartment.id).then(result=>{
-                            result.forEach(b => {
-                                bva.push(b)
-                            });
-                        }).catch(error=>{
-                            reject(error.message || error)
-                        })
-                    }
-                    resolve(bva)
-                }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
-                })
-            }
-        })
+    listBlockVolumes(){
+        return new BlockVolumes(this.#provider).listBlockVolumes();
     }
 
     getBootVolume(volumeId){
-        
-        /**
-         * Retorna a promise
-         */
         return new BootVolumes(this.#provider).getBootVolume(volumeId);
     }
 
-    /**
-     * Retorna a lista de todos os bootVolumes
-     */
-    getBootVolumes(volumeId){
+    listBootVolumes(){
+        return new BootVolumes(this.#provider).getAllBootVolumes();
+    }
 
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
+    listBootVolumeAttachments(){
+        return new BootVolumes(this.#provider).listBootVolumeAttachments();
+    }
 
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var bv = [];
+    listBlockVolumeAttachments(){
+        return new BlockVolumes(this.#provider).listBlockVolumeAttachments();
+    }
 
-            /**
-             * Se foi passado um compartimento
-             */
-            if(volumeId){
+    getRegionSubscriptions(){
+        return new Regions(this.#provider).getRegionSubscriptions();
+    }
 
-                /**
-                 * Habilita o console
-                 */
-                this.#disableConsole();
-
-                try {
-
-                    /**
-                     * 
-                     */
-                    var bv = await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getBootVolume({
-                        bootVolumeId: volumeId
-                    });
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                } catch (error) {
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message || error)
-                }
-
-                /**
-                 * Retorna a informação
-                 */
-                resolve(bv.bootVolume);
-
-            }else{
-
-                /**
-                 * Obtem a lista de bootvolumes
-                 */
-                this.getBootVolumeAttachments().then(async bootVolumes=>{
-                    
-                    for (const bootVolume of bootVolumes) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.getBootVolumes(bootVolume.bootVolumeId).then(result=>{
-                            bv.push(result);
-                        }).catch(error=>{
-                            reject(error.message || error)
-                        })
-                    }
-                    resolve(bv)
-                }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
-                })
-            }
-        })
+    getCompartments(){
+        return new Compartments(this.#provider).getCompartments();
     }
     
-    /**
-     * Retorna a lista de todos os blockVolumes
-     */
-    getBlockVolumes(volumeId){
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
-
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var bv = [];
-
-            /**
-             * Se foi passado um compartimento
-             */
-            if(volumeId){
-
-                /**
-                 * Desabilita o console
-                 */
-                this.#disableConsole();
-
-                try {
-
-                    /**
-                     * Realiza a consulta
-                     */
-                     var bv = await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getVolume({
-                        volumeId: volumeId
-                    });
-
-                } catch (error) {
-
-                    /**
-                     * Ativa o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message || error)
-                }
-
-                /**
-                 * Ativa o console
-                 */
-                this.#enableConsole();
-
-                /**
-                 * Retorna a informação
-                 */
-                resolve(bv.bootVolume);
-            }else{
-
-                /**
-                 * Obtem a lista de bootvolumes
-                 */
-                this.getBlockVolumeAttachments().then(async blockVolumes=>{
-                    
-                    for (const blockVolume of blockVolumes) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.getBlockVolumes(blockVolume.volumeId).then(result=>{
-                            bv.push(result);
-                        }).catch(error=>{
-                            reject(error.message || error)
-                        })
-                    }
-                    resolve(bv)
-                }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
-                })
-            }
-        })
-    }
-
-    searchResource(q){
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
-
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var resources = [];
-
-            /**
-             * Cria uma variavel de ferencia para usar quando ouver o nextPage que representa uma nova requisição de paginação
-             * que deve ser feito para seguir extraindo os dados
-             */
-            var nextPage = false;
-
-            /**
-             * Aqui criamos um looping infinito, pois não sabemos quantos requests será necessário realizar para obter as informações completas
-             */
-            while(true){
-
-                /**
-                 * instancia o resource 
-                 */
-                var searchClient = new rs.ResourceSearchClient({
-                    authenticationDetailsProvider: this.#provider
-                });
-
-                /**
-                 * Desativa o console
-                 */
-                this.#disableConsole();
-
-                try {
-
-                    /**
-                     * Realizamos a consulta dos compartimentos
-                     */
-                     var result = await searchClient.searchResources({
-                        searchDetails: {
-                            query: `QUERY ${q} where (lifecycleState = 'AVAILABLE')`,
-                            type: "Structured",
-                            matchingContextType: rs.models.SearchDetails.MatchingContextType.None
-                        }
-                    })
-                    
-                    /**
-                     * Ativa o console
-                     */
-                     this.#enableConsole();
-                     
-                } catch (error) {
-                    
-                    /**
-                     * Ativa o console
-                     */
-                    this.#enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message || error)
-                }
-                
-                /**
-                 * Varre a lista de resultados e vai adicionando no array
-                 */
-                (result ? result.resourceSummaryCollection.items : []).forEach(item => {
-                    resources.push(item)
-                });
-
-                /**
-                 * Valida se tem mais dados para serem buscados
-                 */
-                if(result && result.opcNextPage){
-
-                    /**
-                     * Define o nextPage para a próxima requisição
-                     */
-                    nextPage = result.opcNextPage;
-
-                }else{
-
-                    /**
-                     * Retorna a promise com a lista dos compartimentos
-                     */
-                    return resolve(resources)
-                }
-            }
-        })
-    }
-
-    getCompartments(compartment){
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async(resolve,reject)=>{
-
-            /**
-             * Cria um array para armazenar as informações
-             */
-            var resources = [];
-
-            /**
-             * Define as configurações de pesquisa
-             */
-             var lConfig = {
-                compartmentId: compartment ? compartment : this.#provider.getTenantId(),
-                compartmentIdInSubtree: true,
-                lifecycleState: "ACTIVE",
-                limit: 100
-            }
-
-            /**
-             * Aqui criamos um looping infinito, pois não sabemos quantos requests será necessário realizar para obter as informações completas
-             */
-            while(true){
-
-                /**
-                 * Desabilita logs do console, oracle joga muita coisa desnecessária que você não consegue tratar
-                 */
-                this.#disableConsole()
-                
-                /**
-                 * Realiza a consulta
-                 */
-                try {
-
-                    /**
-                     * Desativa o console
-                     */
-                    this.#disableConsole();
-
-                    /**
-                     * Realiza a consulta
-                     */
-                    var result = await new identity.IdentityClient({
-                        authenticationDetailsProvider: this.#provider
-                    }).listCompartments(lConfig);
-
-                    /**
-                     * Ativa o console
-                     */
-                    this.#enableConsole();
-                    
-                } catch (error) {
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#enableConsole()
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    return reject("Erro a consultar a lista de compartimentos. \n\n" + error.message)
-                }
-                
-                /**
-                 * Varre a lista de resultados
-                 */
-                result.items.forEach(item => {
-                    resources.push(item);
-                });
-
-                /**
-                 * Valida se tem mais dados para serem buscados
-                 */
-                if(result.opcNextPage){
-
-                    /**
-                     * Define o nextPage para a próxima requisição
-                     */
-                    lConfig.page = result.opcNextPage;
-                    
-                }else{
-
-                    /**
-                     * Retorna a promise com a lista dos compartimentos
-                     */
-                    return resolve(resources)
-                }
-            }
-        })
-    }
 }
