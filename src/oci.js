@@ -6,6 +6,7 @@ var BlockVolumes = require("./blockVolumes")
 var ResourceSearch = require("./resourceSearch")
 var Compartments = require("./compartments")
 var Regions = require("./regions")
+var Network = require("./network")
 
 module.exports = class oci {
     
@@ -124,10 +125,6 @@ module.exports = class oci {
         }        
     }
 
-    
-
-    
-
     searchResource(queryString, AllRegions){
         return new ResourceSearch(this.#provider).find(queryString,AllRegions)
     }
@@ -162,6 +159,30 @@ module.exports = class oci {
 
     getCompartments(){
         return new Compartments(this.#provider).getCompartments();
+    }
+
+    listVnicAttachments(){
+        return new Network(this.#provider).listVnicAttachments();
+    }
+
+    listVnics(){
+        return new Network(this.#provider).listVnics();
+    }
+
+    listPublicIps(){
+        return new Network(this.#provider).listPublicIps();
+    }
+
+    getPublicIp(){
+        return new Network(this.#provider).getPublicIp();
+    }
+
+    listPrivateIps(){
+        return new Network(this.#provider).listPrivateIps();
+    }
+
+    getPrivateIp(){
+        return new Network(this.#provider).getPrivateIp();
     }
     
 }
