@@ -1,6 +1,6 @@
 let Util = require("./util");
 const rs = require("oci-resourcesearch");
-
+//https://docs.oracle.com/en-us/iaas/Content/Search/Concepts/queryoverview.htm#resourcetypes
 class RessourceSearch {
 
     #provider = "";

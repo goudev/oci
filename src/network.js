@@ -384,6 +384,671 @@ class Network {
             })
         })
     }
+
+    /**
+     * Obtem um volume
+     */
+    getVcn(vcnId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getVcn({
+                    vcnId: vcnId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.vcn)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listVcns(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var vcnsList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("vcn resources where (lifecycleState = 'AVAILABLE')").then(async vcns=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const vcn of vcns) {
+                    await this.getVcn(vcn.identifier).then(v=>{
+                        vcnsList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + vcn.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(vcnsList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+    /**
+     * Obtem um volume
+     */
+    getSubnet(subnetId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getSubnet({
+                    subnetId: subnetId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.subnet)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listSubnets(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var subnetsList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("subnet resources where (lifecycleState = 'AVAILABLE')").then(async subnets=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const subnet of subnets) {
+                    await this.getSubnet(subnet.identifier).then(v=>{
+                        subnetsList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + subnet.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(subnetsList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+    /**
+     * Obtem um volume
+     */
+    getSecurityList(securityListId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getSecurityList({
+                    securityListId: securityListId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.securityList)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listSecurityLists(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var securityListsList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("securityList resources where (lifecycleState = 'AVAILABLE')").then(async securityLists=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const securityList of securityLists) {
+                    await this.getSecurityList(securityList.identifier).then(v=>{
+                        securityListsList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + securityList.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(securityListsList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+    /**
+     * Obtem um volume
+     */
+    getNetworkSecurityGroup(networkSecurityGroupId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getNetworkSecurityGroup({
+                    networkSecurityGroupId: networkSecurityGroupId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.networkSecurityGroup)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listNetworkSecurityGroups(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var networkSecurityGroupsList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("networksecuritygroup resources where (lifecycleState = 'AVAILABLE')").then(async networkSecurityGroups=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const networkSecurityGroup of networkSecurityGroups) {
+                    await this.getNetworkSecurityGroup(networkSecurityGroup.identifier).then(v=>{
+                        networkSecurityGroupsList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + networkSecurityGroup.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(networkSecurityGroupsList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+    /**
+     * Obtem um volume
+     */
+    getRouteTable(rtId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getRouteTable({
+                    rtId: rtId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.routeTable)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listRouteTables(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var routeTablesList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("routetable resources where (lifecycleState = 'AVAILABLE')").then(async routeTables=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const routeTable of routeTables) {
+                    await this.getRouteTable(routeTable.identifier).then(v=>{
+                        routeTablesList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + routeTable.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(routeTablesList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+        /**
+     * Obtem um volume
+     */
+    getNatGateway(natGatewayId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getNatGateway({
+                    natGatewayId: natGatewayId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.natGateway)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listNatGateways(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var natGatewaysList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("natgateway resources where (lifecycleState = 'AVAILABLE')").then(async natGateways=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const natGateway of natGateways) {
+                    await this.getNatGateway(natGateway.identifier).then(v=>{
+                        natGatewaysList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + natGateway.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(natGatewaysList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
+
+    /**
+     * Obtem um volume
+     */
+    getServiceGateway(serviceGatewayId){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+             try {
+
+                /**
+                 * 
+                 */
+                await new core.VirtualNetworkClient({ authenticationDetailsProvider: this.#provider}).getServiceGateway({
+                    serviceGatewayId: serviceGatewayId
+                }).then(result=>{
+
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.serviceGateway)
+                })
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                 reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * Obtem a lista de todos os vnics
+     */
+    listServiceGateways(){
+        
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            /**
+             * Define um array para armazenar
+             */
+            var serviceGatewaysList = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("servicegateway resources where (lifecycleState = 'AVAILABLE')").then(async serviceGateways=>{
+                
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const serviceGateway of serviceGateways) {
+                    await this.getServiceGateway(serviceGateway.identifier).then(v=>{
+                        serviceGatewaysList.push(v);
+                    }).catch(error=>{
+                        reject("Erro ao consultar a vnic " + serviceGateway.identifier + "\n\n" + error.message || error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(serviceGatewaysList)
+            }).catch(error=>{
+                reject(error);
+            })
+        })
+    }
 }
 
 module.exports = Network

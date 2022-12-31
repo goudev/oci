@@ -7,6 +7,7 @@ var ResourceSearch = require("./resourceSearch")
 var Compartments = require("./compartments")
 var Regions = require("./regions")
 var Network = require("./network")
+var Compute = require("./compute")
 
 module.exports = class oci {
     
@@ -169,20 +170,96 @@ module.exports = class oci {
         return new Network(this.#provider).listVnics();
     }
 
+    getVnic(vnicId){
+        return new Network(this.#provider).getVnic(vnicId);
+    }
+
     listPublicIps(){
         return new Network(this.#provider).listPublicIps();
     }
 
-    getPublicIp(){
-        return new Network(this.#provider).getPublicIp();
+    getPublicIp(publicIpId){
+        return new Network(this.#provider).getPublicIp(publicIpId);
     }
 
     listPrivateIps(){
         return new Network(this.#provider).listPrivateIps();
     }
 
-    getPrivateIp(){
-        return new Network(this.#provider).getPrivateIp();
+    getPrivateIp(privateIpId){
+        return new Network(this.#provider).getPrivateIp(privateIpId);
+    }
+
+    listVcns(){
+        return new Network(this.#provider).listVcns();
+    }
+
+    getVcn(vcnId){
+        return new Network(this.#provider).getVcn(vcnId);
+    }
+
+    listSubnets(){
+        return new Network(this.#provider).listSubnets();
+    }
+
+    getSubnet(subnetId){
+        return new Network(this.#provider).getSubnet(subnetId);
+    }
+
+    listSecurityLists(){
+        return new Network(this.#provider).listSecurityLists();
+    }
+
+    getSecurityList(securityListId){
+        return new Network(this.#provider).getSecurityList(securityListId);
+    }
+
+    listNetworkSecurityGroups(){
+        return new Network(this.#provider).listNetworkSecurityGroups();
+    }
+
+    getNetworkSecurityGroup(networkSecurityGroupId){
+        return new Network(this.#provider).getNetworkSecurityGroup(networkSecurityGroupId);
+    }
+
+    listRouteTables(){
+        return new Network(this.#provider).listRouteTables();
+    }
+
+    getRouteTable(routeTableId){
+        return new Network(this.#provider).getRouteTable(routeTableId);
+    }
+
+    listNatGateways(){
+        return new Network(this.#provider).listNatGateways();
+    }
+
+    getNatGateway(natGatewayId){
+        return new Network(this.#provider).getNatGateway(natGatewayId);
+    }
+
+    listServiceGateways(){
+        return new Network(this.#provider).listServiceGateways();
+    }
+
+    getServiceGateway(serviceGatewayId){
+        return new Network(this.#provider).getServiceGateway(serviceGatewayId);
+    }
+
+    listImages(){
+        return new Compute(this.#provider).listImages();
+    }
+
+    getImage(imageId){
+        return new Compute(this.#provider).getImage(imageId);
+    }
+
+    listInstances(){
+        return new Compute(this.#provider).listInstances();
+    }
+
+    getInstance(instanceId){
+        return new Compute(this.#provider).getInstance(instanceId);
     }
     
 }
