@@ -8,6 +8,7 @@ var Compartments = require("./compartments")
 var Regions = require("./regions")
 var Network = require("./network")
 var Compute = require("./compute")
+var Region = require("./regions")
 
 module.exports = class oci {
     
@@ -260,6 +261,10 @@ module.exports = class oci {
 
     getInstance(instanceId){
         return new Compute(this.#provider).getInstance(instanceId);
+    }
+
+    listRegionSubscriptions(){
+        return new Region(this.#provider).listRegionSubscriptions();
     }
     
 }

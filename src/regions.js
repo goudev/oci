@@ -15,7 +15,7 @@ class Regions {
     /**
      * Obtem um volume
      */
-    getRegionSubscriptions(){
+    listRegionSubscriptions(){
 
         /**
          * Retorna a promise
