@@ -102,7 +102,7 @@ class Network {
                              * Trace
                              */
                             trace(`Encontrado ${result.length} vnics no compartimento ${compartment.name}`);
-                            
+
                             result.forEach(b => {
                                 bva.push(b)
                             });
@@ -138,15 +138,36 @@ class Network {
             var vnics = [];
 
             /**
+             * Trace
+             */
+            trace(`Consultando a lista de vnics`)
+
+            /**
              * Consulta a lista de bootVolumes
              */
             new resourceSearch(this.#provider).find("vnic resources where (lifecycleState = 'AVAILABLE')").then(async vns=>{
 
                 /**
+                 * Trace
+                 */
+                trace(`ResourceSearch encontrou ${vns.length} vnics.`);
+
+                /**
                  * Varre a lista de boot volumes
                  */
                 for (const vn of vns) {
+
+                    /**
+                     * Trace
+                     */
+                    trace(`Obtendo informações da VNIC ${vn.displayName}`);
+
                     await this.getVnic(vn.identifier).then(v=>{
+
+                        /**
+                         * Trace
+                         */
+                        trace(`Dados da vnic obtidos com sucesso.`);
                         vnics.push(v);
                     }).catch(error=>{
                         reject("Erro ao consultar a vnic " + vn.identifier + "\n\n" + error.message || error)
