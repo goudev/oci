@@ -144,7 +144,7 @@ module.exports = class oci {
     }
 
     listBootVolumes(){
-        return new BootVolumes(this.#provider).getAllBootVolumes();
+        return new BootVolumes(this.#provider).listBootVolumes();
     }
 
     listBootVolumeAttachments(){
