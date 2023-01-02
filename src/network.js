@@ -1,5 +1,6 @@
 let Util = require("./util");
 const core = require('oci-core');
+var trace = require('debug')('oci:trace:network');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
 
@@ -71,15 +72,37 @@ class Network {
             }else{
 
                 /**
+                 * Trace
+                 */
+                trace("Obtendo a lista de compartmentos");
+
+                /**
                  * Obtem a lista de compartimentos
                  */
                 new Compartments(this.#provider).listCompartments().then(async compartments=>{
+
+                    /**
+                     * Trace
+                     */
+                    trace(`Encontrado ${compartments.length} compartimentos`);
+
                     for (const compartment of compartments) {
+
+                        /**
+                         * Trace
+                         */
+                        trace(`Consultando a lista de vnics no compartimento ${compartment.name}`);
 
                         /**
                          * Obtem a lista de vnics
                          */
                         await this.listVnicAttachments(compartment.id).then(result=>{
+
+                            /**
+                             * Trace
+                             */
+                            trace(`Encontrado ${result.length} vnics no compartimento ${compartment.name}`);
+                            
                             result.forEach(b => {
                                 bva.push(b)
                             });

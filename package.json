@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/goudev/oci#readme",
   "dependencies": {
+    "debug": "^4.3.4",
     "object-hash": "^3.0.0",
     "oci-common": "^2.50.0",
     "oci-core": "^2.50.0",
