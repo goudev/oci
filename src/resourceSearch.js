@@ -58,15 +58,29 @@ class RessourceSearch {
                     trace(`Resource Search com criterio ${queryString} para tenancy ${this.#provider.delegate.tenancy}`);
 
                     /**
-                     * Realizamos a consulta dos compartimentos
+                     * Define o criterio de consulta
                      */
-                    var result = await searchClient.searchResources({
+                    var search = {
                         searchDetails: {
                             query: `QUERY ${queryString}`,
                             type: "Structured",
-                            matchingContextType: rs.models.SearchDetails.MatchingContextType.None
-                        }
-                    })
+                            matchingContextType: rs.models.SearchDetails.MatchingContextType.None,
+                        },
+                        limit: 500
+                    }
+
+                    /**
+                     * Valida se é uma requisição de próxima pagina
+                     */
+                    if(nextPage){
+                        search.page = nextPage;
+                    }
+
+
+                    /**
+                     * Realizamos a consulta dos compartimentos
+                     */
+                    var result = await searchClient.searchResources(search)
                     
                     /**
                      * Ativa o console
@@ -94,8 +108,8 @@ class RessourceSearch {
                 /**
                  * Trace
                  */
-                trace(`Resultado da consulta retornou ${items.length} registros para tenancy ${this.#provider.delegate.tenancy}`);
-                
+                trace(`Resultado da consulta retornou ${items.length} registros para tenancy ${this.#provider.delegate.tenancy}`);                
+
                 /**
                  * Varre a lista de resultados e vai adicionando no array
                  */
