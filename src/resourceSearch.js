@@ -1,6 +1,6 @@
 let Util = require("./util");
 const rs = require("oci-resourcesearch");
-//https://docs.oracle.com/en-us/iaas/Content/Search/Concepts/queryoverview.htm#resourcetypes
+var trace = require('debug')('oci:trace:network');
 class RessourceSearch {
 
     #provider = "";
@@ -34,16 +34,16 @@ class RessourceSearch {
             var nextPage = false;
 
             /**
+             * instancia o resource 
+             */
+            var searchClient = new rs.ResourceSearchClient({
+                authenticationDetailsProvider: this.#provider
+            });
+
+            /**
              * Aqui criamos um looping infinito, pois não sabemos quantos requests será necessário realizar para obter as informações completas
              */
             while(true){
-
-                /**
-                 * instancia o resource 
-                 */
-                var searchClient = new rs.ResourceSearchClient({
-                    authenticationDetailsProvider: this.#provider
-                });
 
                 /**
                  * Desativa o console
@@ -53,9 +53,14 @@ class RessourceSearch {
                 try {
 
                     /**
+                     * Trace
+                     */
+                    trace(`Resource Search com criterio ${queryString} para tenancy ${this.#provider.delegate.tenancy}`);
+
+                    /**
                      * Realizamos a consulta dos compartimentos
                      */
-                     var result = await searchClient.searchResources({
+                    var result = await searchClient.searchResources({
                         searchDetails: {
                             query: `QUERY ${queryString}`,
                             type: "Structured",
@@ -80,11 +85,25 @@ class RessourceSearch {
                      */
                     reject(error.message || error)
                 }
+
+                /**
+                 * Define um resultado
+                 */
+                var items = result ? result.resourceSummaryCollection.items : []
                 
                 /**
                  * Varre a lista de resultados e vai adicionando no array
                  */
-                (result ? result.resourceSummaryCollection.items : []).forEach(item => {
+                items.forEach(item => {
+
+                    /**
+                     * Trace
+                     */
+                    trace(`Resultado da consulta retornou ${items.length} registros para tenancy ${this.#provider.delegate.tenancy}`);
+
+                    /**
+                     * Adiciona ao array
+                     */
                     resources.push(item)
                 });
 
@@ -94,11 +113,21 @@ class RessourceSearch {
                 if(result && result.opcNextPage){
 
                     /**
+                     * Trace
+                     */
+                    trace(`Realizando uma nova consulta para obter o restante dos dados para tenancy ${this.#provider.delegate.tenancy}`);
+
+                    /**
                      * Define o nextPage para a próxima requisição
                      */
                     nextPage = result.opcNextPage;
 
                 }else{
+
+                    /**
+                     * Trace
+                     */
+                    trace(`Finalizada a consulta, não é necessário paginar os dados para tenancy ${this.#provider.delegate.tenancy}`);
 
                     /**
                      * Retorna a promise com a lista dos compartimentos
