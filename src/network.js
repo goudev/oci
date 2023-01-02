@@ -140,7 +140,7 @@ class Network {
             /**
              * Trace
              */
-            trace(`Consultando a lista de vnics da tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion().regionName}`);
+            trace(`Consultando a lista de vnics da tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
             /**
              * Consulta a lista de bootVolumes
