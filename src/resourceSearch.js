@@ -1,6 +1,6 @@
 let Util = require("./util");
 const rs = require("oci-resourcesearch");
-var trace = require('debug')('oci:trace:network');
+var trace = require('debug')('oci:trace:resourceSearch');
 class RessourceSearch {
 
     #provider = "";
