@@ -159,8 +159,8 @@ module.exports = class oci {
         return new Regions(this.#provider).getRegionSubscriptions();
     }
 
-    getCompartments(){
-        return new Compartments(this.#provider).getCompartments();
+    listCompartments(){
+        return new Compartments(this.#provider).listCompartments();
     }
 
     listVnicAttachments(){

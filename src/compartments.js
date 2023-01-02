@@ -11,7 +11,7 @@ class Compartments {
         return this;
     }
 
-    getCompartments(compartment){
+    listCompartments(compartment){
 
         /**
          * Retorna a promise
