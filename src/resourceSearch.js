@@ -90,16 +90,16 @@ class RessourceSearch {
                  * Define um resultado
                  */
                 var items = result ? result.resourceSummaryCollection.items : []
+
+                /**
+                 * Trace
+                 */
+                trace(`Resultado da consulta retornou ${items.length} registros para tenancy ${this.#provider.delegate.tenancy}`);
                 
                 /**
                  * Varre a lista de resultados e vai adicionando no array
                  */
                 items.forEach(item => {
-
-                    /**
-                     * Trace
-                     */
-                    trace(`Resultado da consulta retornou ${items.length} registros para tenancy ${this.#provider.delegate.tenancy}`);
 
                     /**
                      * Adiciona ao array
