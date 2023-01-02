@@ -140,7 +140,7 @@ class Network {
             /**
              * Trace
              */
-            trace(`Consultando a lista de vnics`)
+            trace(`Consultando a lista de vnics da tenancy ${this.#provider.delegate.tenancy}`);
 
             /**
              * Consulta a lista de bootVolumes
@@ -150,7 +150,7 @@ class Network {
                 /**
                  * Trace
                  */
-                trace(`ResourceSearch encontrou ${vns.length} vnics.`);
+                trace(`ResourceSearch encontrou ${vns.length} vnics para tenancy ${this.#provider.delegate.tenancy}`);
 
                 /**
                  * Varre a lista de boot volumes
@@ -160,16 +160,23 @@ class Network {
                     /**
                      * Trace
                      */
-                    trace(`Obtendo informações da VNIC ${vn.displayName}`);
+                    trace(`Obtendo informações da VNIC ${vn.displayName} para tenancy ${this.#provider.delegate.tenancy}`);
 
                     await this.getVnic(vn.identifier).then(v=>{
 
                         /**
                          * Trace
                          */
-                        trace(`Dados da vnic obtidos com sucesso.`);
+                        trace(`Dados da vnic obtidos com sucesso para tenancy ${this.#provider.delegate.tenancy}`);
+
                         vnics.push(v);
                     }).catch(error=>{
+
+                        /**
+                         * Trace
+                         */
+                        trace(`Erro a consultar a vnic ${vn.id} para tenancy ${this.#provider.delegate.tenancy}`);
+
                         reject("Erro ao consultar a vnic " + vn.identifier + "\n\n" + error.message || error)
                     })
                 }
