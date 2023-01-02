@@ -95,7 +95,7 @@ class BlockVolume {
                     await this.getBlockVolume(bv.identifier).then(b=>{
                         bootVolumes.push(b);
                     }).catch(error=>{
-                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
                     })
                 }
 
