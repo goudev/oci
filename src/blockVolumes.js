@@ -168,7 +168,7 @@ class BlockVolume {
                 /**
                  * Obtem a lista de compartimentos
                  */
-                new Compartments(this.#provider).getCompartments().then(async compartments=>{
+                new Compartments(this.#provider).listCompartments().then(async compartments=>{
                     for (const compartment of compartments) {
 
                         /**
