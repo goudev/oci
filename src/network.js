@@ -66,7 +66,7 @@ class Network {
                     /**
                      * Rejeita a promise
                      */
-                    reject("Erro ao obter a lista de Block Volume Attachments. \n\n" + error.message || error);
+                    reject("Erro ao obter a lista de Vnic Attachments. \n\n" + error);
                 });
 
             }else{
@@ -107,7 +107,7 @@ class Network {
                                 bva.push(b)
                             });
                         }).catch(error=>{
-                            reject(error.message || error)
+                            reject(error)
                         })
                     }
                     resolve(bva)
@@ -116,7 +116,7 @@ class Network {
                     /**
                      * Rejeita a promise
                      */
-                    reject(error.message);
+                    reject(message);
                 })
             }
         })
@@ -240,7 +240,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -294,7 +294,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -326,7 +326,7 @@ class Network {
                     await this.getPublicIp(ip.identifier).then(i=>{
                         lips.push(i);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + ip.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + ip.identifier + "\n\n" + error)
                     })
                 }
 
@@ -389,7 +389,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -421,7 +421,7 @@ class Network {
                     await this.getPrivateIp(ip.identifier).then(i=>{
                         lips.push(i);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + ip.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + ip.identifier + "\n\n" + error)
                     })
                 }
 
@@ -484,7 +484,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -516,7 +516,7 @@ class Network {
                     await this.getVcn(vcn.identifier).then(v=>{
                         vcnsList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + vcn.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + vcn.identifier + "\n\n" + error)
                     })
                 }
 
@@ -579,7 +579,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -611,7 +611,7 @@ class Network {
                     await this.getSubnet(subnet.identifier).then(v=>{
                         subnetsList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + subnet.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + subnet.identifier + "\n\n" + error)
                     })
                 }
 
@@ -674,7 +674,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -706,7 +706,7 @@ class Network {
                     await this.getSecurityList(securityList.identifier).then(v=>{
                         securityListsList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + securityList.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + securityList.identifier + "\n\n" + error)
                     })
                 }
 
@@ -769,7 +769,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -801,7 +801,7 @@ class Network {
                     await this.getNetworkSecurityGroup(networkSecurityGroup.identifier).then(v=>{
                         networkSecurityGroupsList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + networkSecurityGroup.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + networkSecurityGroup.identifier + "\n\n" + error)
                     })
                 }
 
@@ -864,7 +864,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -896,7 +896,7 @@ class Network {
                     await this.getRouteTable(routeTable.identifier).then(v=>{
                         routeTablesList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + routeTable.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + routeTable.identifier + "\n\n" + error)
                     })
                 }
 
@@ -959,7 +959,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -991,7 +991,7 @@ class Network {
                     await this.getNatGateway(natGateway.identifier).then(v=>{
                         natGatewaysList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + natGateway.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + natGateway.identifier + "\n\n" + error)
                     })
                 }
 
@@ -1054,7 +1054,7 @@ class Network {
                  /**
                   * Rejeita a promise
                   */
-                 reject(error.message || error)
+                 reject(error)
              }
         })
     }
@@ -1086,7 +1086,7 @@ class Network {
                     await this.getServiceGateway(serviceGateway.identifier).then(v=>{
                         serviceGatewaysList.push(v);
                     }).catch(error=>{
-                        reject("Erro ao consultar a vnic " + serviceGateway.identifier + "\n\n" + error.message || error)
+                        reject("Erro ao consultar a vnic " + serviceGateway.identifier + "\n\n" + error)
                     })
                 }
 
