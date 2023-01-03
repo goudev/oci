@@ -28,7 +28,12 @@ class Network {
             /**
              * Cria um array para armazenar as informações
              */
-            var bva = [];
+            var vnicsa = [];
+
+            /**
+             * Trace
+             */
+            trace(`Consultando a lista de vnics da tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
             /**
              * Se foi passado um compartimento
@@ -66,7 +71,7 @@ class Network {
                     /**
                      * Rejeita a promise
                      */
-                    reject("Erro ao obter a lista de Vnic Attachments. \n\n" + error);
+                    reject(`Erro ao obter a lista de Vnic Attachments no compartimento ${compartmentId} para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}. \n\n` + error);
                 });
 
             }else{
@@ -74,7 +79,7 @@ class Network {
                 /**
                  * Trace
                  */
-                trace("Obtendo a lista de compartmentos");
+                trace(`Obtendo a lista de compartmentos para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
                 /**
                  * Obtem a lista de compartimentos
@@ -84,14 +89,14 @@ class Network {
                     /**
                      * Trace
                      */
-                    trace(`Encontrado ${compartments.length} compartimentos`);
+                    trace(`Encontrado ${compartments.length} compartimentos para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
                     for (const compartment of compartments) {
 
                         /**
                          * Trace
                          */
-                        trace(`Consultando a lista de vnics no compartimento ${compartment.name}`);
+                        trace(`Consultando a lista de vnics no compartimento ${compartment.name} para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
                         /**
                          * Obtem a lista de vnics
@@ -101,22 +106,22 @@ class Network {
                             /**
                              * Trace
                              */
-                            trace(`Encontrado ${result.length} vnics no compartimento ${compartment.name}`);
+                            trace(`Encontrado ${result.length} vnics no compartimento ${compartment.name} para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
                             result.forEach(b => {
-                                bva.push(b)
+                                vnicsa.push(b)
                             });
                         }).catch(error=>{
                             reject(error)
                         })
                     }
-                    resolve(bva)
+                    resolve(vnicsa)
                 }).catch(error=>{
 
                     /**
                      * Rejeita a promise
                      */
-                    reject(message);
+                    reject(error);
                 })
             }
         })
