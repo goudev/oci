@@ -175,9 +175,8 @@ class Network {
                         /**
                          * Trace
                          */
-                        trace(`Erro a consultar a vnic ${vn.id} para tenancy ${this.#provider.delegate.tenancy}`);
+                        trace(`Erro a consultar a vnic ${vn.identifier} para tenancy ${this.#provider.delegate.tenancy}\n\n` + error);
 
-                        reject("Erro ao consultar a vnic " + vn.identifier + "\n\n" + error.message || error)
                     })
                 }
 
