@@ -14,6 +14,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/jsonwebtoken@9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-9.0.0.tgz#4db9bfaf276ef4fdc3608194fab8b8f2fd1c44f9"
+  integrity sha512-mM4TkDpA9oixqg1Fv2vVpOFyIVLJjm5x4k0V+K/rEsizfjD7Tk7LKk3GTtbB7KCfP0FEHQtsZqFxYA0+sijNVg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/jssha@2.0.0":
   version "2.0.0"
   resolved "https://registry.npmjs.org/@types/jssha/-/jssha-2.0.0.tgz"
@@ -161,6 +168,16 @@ jsonwebtoken@8.5.1:
     ms "^2.1.1"
     semver "^5.6.0"
 
+jsonwebtoken@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.0.tgz#d0faf9ba1cc3a56255fe49c0961a67e520c1926d"
+  integrity sha512-tuGfYXxkQGDPnLJ7SibiQgVgeDgfbPq2k2ICcbgqW8WxWLBAxKQM/ZCu/IT8SOSwmaYl4dpTFCW5xZv7YbbWUw==
+  dependencies:
+    jws "^3.2.2"
+    lodash "^4.17.21"
+    ms "^2.1.1"
+    semver "^7.3.8"
+
 jsprim@^1.2.2:
   version "1.4.2"
   resolved "https://registry.npmjs.org/jsprim/-/jsprim-1.4.2.tgz"
@@ -228,6 +245,18 @@ lodash.once@^4.0.0:
   resolved "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz"
   integrity sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
+lru-cache@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-6.0.0.tgz#6d6fe6570ebd96aaf90fcad1dafa3b2566db3a94"
+  integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
+  dependencies:
+    yallist "^4.0.0"
+
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
@@ -269,6 +298,25 @@ oci-common@2.50.0, oci-common@^2.50.0:
     sshpk "1.16.1"
     uuid "3.3.3"
 
+oci-common@2.50.2:
+  version "2.50.2"
+  resolved "https://registry.yarnpkg.com/oci-common/-/oci-common-2.50.2.tgz#495f463bb0d93b6d60a657ead90774cd84e001d4"
+  integrity sha512-L6yJOIG1ERkWaxS9gAoexA9C4bk5c/CjANIGkiGydPHirwd+pg0ajjeJ4D9li2mUZIreN6Gh8ZGGLOycSDmgow==
+  dependencies:
+    "@types/isomorphic-fetch" "0.0.35"
+    "@types/jsonwebtoken" "9.0.0"
+    "@types/jssha" "2.0.0"
+    "@types/opossum" "4.1.1"
+    "@types/sshpk" "1.10.3"
+    es6-promise "4.2.6"
+    http-signature "1.3.1"
+    isomorphic-fetch "3.0.0"
+    jsonwebtoken "9.0.0"
+    jssha "2.4.1"
+    opossum "5.0.1"
+    sshpk "1.16.1"
+    uuid "3.3.3"
+
 oci-core@^2.50.0:
   version "2.50.0"
   resolved "https://registry.npmjs.org/oci-core/-/oci-core-2.50.0.tgz"
@@ -285,6 +333,14 @@ oci-identity@^2.50.0:
     oci-common "2.50.0"
     oci-workrequests "2.50.0"
 
+oci-monitoring@^2.50.2:
+  version "2.50.2"
+  resolved "https://registry.yarnpkg.com/oci-monitoring/-/oci-monitoring-2.50.2.tgz#22f3eb17bde538b6aa6061a96610a8918c753eed"
+  integrity sha512-rRf9Z2rfp+CQ4OtR2e/7w7hJOziPvP6LSfGbNhUSGA0kvwBeE3P7rA5/oqTIo6+N3e6fW89oZQTh9tRCsg2kCA==
+  dependencies:
+    oci-common "2.50.2"
+    oci-workrequests "2.50.2"
+
 oci-resourcesearch@^2.50.0:
   version "2.50.0"
   resolved "https://registry.npmjs.org/oci-resourcesearch/-/oci-resourcesearch-2.50.0.tgz"
@@ -300,6 +356,14 @@ oci-workrequests@2.50.0:
   dependencies:
     oci-common "2.50.0"
     oci-workrequests "2.50.0"
+
+oci-workrequests@2.50.2:
+  version "2.50.2"
+  resolved "https://registry.yarnpkg.com/oci-workrequests/-/oci-workrequests-2.50.2.tgz#ba97c49e5c035b5752edc92e790466eb9a622b71"
+  integrity sha512-nJvnN9gjdjMnVi7JcaI6Iel9SmEm1HOL+D7bt97cMKi/8yK8l9ryXTs7x9aE4WE+tspT6KT2k9J/7019INfIiQ==
+  dependencies:
+    oci-common "2.50.2"
+    oci-workrequests "2.50.2"
 
 opossum@5.0.1:
   version "5.0.1"
@@ -320,6 +384,13 @@ semver@^5.6.0:
   version "5.7.1"
   resolved "https://registry.npmjs.org/semver/-/semver-5.7.1.tgz"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
+
+semver@^7.3.8:
+  version "7.3.8"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz#07a78feafb3f7b32347d725e33de7e2a2df67798"
+  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
+  dependencies:
+    lru-cache "^6.0.0"
 
 sshpk@1.16.1:
   version "1.16.1"
@@ -392,3 +463,8 @@ whatwg-url@^5.0.0:
   dependencies:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"
+
+yallist@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
+  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==

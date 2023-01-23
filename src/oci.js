@@ -9,6 +9,7 @@ var Regions = require("./regions")
 var Network = require("./network")
 var Compute = require("./compute")
 var Region = require("./regions")
+var Monitoring = require("./monitoring")
 
 module.exports = class oci {
     
@@ -265,6 +266,14 @@ module.exports = class oci {
 
     listRegionSubscriptions(){
         return new Region(this.#provider).listRegionSubscriptions();
+    }
+
+    getCpuMetrics(resourceId,days){
+        return new Monitoring(this.#provider).getCpuMetrics(resourceId,days,getCpuUsage);
+    }
+
+    getCpuUsage(resourceId,days,getCpuUsage){
+        return new Monitoring(this.#provider).getCpuUsage(resourceId,days,getCpuUsage);
     }
     
 }
