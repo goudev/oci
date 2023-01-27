@@ -14,30 +14,13 @@ class Monitoring {
     }
 
     /**
-     * Obtem o compartimento da instância
-     */
-    getCompartmentInstance(instanceId){
-        return new Promise((resolve,reject)=>{
-            new Compute(this.#provider).getInstance(instanceId).then(result=>{
-                if(result.compartmentId){
-                    resolve(result.compartmentId)
-                }else{
-                    reject("Nenhuma instância encontrada.")
-                }
-            }).catch(error=>{
-                reject(error)
-            })
-        })
-    }
-
-    /**
      * 
      * @param {string} instanceId ocid da instância
      * @param {int} days intervalo dos dias em que a metrica sera exibida
      * @param {int} interval intervalo de valores
      * @returns 
      */
-    getCpuMetrics(instanceId,days,interval=60){
+    getCpuMetrics(instanceData,days,interval=60){
         /**
          * Retorna a promise
          */
@@ -50,10 +33,10 @@ class Monitoring {
                  */
                 new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
                     {
-                        compartmentId: await this.getCompartmentInstance(instanceId),
+                        compartmentId: instanceData.compartmentId,
                         summarizeMetricsDataDetails: {
                             namespace: "oci_computeagent",
-                            query: `(CPUUtilization[${interval}m]{resourceId = "${instanceId}"}.mean())`,
+                            query: `(CPUUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
                             startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
                             endTime: new Date(),
                         }
@@ -86,7 +69,7 @@ class Monitoring {
      * @param {int} interval intervalo de valores
      * @returns 
      */
-    getCpuUsage(instanceId,days,interval=60){
+    getCpuUsage(instanceData,days,interval=60){
         /**
          * Retorna a promise
          */
@@ -99,10 +82,10 @@ class Monitoring {
                  */
                 new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
                     {
-                        compartmentId: await this.getCompartmentInstance(instanceId),
+                        compartmentId: instanceData.compartmentId,
                         summarizeMetricsDataDetails: {
                             namespace: "oci_computeagent",
-                            query: `(CPUUtilization[${interval}m]{resourceId = "${instanceId}"}.mean())`,
+                            query: `(CPUUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
                             startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
                             endTime: new Date(),
                         }
