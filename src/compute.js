@@ -137,12 +137,12 @@ class Compute {
                     await new monitoring(this.#provider).getCpuUsage(result.instance,30).then(async metrics=>{
                         result.instance.metrics.cpu["last30"]=metrics;
                     });
-                    await new monitoring(this.#provider).getCpuUsage(result.instance,15).then(async metrics=>{
-                        result.instance.metrics.cpu["last15"]=metrics;
-                    })
-                    await new monitoring(this.#provider).getCpuUsage(result.instance,7).then(async metrics=>{
-                        result.instance.metrics.cpu["last7"]=metrics;
-                    })
+//                     await new monitoring(this.#provider).getCpuUsage(result.instance,15).then(async metrics=>{
+//                         result.instance.metrics.cpu["last15"]=metrics;
+//                     })
+//                     await new monitoring(this.#provider).getCpuUsage(result.instance,7).then(async metrics=>{
+//                         result.instance.metrics.cpu["last7"]=metrics;
+//                     })
 
                     /**
                      * Habilita novamente o console
