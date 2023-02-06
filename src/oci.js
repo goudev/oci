@@ -10,6 +10,7 @@ var Network = require("./network")
 var Compute = require("./compute")
 var Region = require("./regions")
 var Monitoring = require("./monitoring")
+var ObjectStorage = require("./objectStorage")
 
 module.exports = class oci {
     
@@ -274,6 +275,10 @@ module.exports = class oci {
 
     getCpuUsage(resourceId,days,getCpuUsage){
         return new Monitoring(this.#provider).getCpuUsage(resourceId,days,getCpuUsage);
+    }
+
+    getNamespace(){
+        return new ObjectStorage(this.#provider).getNamespace();
     }
     
 }
