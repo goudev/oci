@@ -268,12 +268,22 @@ module.exports = class oci {
         return new Region(this.#provider).listRegionSubscriptions();
     }
 
-    getCpuMetrics(resourceId,days){
-        return new Monitoring(this.#provider).getCpuMetrics(resourceId,days,getCpuUsage);
+    getCpuMetrics(resourceId,days,interval){
+        return new Monitoring(this.#provider).getCpuMetrics(resourceId,days,interval);
     }
 
-    getCpuUsage(resourceId,days,getCpuUsage){
-        return new Monitoring(this.#provider).getCpuUsage(resourceId,days,getCpuUsage);
+    getMemoryMetrics(instanceData,days,interval){
+        return new Monitoring(this.#provider).getMemoryMetrics(instanceData,days,interval);
     }
+    
+
+    getCpuUsage(resourceId,days,interval){
+        return new Monitoring(this.#provider).getCpuUsage(resourceId,days,interval);
+    }
+
+    getMemoryUsage(resourceId,days,interval){
+        return new Monitoring(this.#provider).getMemoryUsage(resourceId,days,interval);
+    }
+    
     
 }
