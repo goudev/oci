@@ -10,6 +10,7 @@ var Network = require("./network")
 var Compute = require("./compute")
 var Region = require("./regions")
 var Monitoring = require("./monitoring")
+var Database = require("./database")
 
 module.exports = class oci {
     
@@ -262,6 +263,14 @@ module.exports = class oci {
 
     getInstance(instanceId){
         return new Compute(this.#provider).getInstance(instanceId);
+    }
+
+    listDbSystems(){
+        return new Database(this.#provider).listDbSystems();
+    }
+
+    getDbSystem(dbSystemId){
+        return new Database(this.#provider).getDbSystem(dbSystemId);
     }
 
     listRegionSubscriptions(){
