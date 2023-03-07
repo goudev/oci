@@ -44,7 +44,7 @@ class Database {
                     /**
                      * Retorna o DbSystem
                      */
-                    resolve(result.bootVolume)
+                    resolve(result.dbSystem)
                 })
 
                  /**
@@ -91,7 +91,7 @@ class Database {
                  * Varre a lista de DbSystems
                  */
                 for (const db of dbs) {
-                    await this.getDatabase(db.identifier).then(d=>{
+                    await this.getDbSystem(db.identifier).then(d=>{
                         dbSystems.push(d);
                     }).catch(error=>{
                         reject("Erro ao consultar o banco " + db.identifier + "\n\n" + error)
