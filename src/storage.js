@@ -45,7 +45,7 @@ class Storage {
                     /**
                      * Retorna o Bucket
                      */
-                    resolve(result.dbSystem)
+                    resolve(result.bucket)
                 })
 
                  /**
