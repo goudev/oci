@@ -148,7 +148,7 @@ class ObjectStorage {
                  * Varre a lista de Buckets
                  */
                 for (const bck of bcks) {
-                    await this.getBucket(bck.availabilityDomain, bck.getNamespace(), bck.displayName).then(b=>{
+                    await this.getBucket(bck.availabilityDomain, bck.namespaceName, bck.displayName).then(b=>{
                         buckets.push(b);
                     }).catch(error=>{
                         reject("Erro ao consultar o bucket " + bck.displayName + "\n\n" + error)
