@@ -71,7 +71,7 @@ class ObjectStorage {
     /**
      * Obtem um Bucket
      */
-    getBucket(region, namespaceName, bucketName){
+    getBucket(namespaceName, bucketName){
         /**
          * Retorna a promise
          */
@@ -87,7 +87,6 @@ class ObjectStorage {
                 /**
                  * 
                  */
-                this.#provider.setRegion(region);
                 await new os.ObjectStorageClient({ authenticationDetailsProvider: this.#provider}).getBucket({
                     namespaceName: namespaceName,
                     bucketName: bucketName
@@ -148,10 +147,10 @@ class ObjectStorage {
                  * Varre a lista de Buckets
                  */
                 for (const bck of bcks) {
-                    await this.getBucket(bck.availabilityDomain, bck.namespaceName, bck.displayName).then(b=>{
+                    await this.getBucket(bck.namespace, bck.name).then(b=>{
                         buckets.push(b);
                     }).catch(error=>{
-                        reject("Erro ao consultar o bucket " + bck.displayName + "\n\n" + error)
+                        reject("Erro ao consultar o bucket " + bck.name + "\n\n" + error)
                     })
                 }
 
