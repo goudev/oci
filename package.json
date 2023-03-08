@@ -24,6 +24,7 @@
     "oci-database": "^2.54.0",
     "oci-identity": "^2.50.0",
     "oci-monitoring": "^2.50.2",
+    "oci-objectstorage": "^2.54.0",
     "oci-resourcesearch": "^2.50.0"
   }
 }
