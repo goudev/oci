@@ -1,8 +1,8 @@
 let Util = require("./util");
-const objectstorage = require('oci-objectstorage');
 const resourceSearch = require('./resourceSearch');
+const os = require("oci-objectstorage");
 
-class Storage {
+class ObjectStorage {
 
     #provider = "";
     #util = ""
@@ -13,10 +13,65 @@ class Storage {
         return this;
     }
 
+    getNamespace(){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+             try {
+
+                /**
+                 * Desabilita o console
+                 */
+                this.#util.disableConsole();
+
+                /**
+                 * Obtem a metrica
+                 */
+                new os.ObjectStorageClient({authenticationDetailsProvider: this.#provider}).getNamespace({}).then(result=>{
+
+                    /**
+                     * Habilita o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna
+                     */
+                    resolve(result);
+                }).catch(error=>{
+
+                    /**
+                     * Habilita o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Obtem o erro
+                     */
+                    reject(error)
+                })
+
+             } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                reject(error.message || error)
+             }
+        })
+    }
+
     /**
      * Obtem um Bucket
      */
-    getBucket(namespaceName, bucketName){
+    getBucket(region, namespaceName, bucketName){
         /**
          * Retorna a promise
          */
@@ -32,7 +87,8 @@ class Storage {
                 /**
                  * 
                  */
-                await new objectstorage.ObjectStorageClient({ authenticationDetailsProvider: this.#provider}).getBucket({
+                this.#provider.setRegion(region);
+                await new os.ObjectStorageClient({ authenticationDetailsProvider: this.#provider}).getBucket({
                     namespaceName: namespaceName,
                     bucketName: bucketName
                 }).then(result=>{
@@ -92,7 +148,7 @@ class Storage {
                  * Varre a lista de Buckets
                  */
                 for (const bck of bcks) {
-                    await this.getBucket(bck.namespaceName, bck.bucketName).then(b=>{
+                    await this.getBucket(bck.region, bck.namespaceName, bck.bucketName).then(b=>{
                         buckets.push(b);
                     }).catch(error=>{
                         reject("Erro ao consultar o banco " + bck.namespaceName, bck.bucketName + "\n\n" + error)
@@ -108,6 +164,7 @@ class Storage {
             })
         })
     }
+
 }
 
-module.exports = Storage
+module.exports = ObjectStorage

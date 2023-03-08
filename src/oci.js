@@ -11,7 +11,7 @@ var Compute = require("./compute")
 var Region = require("./regions")
 var Monitoring = require("./monitoring")
 var Database = require("./database")
-var Storage = require("./storage")
+var ObjectStorage = require("./objectStorage")
 
 module.exports = class oci {
     
@@ -275,11 +275,11 @@ module.exports = class oci {
     }
 
     listBuckets(){
-        return new Storage(this.#provider).listBuckets();
+        return new ObjectStorage(this.#provider).listBuckets();
     }
 
-    getBucket(namespaceName, bucketName){
-        return new Storage(this.#provider).getBucket(namespaceName, bucketName);
+    getBucket(region, getNamespace, bucketName){
+        return new ObjectStorage(this.#provider).getBucket(region, getNamespace, bucketName);
     }
 
     listRegionSubscriptions(){
@@ -301,6 +301,10 @@ module.exports = class oci {
 
     getMemoryUsage(resourceId,days,interval){
         return new Monitoring(this.#provider).getMemoryUsage(resourceId,days,interval);
+    }
+
+    getNamespace(){
+        return new ObjectStorage(this.#provider).getNamespace();
     }
     
     
