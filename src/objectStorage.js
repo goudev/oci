@@ -132,6 +132,7 @@ class ObjectStorage {
          * Retorna a promise
          */
         return new Promise(async(resolve,reject)=>{
+            let namespace = await this.getNamespace()
 
             /**
              * Define um array para armazenar
@@ -147,7 +148,7 @@ class ObjectStorage {
                  * Varre a lista de Buckets
                  */
                 for (const bck of bcks) {
-                    await this.getBucket(bck.namespace, bck.name).then(b=>{
+                    await this.getBucket(namespace.value, bck.displayName).then(b=>{
                         buckets.push(b);
                     }).catch(error=>{
                         reject("Erro ao consultar o bucket " + bck.name + "\n\n" + error)
