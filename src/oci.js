@@ -278,8 +278,8 @@ module.exports = class oci {
         return new ObjectStorage(this.#provider).listBuckets();
     }
 
-    getBucket(region, bucketName){
-        return new ObjectStorage(this.#provider).getBucket(region, bucketName);
+    getBucket(region, namespaceName, bucketName){
+        return new ObjectStorage(this.#provider).getBucket(region, namespaceName, bucketName);
     }
 
     listRegionSubscriptions(){
