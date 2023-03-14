@@ -11,6 +11,8 @@ var Network = require("./network")
 var Compute = require("./compute")
 var Region = require("./regions")
 var Monitoring = require("./monitoring")
+var Database = require("./database")
+var ObjectStorage = require("./objectStorage")
 
 module.exports = class oci {
 
@@ -274,7 +276,23 @@ module.exports = class oci {
         return new Compute(this.#provider).getInstance(instanceId);
     }
 
-    listRegionSubscriptions() {
+    listDbSystems(){
+        return new Database(this.#provider).listDbSystems();
+    }
+
+    getDbSystem(dbSystemId){
+        return new Database(this.#provider).getDbSystem(dbSystemId);
+    }
+
+    listBuckets(){
+        return new ObjectStorage(this.#provider).listBuckets();
+    }
+
+    getBucket(region, namespaceName, bucketName){
+        return new ObjectStorage(this.#provider).getBucket(region, namespaceName, bucketName);
+    }
+
+    listRegionSubscriptions(){
         return new Region(this.#provider).listRegionSubscriptions();
     }
 
@@ -296,4 +314,9 @@ module.exports = class oci {
     }
 
 
+    getNamespace(){
+        return new ObjectStorage(this.#provider).getNamespace();
+    }
+    
+    
 }

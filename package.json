@@ -21,10 +21,12 @@
     "object-hash": "^3.0.0",
     "oci-common": "^2.50.0",
     "oci-core": "^2.50.0",
+    "oci-database": "^2.54.0",
     "oci-identity": "^2.50.0",
     "oci-monitoring": "^2.50.2",
     "oci-resourcesearch": "^2.50.0",
-    "oci-usageapi": "^2.53.1"
+    "oci-usageapi": "^2.53.1",
+    "oci-objectstorage": "^2.54.0"
   },
   "devDependencies": {
     "jest": "^29.5.0",
