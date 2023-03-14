@@ -4,7 +4,7 @@
   "description": "Biblioteca de abstração com OCI",
   "main": "src/oci.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,12 @@
     "oci-filestorage": "^2.54.0",
     "oci-identity": "^2.50.0",
     "oci-monitoring": "^2.50.2",
-    "oci-objectstorage": "^2.54.0",
-    "oci-resourcesearch": "^2.50.0"
+    "oci-resourcesearch": "^2.50.0",
+    "oci-usageapi": "^2.53.1",
+    "oci-objectstorage": "^2.54.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "sinon": "^15.0.2"
   }
 }
