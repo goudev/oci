@@ -92,7 +92,7 @@ class FileStorage {
                  * Varre a lista de File Systems
                  */
                 for (const f of fs) {
-                    await this.getFileSystem(f.identifier).then(b=>{
+                    await this.getFileSystem(f.identifier).then(f=>{
                         fileSystems.push(f);
                     }).catch(error=>{
                         reject("Erro ao consultar o filesystem " + f.identifier + "\n\n" + error)
