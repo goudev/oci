@@ -1,0 +1,37 @@
+module.exports = {
+  provider_name: "Oracle Cloud",
+  tenancy: "ocid1.tenancy.oc1..aaaaaaaagluh5ajtkznv7ucxv266ar5ujcd7k2dh36nqonafsbtdzrsuxzwq",
+  fingerprint: "f7:54:f9:2b:0f:2c:00:c0:cb:01:eb:59:6a:93:50:64",
+  private_key: `
+  -----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOrkacbJDL7/s7
+nqBaYkNZZZM7VW8lPL+6n0oRjssBxreYjBSefCrZqDYDxw92/mAJezpBP+lRMSvp
+sfA7h1+llqvWh18nbF4usOcO/OJHmLUG/Y39pMpbD/pj65AJrrkL+jhiAUUQnz2W
+4RKKno/HNDA9NgvYaD4F7web1D9Lu7glD6TspcWvyCpR8YJNiJbJyQjHtYWxBk/K
+jwAelKycz/peSRvGTgJ3xTJZ0pnb9IST++qTZsB0Q+NqbDQccATkosRbWNYBpMiy
+gqscADORpHVLLTylaOqfcg1aV84hLnmN/fxxdUr+5CB3L6CSQxvSQCWtmEm3dsmu
+N0wvIUKBAgMBAAECggEAPBQG+HvAVpcUrwyCkbxZho1+OtglBkV3p/HFovIA6h0O
+FqY5UmiPNHofUGTjzqOatbNVGr96E22Eg5Egyjgc3qE8dwcmWnfHipqDmGyELUiQ
+RULDpJ9cc46dTLCWRHV1RqVUU3QcbDzZFqxr/cF5YhRIEaYtw7BVGXOGPSfYhR8D
+k2NHzi9LuiBTdY5ubZoOrX9smjbnfZsBmejmuPTZr38s3o2iXAtCz7IPh5QNsiBi
+8eb+Nq297aUtzkZtBeJetXx+CrqnyIuUzmbwSUvCiAoxBTwKhZ7KTdN7N4hkwFai
+EMAz9JfeT5S2aMtjEbxofdkt56N7N/+QJcO9M2rUBwKBgQDDiZPdv9klx3e0FcxT
+r9izYezAm3wWVRU+a+0NQpLmnibxKkUp6tiGqvWvTcNY56T75MW6eWITvQL4dA/y
+oCNreVE+HHz3CS88tflCvwkLqJ6g7zes9N7Ye2fYmDOtivbJda+KXCSBTE3vz9i5
+tQKyMhug6vQ5+5/CCxkY/9nWOwKBgQC6zKb7uDO0mHtOakCYbE0/1Kihymw/Rupo
+5wMNme+0lC+uh2Vbfcs4yMfuPEeusraP7n6UM8Cyh2JIVaLpDQT7H+VFtEsCALeC
+7FGJM3vFOrZ+Ph/NGKyLX+HhDZDTkWnGTNuA1Kva7zvpiE45fNP2vQUdMLnYSmsU
+AA4ESeOycwKBgFfr2Izw4pbWJcDXvFQ00V93PJkuUJFKGI9EwAYiVSNVIXV26Dp8
+2ndTD72PXbLwFYMdzrqWMb9mUZudtD4IO2Tr29ftv1Lk0lSeDkIw28ReQVVjuskO
+IdV9R6hgZ3w069qSDChOXiu1P6YA8xYtidTOKxYkD0SzG5aInvRatnxZAoGANeBM
+0REhqJbKCaXPl6a06RIWyQMvEVkMxtDKKqQZZMXQss/ORgMUF/6g2297ZUGaMg0h
+aPE8RMGTcTVx1TGyHBPo9p+3eo5mX1Z1ddLpgcsbU3HrjiXtrg0rgtN8z+iCz3Tf
+Ylr0biLN7t8nYKFGKUX/MZoaH+3m0E/ruwTsrU0CgYEAl+SLzLTMBkLBS9xon2w7
+9HR+BpW/kUWfnFCDShgNAmJsLxncAAwYD1fpG3Ddo+FQqedkO1xcpOGpkBg2bWLD
+cVkOxJOdVd6LX6INGWzvWKxP0pUaaOuN3A8p5ucJtSqwcrQSE3oZAFGuk53uy0ue
+6OjURFCKFTQEZ/gg7+lDwXc=
+-----END PRIVATE KEY-----
+  `,
+  region: "sa-vinhedo-1",
+  user: "ocid1.user.oc1..aaaaaaaabf3m7657den3vwswxxf5qbjlpwancmf7a6ml66oasnsl4hx72srq"
+};
