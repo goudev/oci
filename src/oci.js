@@ -301,6 +301,14 @@ module.exports = class oci {
         return new FileStorage(this.#provider).getFileSystem(fileSystemId)
     }
 
+    listVolumesPolicies(){
+        return new BlockVolumes(this.#provider).listVolumesPolicies()
+    }
+        
+    getVolumePolicy(policyId){
+        return new BlockVolumes(this.#provider).getVolumePolicy(policyId)
+    }
+
     listRegionSubscriptions(){
         return new Region(this.#provider).listRegionSubscriptions();
     }
