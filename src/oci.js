@@ -13,6 +13,7 @@ var Region = require("./regions")
 var Monitoring = require("./monitoring")
 var Database = require("./database")
 var ObjectStorage = require("./objectStorage")
+var FileStorage = require("./fileStorage")
 
 module.exports = class oci {
 
@@ -290,6 +291,14 @@ module.exports = class oci {
 
     getBucket(region, namespaceName, bucketName){
         return new ObjectStorage(this.#provider).getBucket(region, namespaceName, bucketName);
+    }
+
+    listFileSystems(){
+        return new FileStorage(this.#provider).listFileSystems()
+    }
+
+    getFileSystem(fileSystemId){
+        return new FileStorage(this.#provider).getFileSystem(fileSystemId)
     }
 
     listRegionSubscriptions(){

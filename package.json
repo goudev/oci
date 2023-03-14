@@ -22,6 +22,7 @@
     "oci-common": "^2.50.0",
     "oci-core": "^2.50.0",
     "oci-database": "^2.54.0",
+    "oci-filestorage": "^2.54.0",
     "oci-identity": "^2.50.0",
     "oci-monitoring": "^2.50.2",
     "oci-resourcesearch": "^2.50.0",
