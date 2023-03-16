@@ -2098,6 +2098,14 @@ oci-common@2.54.0:
     sshpk "1.16.1"
     uuid "3.3.3"
 
+oci-containerengine@^2.54.0:
+  version "2.54.0"
+  resolved "https://registry.npmjs.org/oci-containerengine/-/oci-containerengine-2.54.0.tgz"
+  integrity sha512-c5RKNXUW0+OlsLKlIw2Zl/3gM/ltvm5W5CUcYTIRK2OkasXy1BiqbNafgFCsXiOt5TXMKwZ2eSXQsRM2FIhYKQ==
+  dependencies:
+    oci-common "2.54.0"
+    oci-workrequests "2.54.0"
+
 oci-core@^2.50.0:
   version "2.50.0"
   resolved "https://registry.npmjs.org/oci-core/-/oci-core-2.50.0.tgz"
@@ -2110,6 +2118,14 @@ oci-database@^2.54.0:
   version "2.54.0"
   resolved "https://registry.npmjs.org/oci-database/-/oci-database-2.54.0.tgz"
   integrity sha512-rNXLXT5LjaU94zVx5EboG7ON1YSxoOYJvmJVUhUqS6HptVnJ5pgUEc5lScLc4PwogjVMcKWtRYziBWmkkT7psA==
+  dependencies:
+    oci-common "2.54.0"
+    oci-workrequests "2.54.0"
+
+oci-filestorage@^2.54.0:
+  version "2.54.0"
+  resolved "https://registry.npmjs.org/oci-filestorage/-/oci-filestorage-2.54.0.tgz"
+  integrity sha512-0qHt9L2kLL7JqTst7WiSGhAoYEcKJ+l9g7sM4H3EizPFdKnKKFhqfsy4NZqVA+Jefb9t8KaFhG1MDmulusNX7A==
   dependencies:
     oci-common "2.54.0"
     oci-workrequests "2.54.0"
