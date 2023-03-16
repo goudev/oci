@@ -8,7 +8,7 @@ class BlockVolume {
     #provider = "";
     #util = ""
 
-    constructor(provider){
+    constructor(provider) {
         this.#provider = provider;
         this.#util = new Util();
         return this;
@@ -17,66 +17,66 @@ class BlockVolume {
     /**
      * Obtem um volume
      */
-    getBlockVolume(volumeId){
+    getBlockVolume(volumeId) {
         /**
          * Retorna a promise
          */
-        return new Promise(async(resolve,reject)=>{
+        return new Promise(async (resolve, reject) => {
 
             /**
              * Desabilita o console
              */
             this.#util.disableConsole();
 
-             try {
+            try {
 
                 /**
                  * 
                  */
-                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getVolume({
-                     volumeId: volumeId
-                }).then(result=>{
-                    
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolume({
+                    volumeId: volumeId
+                }).then(result => {
+
                     /**
                      * Habilita novamente o console
                      */
                     this.#util.enableConsole();
-                    
+
                     /**
                      * Retorna o bootVolume
                      */
                     resolve(result.volume)
                 })
 
-                 /**
-                  * Habilita o console
-                  */
+                /**
+                 * Habilita o console
+                 */
                 this.#util.enableConsole();
 
-             } catch (error) {
+            } catch (error) {
 
-                 /**
-                  * Habilita o console
-                  */
+                /**
+                 * Habilita o console
+                 */
                 this.#util.enableConsole();
 
-                 /**
-                  * Rejeita a promise
-                  */
-                 reject(error.message || error)
-             }
+                /**
+                 * Rejeita a promise
+                 */
+                reject(error.message || error)
+            }
         })
     }
 
     /**
      * Obtem a lista de todos os boot-volumes
      */
-    listBlockVolumes(){
-        
+    listBlockVolumes() {
+
         /**
          * Retorna a promise
          */
-        return new Promise(async(resolve,reject)=>{
+        return new Promise(async (resolve, reject) => {
 
             /**
              * Define um array para armazenar
@@ -86,15 +86,15 @@ class BlockVolume {
             /**
              * Consulta a lista de bootVolumes
              */
-            new resourceSearch(this.#provider).find("volume resources where (lifecycleState = 'AVAILABLE')").then(async bvs=>{
+            new resourceSearch(this.#provider).find("volume resources where (lifecycleState = 'AVAILABLE')").then(async bvs => {
 
                 /**
                  * Varre a lista de boot volumes
                  */
                 for (const bv of bvs) {
-                    await this.getBlockVolume(bv.identifier).then(b=>{
+                    await this.getBlockVolume(bv.identifier).then(b => {
                         bootVolumes.push(b);
-                    }).catch(error=>{
+                    }).catch(error => {
                         reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
                     })
                 }
@@ -103,7 +103,7 @@ class BlockVolume {
                  * Retorna
                  */
                 resolve(bootVolumes)
-            }).catch(error=>{
+            }).catch(error => {
                 reject(error);
             })
         })
@@ -112,12 +112,12 @@ class BlockVolume {
     /**
      * Retorna a lista de todos os blockVolumesAttachments
      */
-    listBlockVolumeAttachments(compartmentId){
+    listBlockVolumeAttachments(compartmentId) {
 
         /**
          * Retorna a promise
          */
-        return new Promise(async(resolve,reject)=>{
+        return new Promise(async (resolve, reject) => {
 
             /**
              * Cria um array para armazenar as informações
@@ -127,7 +127,7 @@ class BlockVolume {
             /**
              * Se foi passado um compartimento
              */
-            if(compartmentId){
+            if (compartmentId) {
 
                 /**
                  * Habilita o console
@@ -137,9 +137,9 @@ class BlockVolume {
                 /**
                  * Realiza a consulta
                  */
-                new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).listVolumeAttachments({
+                new core.ComputeClient({ authenticationDetailsProvider: this.#provider }).listVolumeAttachments({
                     compartmentId: compartmentId
-                }).then(result=>{
+                }).then(result => {
 
                     /**
                      * Habilita o console
@@ -151,7 +151,7 @@ class BlockVolume {
                      */
                     resolve(result.items);
 
-                }).catch(error=>{
+                }).catch(error => {
                     /**
                      * Habilita o console
                      */
@@ -163,27 +163,27 @@ class BlockVolume {
                     reject("Erro ao obter a lista de Block Volume Attachments. \n\n" + error.message || error);
                 });
 
-            }else{
+            } else {
 
                 /**
                  * Obtem a lista de compartimentos
                  */
-                new Compartments(this.#provider).listCompartments().then(async compartments=>{
+                new Compartments(this.#provider).listCompartments().then(async compartments => {
                     for (const compartment of compartments) {
 
                         /**
                          * Obtem a lista de compartimentos
                          */
-                        await this.listBlockVolumeAttachments(compartment.id).then(result=>{
+                        await this.listBlockVolumeAttachments(compartment.id).then(result => {
                             result.forEach(b => {
                                 bva.push(b)
                             });
-                        }).catch(error=>{
+                        }).catch(error => {
                             reject(error.message || error)
                         })
                     }
                     resolve(bva)
-                }).catch(error=>{
+                }).catch(error => {
 
                     /**
                      * Rejeita a promise
@@ -191,6 +191,98 @@ class BlockVolume {
                     reject(error.message);
                 })
             }
+        })
+    }
+
+    /**
+    * Obtem uma política de backup de um volume
+    */
+    getVolumePolicy(policyId) {
+        /**
+        * Retorna a promise
+        */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+            * Desabilita o console
+            */
+            this.#util.disableConsole();
+
+            try {
+
+                /**
+                * 
+                */
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicy({
+                    policyId: policyId
+                }).then(result => {
+                    /**
+                    * Habilita novamente o console
+                    */
+                    this.#util.enableConsole();
+                    /**
+                    * Retorna a politica de backup
+                    */
+                    resolve(result.volumeBackupPolicy)
+                })
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+            } catch (error) {
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+                /**
+                * Rejeita a promise
+                */
+                reject(error.message || error)
+            }
+        })
+    }
+
+    /**
+    * Obtem a lista de todas as politicas de backup dos volumes
+    */
+    listVolumesPolicies() {
+        /**
+        * Retorna a promise
+        */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+            * Define um array para armazenar
+            */
+            var backupPolicies = [];
+
+            /**
+            * Consulta a lista de politicas de backup dos volumes
+            */
+            new resourceSearch(this.#provider).find("VolumeBackupPolicy resources").then(async bvps => {
+
+                /**
+                * Varre a lista de politicas de backup
+                */
+                for (const bvp of bvps) {
+                    await this.getVolumePolicy(bvp.identifier).then(b => {
+                        backupPolicies.push(b);
+                    }).catch(error => {
+                        reject("Erro ao consultar a politica de backup " + bvp.identifier + "\n\n" + error)
+                    })
+                }
+
+                /**
+                * Retorna
+                */
+                resolve(backupPolicies)
+            }).catch(error => {
+                reject(error);
+            })
         })
     }
 }
