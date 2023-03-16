@@ -6,6 +6,7 @@ var BlockVolumes = require("./blockVolumes")
 var ResourceSearch = require("./resourceSearch")
 var Compartments = require("./compartments")
 var Usage = require("./usage")
+var Cluster = require("./clusters")
 var Regions = require("./regions")
 var Network = require("./network")
 var Compute = require("./compute")
@@ -175,6 +176,12 @@ module.exports = class oci {
             endDate,
             granularity
         );
+    }
+
+    listClusters({ compartmentId }) {
+        return new Cluster(this.#provider).listClusters({
+            compartmentId,
+        });
     }
 
     listVnicAttachments() {
