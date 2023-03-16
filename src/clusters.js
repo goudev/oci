@@ -15,7 +15,7 @@ class Cluster {
     /**
      * Lists all clusters
      */
-    async listClusters({ compartmentId }) {
+    async listClusters() {
         try {
             // An array to save the informations further
             const results = [];
@@ -27,7 +27,7 @@ class Cluster {
 
             // Request details
             const listClustersRequest = {
-                compartmentId: compartmentId ? compartmentId : this.#provider.getTenantId(),
+                compartmentId: this.#provider.getTenantId(),
                 lifecycleState: [containerengine.models.ClusterLifecycleState.Active],
                 limit: 1000,
             };
