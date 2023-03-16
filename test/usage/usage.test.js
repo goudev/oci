@@ -2,7 +2,7 @@ const Oracle = require('../../src/oci');
 const sinon = require('sinon');
 
 /** Mocks */
-const cloudProvider = require('./mocks/cloudProviderMock');
+const cloudProvider = require('../cloudProviderMock');
 const usageRequest = require('./mocks/usageApiRequestMock');
 const successfulResponse = require('./mocks/successfulResponseMock');
 
