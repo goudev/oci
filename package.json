@@ -19,6 +19,7 @@
   "dependencies": {
     "debug": "^4.3.4",
     "object-hash": "^3.0.0",
+    "oci-announcementsservice": "^2.55.0",
     "oci-common": "^2.50.0",
     "oci-containerengine": "^2.54.0",
     "oci-core": "^2.50.0",

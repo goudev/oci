@@ -15,6 +15,7 @@ var Monitoring = require("./monitoring")
 var Database = require("./database")
 var ObjectStorage = require("./objectStorage")
 var FileStorage = require("./fileStorage")
+var Announcements = require("./announcements")
 
 module.exports = class oci {
 
@@ -313,6 +314,14 @@ module.exports = class oci {
     getVolumePolicy(policyId){
         return new BlockVolumes(this.#provider).getVolumePolicy(policyId)
     }
+
+    getAnnouncement(announcementId){
+        return new Announcements(this.#provider).getAnnouncement(announcementId);
+    }
+    
+    listAnnouncements(){
+        return new Announcements(this.#provider).listAnnouncements();
+    }    
 
     listRegionSubscriptions(){
         return new Region(this.#provider).listRegionSubscriptions();
