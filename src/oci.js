@@ -16,6 +16,7 @@ var Database = require("./database")
 var ObjectStorage = require("./objectStorage")
 var FileStorage = require("./fileStorage")
 var Announcements = require("./announcements")
+var Budgets = require("./budgets")
 
 module.exports = class oci {
 
@@ -144,6 +145,14 @@ module.exports = class oci {
 
     listBlockVolumes() {
         return new BlockVolumes(this.#provider).listBlockVolumes();
+    }
+
+    getBudget(budgetId) {
+        return new Budgets(this.#provider).getBudget(budgetId);
+    }
+
+    listBudgets() {
+        return new Budgets(this.#provider).listBudgets();
     }
 
     getBootVolume(volumeId) {
