@@ -15,7 +15,7 @@ class Cluster {
     /**
      * Lists all clusters
      */
-    async listClusters() {
+    async listClusters(compartmentId) {
         try {
             // An array to save the informations further
             const results = [];
@@ -27,9 +27,8 @@ class Cluster {
 
             // Request details
             const listClustersRequest = {
-                compartmentId: this.#provider.getTenantId(),
+                compartmentId,
                 lifecycleState: [containerengine.models.ClusterLifecycleState.Active],
-                limit: 1000,
             };
 
             // Send request to the Client.
