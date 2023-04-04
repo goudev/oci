@@ -2209,6 +2209,14 @@
     "oci-common" "2.54.0"
     "oci-workrequests" "2.54.0"
 
+"oci-optimizer@^2.55.1":
+  "integrity" "sha512-ucSNAvvqMfPK5gAQPC1Y4d9ewZZb75k/DKjC92kq1RO28BQKxD2U5yYB7sCXdCi6xavnTwPKww5nAp8o2s5RUg=="
+  "resolved" "https://registry.npmjs.org/oci-optimizer/-/oci-optimizer-2.55.1.tgz"
+  "version" "2.55.1"
+  dependencies:
+    "oci-common" "2.55.1"
+    "oci-workrequests" "2.55.1"
+
 "oci-resourcesearch@^2.50.0":
   "integrity" "sha512-zRokZpJ+sqoQoG4oO/eg+pdmcBKyOpM+mKsjjRTfohrCjawekUHLtOKFiwcxsNMYwdP1b7WUgwmRulQSgjaRrw=="
   "resolved" "https://registry.npmjs.org/oci-resourcesearch/-/oci-resourcesearch-2.50.0.tgz"
