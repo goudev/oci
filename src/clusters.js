@@ -17,9 +17,6 @@ class Cluster {
      */
     async listClusters(compartmentId) {
         try {
-            // An array to save the informations further
-            const results = [];
-
             // Creates a client
             const client = new containerengine.ContainerEngineClient({
                 authenticationDetailsProvider: this.#provider,
@@ -33,12 +30,8 @@ class Cluster {
 
             // Send request to the Client.
             const listClustersResponse = await client.listClusters(listClustersRequest);
-            
-            for (const item of listClustersResponse.items) {
-                results.push(item);
-            }
 
-            return results;
+            return listClustersResponse.items;
         } catch (error) {
             return error;
         }
