@@ -51,7 +51,7 @@ class Usage {
           timeUsageEnded: this.#dateToUTC(endDate),
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity[granularity],
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ['resourceId'],
+          groupBy: ['skuPartNumber', 'skuName'],
           filter: {
             operator: usageapi.models.Filter.Operator.And,
             dimensions: [{
