@@ -17,6 +17,7 @@ var ObjectStorage = require("./objectStorage")
 var FileStorage = require("./fileStorage")
 var Announcements = require("./announcements")
 var Budgets = require("./budgets")
+var ResourceActions = require("./resourceactions")
 
 module.exports = class oci {
 
@@ -331,6 +332,14 @@ module.exports = class oci {
     listAnnouncements(){
         return new Announcements(this.#provider).listAnnouncements();
     }    
+
+    getResourceAction(recommendationId) {
+        return new ResourceActions(this.#provider).getResourceAction(recommendationId);
+    }
+    
+    listResourceActions() {
+        return new ResourceActions(this.#provider).listResourceActions();
+    }
 
     listRegionSubscriptions(){
         return new Region(this.#provider).listRegionSubscriptions();

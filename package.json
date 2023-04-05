@@ -29,6 +29,7 @@
     "oci-identity": "^2.50.0",
     "oci-monitoring": "^2.50.2",
     "oci-objectstorage": "^2.54.0",
+    "oci-optimizer": "^2.55.1",
     "oci-resourcesearch": "^2.50.0",
     "oci-usageapi": "^2.53.1"
   },
