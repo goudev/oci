@@ -189,8 +189,12 @@ module.exports = class oci {
         );
     }
 
-    listClusters(compartmentId) {
-        return new Cluster(this.#provider).listClusters(compartmentId);
+    getCluster(clusterId) {
+        return new Cluster(this.#provider).getCluster(clusterId)
+    }
+
+    listClusters() {
+        return new Cluster(this.#provider).listClusters();
     }
 
     listVnicAttachments() {
