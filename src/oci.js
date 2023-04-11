@@ -371,5 +371,10 @@ module.exports = class oci {
         return new ObjectStorage(this.#provider).getNamespace();
     }
     
+    listVolumeGroups() {
+
+        return new BlockVolumes(this.#provider).listVolumeGroups();
+        
+    }
     
 }

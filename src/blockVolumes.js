@@ -289,6 +289,97 @@ class BlockVolume {
             })
         })
     }
+
+    listVolumeGroups() {
+
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Define um array para armazenar
+             */
+            var volumeGroups = [];
+
+            /**
+             * Consulta a lista de volumeGroups
+             */
+            new resourceSearch(this.#provider).find("volumegroup resources").then(async bvs => {
+
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const bv of bvs) {
+                    await this.getVolumeGroups(bv.identifier).then(b => {
+                        console.log(b);
+                        process.exit(2);
+                        volumeGroups.push(b);
+                    }).catch(error => {
+                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(volumeGroups)
+            }).catch(error => {
+                reject(error);
+            })
+        })
+    }
+
+    getVolumeGroups(volumeGroupId) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+            try {
+
+                /**
+                 * 
+                 */
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeGroup({
+                    volumeGroupId: volumeGroupId
+                }).then(async result => {
+                    
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.volumeGroup)
+                })
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.enableConsole();
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+                reject(error.message || error)
+            }
+        })
+    }
 }
 
 module.exports = BlockVolume
