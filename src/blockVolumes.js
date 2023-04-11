@@ -35,8 +35,12 @@ class BlockVolume {
                  */
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolume({
                     volumeId: volumeId
-                }).then(result => {
-
+                }).then(async result => {
+                    await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
+                        assetId: volumeId
+                    }).then(backup => {
+                        result.volume.backupPolicy = backup.items[0]
+                    })
                     /**
                      * Habilita novamente o console
                      */
