@@ -346,7 +346,7 @@ class BlockVolume {
                  */
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeGroup({
                     volumeGroupId: volumeGroupId
-                }).then(async result => {
+                }).then(result => {
                     
                     /**
                      * Habilita novamente o console
