@@ -312,8 +312,6 @@ class BlockVolume {
                  */
                 for (const bv of bvs) {
                     await this.getVolumeGroups(bv.identifier).then(b => {
-                        console.log(b);
-                        process.exit(2);
                         volumeGroups.push(b);
                     }).catch(error => {
                         reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
