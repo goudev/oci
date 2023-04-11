@@ -189,6 +189,15 @@ module.exports = class oci {
         );
     }
 
+    listSummarizedUsageByService({ service, startDate, endDate, granularity }) {
+        return new Usage(this.#provider).listSummarizedUsageByService(
+            service,
+            startDate,
+            endDate,
+            granularity
+        );
+    }
+
     getCluster(clusterId) {
         return new Cluster(this.#provider).getCluster(clusterId)
     }
