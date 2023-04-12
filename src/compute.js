@@ -137,6 +137,9 @@ class Compute {
                     await new monitoring(this.#provider).getCpuUsage(result.instance,30).then(async metrics=>{
                         result.instance.metrics.cpu["last30"]=metrics;
                     });
+                    await new monitoring(this.#provider).getMemoryUsage(result.instance,30).then(async metrics=>{
+                        result.instance.metrics.memory["last30"]=metrics;
+                    });
 //                     await new monitoring(this.#provider).getCpuUsage(result.instance,15).then(async metrics=>{
 //                         result.instance.metrics.cpu["last15"]=metrics;
 //                     })
