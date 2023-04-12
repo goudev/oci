@@ -224,6 +224,48 @@ class Monitoring {
              }
         })
     }
+
+    getDiskMetrics(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                   {
+                      compartmentId: this.#provider.getTenantId(),
+                       summarizeMetricsDataDetails: {
+                           namespace: "oci_computeagent",
+                           query: `(VolumeGuaranteedIOPS[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                           startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                           endTime: new Date(),
+                       }
+                   }
+               ).then(result=>{
+                   resolve(result);
+               }).catch(error=>{
+                   reject(error)
+               })
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
+    }
 }
 
 module.exports = Monitoring

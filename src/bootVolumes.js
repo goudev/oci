@@ -2,6 +2,7 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
+const Monitoring = require('./monitoring')
 class BootVolume {
 
     #provider = "";
@@ -34,20 +35,16 @@ class BootVolume {
                  */
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getBootVolume({
                      bootVolumeId: volumeId
-                }).then(result=>{
-
-                    /**
-                     * Habilita novamente o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * Retorna o bootVolume
-                     */
+                }).then(async result=>{
+                    result.bootVolume.metrics = {}
+                    
+                    await new Monitoring(this.#provider).getDiskMetrics(result.bootVolume, 30).then(async metrics => {
+                        result.metrics['last30'] = metrics;
+                    });
                     resolve(result.bootVolume)
                 })
 
-                 /**
+                 /*
                   * Habilita o console
                   */
                 this.#util.enableConsole();

@@ -2,6 +2,7 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
+const Monitoring = require('./monitoring');
 
 class BlockVolume {
 
@@ -40,6 +41,13 @@ class BlockVolume {
                         assetId: volumeId
                     }).then(backup => {
                         result.volume.backupPolicy = backup.items[0]
+                    }).then(async () => {
+                        result.volume.metrics = {}
+                        await new Monitoring(this.#provider).getDiskMetrics(result.volume, 30).then(async metrics => {
+
+                            result.volume.metrics['last30'] = metrics;
+                            
+                            });
                     })
                     /**
                      * Habilita novamente o console
