@@ -18,6 +18,7 @@ var FileStorage = require("./fileStorage")
 var Announcements = require("./announcements")
 var Budgets = require("./budgets")
 var ResourceActions = require("./resourceactions")
+var Users = require("./users")
 
 module.exports = class oci {
 
@@ -306,55 +307,55 @@ module.exports = class oci {
         return new Compute(this.#provider).getInstance(instanceId);
     }
 
-    listDbSystems(){
+    listDbSystems() {
         return new Database(this.#provider).listDbSystems();
     }
 
-    getDbSystem(dbSystemId){
+    getDbSystem(dbSystemId) {
         return new Database(this.#provider).getDbSystem(dbSystemId);
     }
 
-    listBuckets(){
+    listBuckets() {
         return new ObjectStorage(this.#provider).listBuckets();
     }
 
-    getBucket(region, namespaceName, bucketName){
+    getBucket(region, namespaceName, bucketName) {
         return new ObjectStorage(this.#provider).getBucket(region, namespaceName, bucketName);
     }
 
-    listFileSystems(){
+    listFileSystems() {
         return new FileStorage(this.#provider).listFileSystems()
     }
 
-    getFileSystem(fileSystemId){
+    getFileSystem(fileSystemId) {
         return new FileStorage(this.#provider).getFileSystem(fileSystemId)
     }
 
-    listVolumesPolicies(){
+    listVolumesPolicies() {
         return new BlockVolumes(this.#provider).listVolumesPolicies()
     }
-        
-    getVolumePolicy(policyId){
+
+    getVolumePolicy(policyId) {
         return new BlockVolumes(this.#provider).getVolumePolicy(policyId)
     }
 
-    getAnnouncement(announcementId){
+    getAnnouncement(announcementId) {
         return new Announcements(this.#provider).getAnnouncement(announcementId);
     }
-    
-    listAnnouncements(){
+
+    listAnnouncements() {
         return new Announcements(this.#provider).listAnnouncements();
-    }    
+    }
 
     getResourceAction(recommendationId) {
         return new ResourceActions(this.#provider).getResourceAction(recommendationId);
     }
-    
+
     listResourceActions() {
         return new ResourceActions(this.#provider).listResourceActions();
     }
 
-    listRegionSubscriptions(){
+    listRegionSubscriptions() {
         return new Region(this.#provider).listRegionSubscriptions();
     }
 
@@ -376,14 +377,20 @@ module.exports = class oci {
     }
 
 
-    getNamespace(){
+    getNamespace() {
         return new ObjectStorage(this.#provider).getNamespace();
     }
-    
+
     listVolumeGroups() {
 
         return new BlockVolumes(this.#provider).listVolumeGroups();
-        
+
     }
-    
+
+    async* listUsers() {
+        const User = new Users(this.#provider);
+        for await (const user of User.listUsers()) {
+            yield user;
+        }
+    }
 }
