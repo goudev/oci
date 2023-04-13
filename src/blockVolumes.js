@@ -43,11 +43,18 @@ class BlockVolume {
                         result.volume.backupPolicy = backup.items[0]
                     }).then(async () => {
                         result.volume.metrics = {}
-                        await new Monitoring(this.#provider).getDiskMetrics(result.volume, 30).then(async metrics => {
-
-                            result.volume.metrics['last30'] = metrics;
-                            
-                            });
+                        result.volume.metrics.readThroughputOps = {}
+                        result.volume.metrics.writeThroughputOps = {}
+                        result.volume.metrics.maxIOPS = {}
+                        await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
+                            result.volume.metrics.readThroughputOps['last30'] = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
+                            result.volume.metrics.writeThroughputOps['last30'] = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.volume, 30).then(async metrics => {
+                            result.volume.metrics.maxIOPS = metrics;
+                        });
                     })
                     /**
                      * Habilita novamente o console

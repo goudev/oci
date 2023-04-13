@@ -35,12 +35,27 @@ class BootVolume {
                  */
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getBootVolume({
                      bootVolumeId: volumeId
-                }).then(async result=>{
-                    result.bootVolume.metrics = {}
+                }).then(async result => {
+                    await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
+                        assetId: volumeId
+                    }).then(backup => {
+                        result.bootVolume.backupPolicy = backup.items[0]
+                    }).then(async () => {
+                        result.bootVolume.metrics = {}
+                        result.bootVolume.metrics.readThroughputOps = {}
+                        result.bootVolume.metrics.writeThroughputOps = {}
+                        result.bootVolume.metrics.maxIOPS = {}
+                        await new Monitoring(this.#provider).getVolumeReadThroughput(result.bootVolume, 30).then(async metrics => {
+                            result.bootVolume.metrics.readThroughputOps['last30'] = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeWriteThroughput(result.bootVolume, 30).then(async metrics => {
+                            result.bootVolume.metrics.writeThroughputOps['last30'] = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.bootVolume, 30).then(async metrics => {
+                            result.bootVolume.metrics.maxIOPS = metrics;
+                        });
+                    })
                     
-                    await new Monitoring(this.#provider).getDiskMetrics(result.bootVolume, 30).then(async metrics => {
-                        result.metrics['last30'] = metrics;
-                    });
                     resolve(result.bootVolume)
                 })
 
@@ -49,7 +64,7 @@ class BootVolume {
                   */
                 this.#util.enableConsole();
 
-             } catch (error) {
+                } catch (error) {
 
                  /**
                   * Habilita o console
