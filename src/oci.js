@@ -20,6 +20,7 @@ var Budgets = require("./budgets")
 var ResourceActions = require("./resourceactions")
 var Users = require("./users")
 var Groups = require("./groups")
+var Policies = require("./policies")
 
 module.exports = class oci {
 
@@ -399,6 +400,13 @@ module.exports = class oci {
         const Group = new Groups(this.#provider);
         for await (const group of Group.listGroups()) {
             yield group;
+        }
+    }
+
+    async* listPolicies() {
+        const Policy = new Policies(this.#provider);
+        for await (const policy of Policy.listPolicies()) {
+            yield policy;
         }
     }
 }
