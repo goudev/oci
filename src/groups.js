@@ -14,9 +14,9 @@ class Groups {
       const details = {
         compartmentId: this.#provider.getTenantId(),
         limit: 1,
-        sortBy: identity.requests.ListUsersRequest.SortBy.Name,
-        sortOrder: identity.requests.ListUsersRequest.SortOrder.Asc,
-        lifecycleState: identity.models.User.LifecycleState.Active,
+        sortBy: identity.requests.ListGroupsRequest.SortBy.Name,
+        sortOrder: identity.requests.ListGroupsRequest.SortOrder.Asc,
+        lifecycleState: identity.models.Group.LifecycleState.Active,
       }
 
       let hasPages = true;
