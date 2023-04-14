@@ -37,21 +37,21 @@ class BootVolume {
                      bootVolumeId: volumeId
                 }).then(async result => {
                         result.bootVolume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
-                    .then(async () => {
-                        result.bootVolume.metrics = {}
-                        result.bootVolume.metrics.readThroughputOps = {}
-                        result.bootVolume.metrics.writeThroughputOps = {}
-                        result.bootVolume.metrics.maxIOPS = {}
-                        await new Monitoring(this.#provider).getVolumeReadThroughput(result.bootVolume, 30).then(async metrics => {
-                            result.bootVolume.metrics.readThroughputOps['last30'] = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeWriteThroughput(result.bootVolume, 30).then(async metrics => {
-                            result.bootVolume.metrics.writeThroughputOps['last30'] = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.bootVolume, 30).then(async metrics => {
-                            result.bootVolume.metrics.maxIOPS = metrics;
-                        });
-                    })
+                    // .then(async () => {
+                    //     result.bootVolume.metrics = {}
+                    //     result.bootVolume.metrics.readThroughputOps = {}
+                    //     result.bootVolume.metrics.writeThroughputOps = {}
+                    //     result.bootVolume.metrics.maxIOPS = {}
+                    //     await new Monitoring(this.#provider).getVolumeReadThroughput(result.bootVolume, 30).then(async metrics => {
+                    //         result.bootVolume.metrics.readThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeWriteThroughput(result.bootVolume, 30).then(async metrics => {
+                    //         result.bootVolume.metrics.writeThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.bootVolume, 30).then(async metrics => {
+                    //         result.bootVolume.metrics.maxIOPS = metrics;
+                    //     });
+                    // })
                     
                     resolve(result.bootVolume)
                 })

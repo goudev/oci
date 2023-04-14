@@ -38,21 +38,21 @@ class BlockVolume {
                     volumeId: volumeId
                 }).then(async result => {
                         result.volume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
-                    .then(async () => {
-                        result.volume.metrics = {}
-                        result.volume.metrics.readThroughputOps = {}
-                        result.volume.metrics.writeThroughputOps = {}
-                        result.volume.metrics.maxIOPS = {}
-                        await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
-                            result.volume.metrics.readThroughputOps['last30'] = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
-                            result.volume.metrics.writeThroughputOps['last30'] = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.volume, 30).then(async metrics => {
-                            result.volume.metrics.maxIOPS = metrics;
-                        });
-                    })
+                    // .then(async () => {
+                    //     result.volume.metrics = {}
+                    //     result.volume.metrics.readThroughputOps = {}
+                    //     result.volume.metrics.writeThroughputOps = {}
+                    //     result.volume.metrics.maxIOPS = {}
+                    //     await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.readThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.writeThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.maxIOPS = metrics;
+                    //     });
+                    // })
                     /**
                      * Habilita novamente o console
                      */
