@@ -37,11 +37,8 @@ class BlockVolume {
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolume({
                     volumeId: volumeId
                 }).then(async result => {
-                    await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
-                        assetId: volumeId
-                    }).then(backup => {
-                        result.volume.backupPolicy = backup.items[0]
-                    }).then(async () => {
+                        result.volume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
+                    .then(async () => {
                         result.volume.metrics = {}
                         result.volume.metrics.readThroughputOps = {}
                         result.volume.metrics.writeThroughputOps = {}
@@ -389,6 +386,55 @@ class BlockVolume {
                 /**
                  * Rejeita a promise
                  */
+                reject(error.message || error)
+            }
+        })
+    }
+
+    getBackupPolicyAttachedToVolume(volumeId) {
+        /**
+        * Retorna a promise
+        */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+            * Desabilita o console
+            */
+            this.#util.disableConsole();
+
+            try {
+
+                /**
+                * 
+                */
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
+                    assetId: volumeId
+                }).then(result => {
+                    /**
+                    * Habilita novamente o console
+                    */
+                    this.#util.enableConsole();
+                    /**
+                    * Retorna a politica de backup
+                    */
+                    resolve(result.items[0] ? result.items[0].policyId : null )
+                })
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+            } catch (error) {
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+                /**
+                * Rejeita a promise
+                */
                 reject(error.message || error)
             }
         })
