@@ -389,6 +389,18 @@ module.exports = class oci {
 
     }
 
+    getVolumeWriteThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeWriteThroughput(data, days, interval);
+    }
+
+    getVolumeReadThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeReadThroughput(data, days, interval);
+    }
+
+    getVolumeGuaranteedThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeGuaranteedThroughput(data, days, interval);
+    }
+
     async* listUsers() {
         const User = new Users(this.#provider);
         for await (const user of User.listUsers()) {

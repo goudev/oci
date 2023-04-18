@@ -252,7 +252,7 @@ class Monitoring {
                         result.items[0].aggregatedDatapoints.forEach(item => {
                             readThroughput = readThroughput + item.value;
                         });
-                        resolve(readThroughput / result.items[0].aggregatedDatapoints.length)
+                        resolve((readThroughput / result.items[0].aggregatedDatapoints.length)*10**-6)
                     }else{
                         resolve(null);
                     }
@@ -303,7 +303,7 @@ class Monitoring {
                     result.items[0].aggregatedDatapoints.forEach(item => {
                         writeThroughput = writeThroughput + item.value;
                     });
-                    resolve(writeThroughput / result.items[0].aggregatedDatapoints.length)
+                    resolve((writeThroughput / result.items[0].aggregatedDatapoints.length) * 10**-6)
                 }else{
                     resolve(null);
                 }
@@ -327,7 +327,7 @@ class Monitoring {
        })
     }
 
-    getVolumeGuaranteedIOPS(data,days,interval=60) {
+    getVolumeGuaranteedThroughput(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -343,7 +343,7 @@ class Monitoring {
                     compartmentId: data.compartmentId,
                     summarizeMetricsDataDetails: {
                         namespace: "oci_blockstore",
-                        query: `(VolumeGuaranteedIOPS[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                        query: `(VolumeGuaranteedThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
                         startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
                         endTime: new Date(),
                     }
