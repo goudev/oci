@@ -393,4 +393,8 @@ module.exports = class oci {
             yield user;
         }
     }
+
+    compartmentPath(compartmentId) {
+        return new Compartments(this.#provider).compartmentPath(compartmentId)
+    }
 }

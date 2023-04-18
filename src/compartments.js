@@ -100,6 +100,39 @@ class Compartments {
             }
         })
     }
+
+    async compartmentPath(compartmentId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const identityClient = new identity.IdentityClient({ authenticationDetailsProvider: this.#provider });
+
+                const { compartment } = await identityClient.getCompartment({ compartmentId });
+
+                const parentCompartments = [];     
+                let parentId = compartment.compartmentId;
+                
+                while (parentId && parentId !== compartment.id) {
+        
+                    const parentCompartment = await identityClient.getCompartment({ compartmentId: parentId });
+                    
+                    parentCompartments.push(parentCompartment.compartment.name);
+                    
+                    parentId = parentCompartment.compartment.compartmentId;
+                
+                }
+
+                const compartmentPath = [...parentCompartments.reverse(), compartment.name].join('/');
+                resolve(compartmentPath);
+
+            } catch (error) {
+                reject(error)
+            }
+
+        })
+
+    }
+
+
 }
 
 module.exports = Compartments
