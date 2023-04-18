@@ -19,6 +19,8 @@ var Announcements = require("./announcements")
 var Budgets = require("./budgets")
 var ResourceActions = require("./resourceactions")
 var Users = require("./users")
+var Groups = require("./groups")
+var Policies = require("./policies")
 
 module.exports = class oci {
 
@@ -387,6 +389,18 @@ module.exports = class oci {
 
     }
 
+    getVolumeWriteThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeWriteThroughput(data, days, interval);
+    }
+
+    getVolumeReadThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeReadThroughput(data, days, interval);
+    }
+
+    getVolumeGuaranteedThroughput(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeGuaranteedThroughput(data, days, interval);
+    }
+
     async* listUsers() {
         const User = new Users(this.#provider);
         for await (const user of User.listUsers()) {
@@ -396,5 +410,6 @@ module.exports = class oci {
 
     compartmentPath(compartmentId) {
         return new Compartments(this.#provider).compartmentPath(compartmentId)
+        // refatorado código
     }
 }

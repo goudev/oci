@@ -225,7 +225,7 @@ class Monitoring {
         })
     }
 
-    getDiskMetrics(data,days,interval=60) {
+    getVolumeReadThroughput(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -237,17 +237,128 @@ class Monitoring {
                 * Obtem a metrica
                 */
                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                   {
-                      compartmentId: this.#provider.getTenantId(),
-                       summarizeMetricsDataDetails: {
-                           namespace: "oci_computeagent",
-                           query: `(VolumeGuaranteedIOPS[${interval}m]{resourceId = "${data.id}"}.mean())`,
-                           startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                           endTime: new Date(),
-                       }
-                   }
-               ).then(result=>{
-                   resolve(result);
+                {
+                    compartmentId: data.compartmentId,
+                    summarizeMetricsDataDetails: {
+                        namespace: "oci_blockstore",
+                        query: `(VolumeReadThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                        endTime: new Date(),
+                    }
+                }
+                ).then(result=>{
+                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                        let readThroughput = 0;
+                        result.items[0].aggregatedDatapoints.forEach(item => {
+                            readThroughput = readThroughput + item.value;
+                        });
+                        resolve((readThroughput / result.items[0].aggregatedDatapoints.length)*10**-6)
+                    }else{
+                        resolve(null);
+                    }
+
+               }).catch(error=>{
+                   reject(error)
+               })
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
+    }
+
+    getVolumeWriteThroughput(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                {
+                    compartmentId: data.compartmentId,
+                    summarizeMetricsDataDetails: {
+                        namespace: "oci_blockstore",
+                        query: `(VolumeWriteThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                        endTime: new Date(),
+                    }
+                }
+            ).then(result=>{
+                if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                    let writeThroughput = 0;
+                    result.items[0].aggregatedDatapoints.forEach(item => {
+                        writeThroughput = writeThroughput + item.value;
+                    });
+                    resolve((writeThroughput / result.items[0].aggregatedDatapoints.length) * 10**-6)
+                }else{
+                    resolve(null);
+                }
+
+               }).catch(error=>{
+                   reject(error)
+               })
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
+    }
+
+    getVolumeGuaranteedThroughput(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                {
+                    compartmentId: data.compartmentId,
+                    summarizeMetricsDataDetails: {
+                        namespace: "oci_blockstore",
+                        query: `(VolumeGuaranteedThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                        endTime: new Date(),
+                    }
+                }
+            ).then(result=>{
+                if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                    let guaranteedIOPS = 0;
+                    result.items[0].aggregatedDatapoints.forEach(item => {
+                        guaranteedIOPS = guaranteedIOPS + item.value;
+                    });
+                    resolve(guaranteedIOPS / result.items[0].aggregatedDatapoints.length)
+                }else{
+                    resolve(null);
+                }
+
                }).catch(error=>{
                    reject(error)
                })

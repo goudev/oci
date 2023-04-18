@@ -37,18 +37,22 @@ class BlockVolume {
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolume({
                     volumeId: volumeId
                 }).then(async result => {
-                    await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
-                        assetId: volumeId
-                    }).then(backup => {
-                        result.volume.backupPolicy = backup.items[0]
-                    }).then(async () => {
-                        result.volume.metrics = {}
-                        await new Monitoring(this.#provider).getDiskMetrics(result.volume, 30).then(async metrics => {
-
-                            result.volume.metrics['last30'] = metrics;
-                            
-                            });
-                    })
+                        result.volume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
+                    // .then(async () => {
+                    //     result.volume.metrics = {}
+                    //     result.volume.metrics.readThroughputOps = {}
+                    //     result.volume.metrics.writeThroughputOps = {}
+                    //     result.volume.metrics.maxIOPS = {}
+                    //     await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.readThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.writeThroughputOps['last30'] = metrics;
+                    //     });
+                    //     await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.volume, 30).then(async metrics => {
+                    //         result.volume.metrics.maxIOPS = metrics;
+                    //     });
+                    // })
                     /**
                      * Habilita novamente o console
                      */
@@ -354,7 +358,8 @@ class BlockVolume {
                  */
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeGroup({
                     volumeGroupId: volumeGroupId
-                }).then(result => {
+                }).then(async result => {
+                    result.volumeGroup.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeGroupId)
                     
                     /**
                      * Habilita novamente o console
@@ -382,6 +387,55 @@ class BlockVolume {
                 /**
                  * Rejeita a promise
                  */
+                reject(error.message || error)
+            }
+        })
+    }
+
+    getBackupPolicyAttachedToVolume(volumeId) {
+        /**
+        * Retorna a promise
+        */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+            * Desabilita o console
+            */
+            this.#util.disableConsole();
+
+            try {
+
+                /**
+                * 
+                */
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeBackupPolicyAssetAssignment({
+                    assetId: volumeId
+                }).then(result => {
+                    /**
+                    * Habilita novamente o console
+                    */
+                    this.#util.enableConsole();
+                    /**
+                    * Retorna a politica de backup
+                    */
+                    resolve(result.items[0] ? result.items[0].policyId : null )
+                })
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+            } catch (error) {
+
+                /**
+                * Habilita o console
+                */
+                this.#util.enableConsole();
+
+                /**
+                * Rejeita a promise
+                */
                 reject(error.message || error)
             }
         })
