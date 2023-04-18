@@ -384,9 +384,7 @@ module.exports = class oci {
     }
 
     listVolumeGroups() {
-
         return new BlockVolumes(this.#provider).listVolumeGroups();
-
     }
 
     getVolumeWriteThroughput(data, days, interval) {

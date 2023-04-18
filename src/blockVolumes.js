@@ -302,96 +302,6 @@ class BlockVolume {
         })
     }
 
-    listVolumeGroups() {
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async (resolve, reject) => {
-
-            /**
-             * Define um array para armazenar
-             */
-            var volumeGroups = [];
-
-            /**
-             * Consulta a lista de volumeGroups
-             */
-            new resourceSearch(this.#provider).find("volumegroup resources").then(async bvs => {
-
-                /**
-                 * Varre a lista de boot volumes
-                 */
-                for (const bv of bvs) {
-                    await this.getVolumeGroups(bv.identifier).then(b => {
-                        volumeGroups.push(b);
-                    }).catch(error => {
-                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
-                    })
-                }
-
-                /**
-                 * Retorna
-                 */
-                resolve(volumeGroups)
-            }).catch(error => {
-                reject(error);
-            })
-        })
-    }
-
-    getVolumeGroups(volumeGroupId) {
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async (resolve, reject) => {
-
-            /**
-             * Desabilita o console
-             */
-            this.#util.disableConsole();
-
-            try {
-
-                /**
-                 * 
-                 */
-                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeGroup({
-                    volumeGroupId: volumeGroupId
-                }).then(async result => {
-                    result.volumeGroup.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeGroupId)
-                    
-                    /**
-                     * Habilita novamente o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * Retorna o bootVolume
-                     */
-                    resolve(result.volumeGroup)
-                })
-
-                /**
-                 * Habilita o console
-                 */
-                this.#util.enableConsole();
-
-            } catch (error) {
-
-                /**
-                 * Habilita o console
-                 */
-                this.#util.enableConsole();
-
-                /**
-                 * Rejeita a promise
-                 */
-                reject(error.message || error)
-            }
-        })
-    }
-
     getBackupPolicyAttachedToVolume(volumeId) {
         /**
         * Retorna a promise
@@ -437,6 +347,88 @@ class BlockVolume {
                 * Rejeita a promise
                 */
                 reject(error.message || error)
+            }
+        })
+    }
+
+    listVolumeGroups(compartmentId) {
+
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Cria um array para armazenar as informações
+             */
+            var volumeGroups = [];
+
+            /**
+             * Se foi passado um compartimento
+             */
+            if (compartmentId) {
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.disableConsole();
+
+                /**
+                 * Realiza a consulta
+                 */
+                new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).listVolumeGroups({
+                    compartmentId: compartmentId
+                }).then(result => {
+
+                    /**
+                     * Habilita o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * retorna a promise
+                     */
+                    resolve(result.items);
+
+                }).catch(error => {
+                    /**
+                     * Habilita o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Rejeita a promise
+                     */
+                    reject("Erro ao obter a lista de Volume Groups. \n\n" + error.message || error);
+                });
+
+            } else {
+
+                /**
+                 * Obtem a lista de compartimentos
+                 */
+                new resourceSearch(this.#provider).find("compartment resources where (lifecycleState = 'ACTIVE')").then(async compartments => {
+                    for (const compartment of compartments) {
+
+                        /**
+                         * Obtem a lista de compartimentos
+                         */
+                        await this.listVolumeGroups(compartment.identifier).then(result => {
+                            result.forEach(async vg => {
+                                volumeGroups.push(vg)
+                            });
+                        }).catch(error => {
+                            reject(error.message || error)
+                        })
+                    }
+                    resolve(volumeGroups)
+                }).catch(error => {
+
+                    /**
+                     * Rejeita a promise
+                     */
+                    reject(error.message);
+                })
             }
         })
     }
