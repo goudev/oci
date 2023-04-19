@@ -421,6 +421,10 @@ class BlockVolume {
                             reject(error.message || error)
                         })
                     }
+                    
+                    for(const vg of volumeGroups) {
+                        vg.backupPolicy = await this.getBackupPolicyAttachedToVolume(vg.id)
+                    }
                     resolve(volumeGroups)
                 }).catch(error => {
 
