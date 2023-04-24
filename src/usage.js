@@ -16,13 +16,13 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
-  listSummarizedUsageByService(service, startDate, endDate, granularity) {
+  listSummarizedUsageByService(startDate, endDate, granularity) {
     return new Promise(async (resolve, reject) => {
       try {
         const client = new usageapi.UsageapiClient({
           authenticationDetailsProvider: this.#provider,
         });
-  
+
         const usageDetails = {
           tenantId: this.#provider.getTenantId(),
           timeUsageStarted: this.#dateToUTC(startDate),
@@ -30,23 +30,43 @@ class Usage {
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity[granularity],
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
           groupBy: ['currency', 'unit', 'service', 'skuName'],
-          filter: {
-            operator: usageapi.models.Filter.Operator.And,
-            dimensions: [{
-              key: 'service',
-              value: service
-            }]
-          },
+          // filter: {
+          //   operator: usageapi.models.Filter.Operator.And,
+          //   dimensions: [{
+          //     key: 'service',
+          //     value: service
+          //   }]
+          // },
         };
-  
+
         const usageRequest = {
           requestSummarizedUsagesDetails: usageDetails,
           limit: 1,
           page: 1
         };
-  
-        const result = await client.requestSummarizedUsages(usageRequest)
-        resolve(result.usageAggregation.items);
+
+        const result = await client.requestSummarizedUsages(usageRequest);
+
+        const usageByService = {};
+        for (const item of result.usageAggregation.items) {
+          if (!isNaN(usageByService[item.service])) {
+            usageByService[item.service] += item.computedAmount;
+          } else {
+            usageByService[item.service] = 0;
+          }
+        }
+
+        for (const service in usageByService) {
+          const formatted = usageByService[service].toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+          });
+
+          usageByService[service] = formatted;
+        }
+
+        resolve(usageByService);
       } catch (error) {
         reject(error);
       }

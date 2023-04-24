@@ -192,9 +192,9 @@ module.exports = class oci {
         );
     }
 
-    listSummarizedUsageByService({ service, startDate, endDate, granularity }) {
+    listSummarizedUsageByService({ startDate, endDate, granularity }) {
         return new Usage(this.#provider).listSummarizedUsageByService(
-            service,
+            // service,
             startDate,
             endDate,
             granularity
