@@ -408,6 +408,13 @@ module.exports = class oci {
 
     compartmentPath(compartmentId) {
         return new Compartments(this.#provider).compartmentPath(compartmentId)
-        // refatorado código
+    }
+
+    getBlockVolumesMetrics() {
+        return new BlockVolumes(this.#provider).getBlockVolumesMetrics()
+    }
+
+    getBootVolumesMetrics() {
+        return new BootVolumes(this.#provider).getBootVolumesMetrics()
     }
 }

@@ -252,7 +252,7 @@ class Monitoring {
                         result.items[0].aggregatedDatapoints.forEach(item => {
                             readThroughput = readThroughput + item.value;
                         });
-                        resolve((readThroughput / result.items[0].aggregatedDatapoints.length)*10**-6)
+                        resolve((readThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
                     }else{
                         resolve(null);
                     }
@@ -303,7 +303,7 @@ class Monitoring {
                     result.items[0].aggregatedDatapoints.forEach(item => {
                         writeThroughput = writeThroughput + item.value;
                     });
-                    resolve((writeThroughput / result.items[0].aggregatedDatapoints.length) * 10**-6)
+                    resolve((writeThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
                 }else{
                     resolve(null);
                 }
@@ -350,11 +350,11 @@ class Monitoring {
                 }
             ).then(result=>{
                 if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                    let guaranteedIOPS = 0;
+                    let guaranteedThroughput = 0;
                     result.items[0].aggregatedDatapoints.forEach(item => {
-                        guaranteedIOPS = guaranteedIOPS + item.value;
+                        guaranteedThroughput = guaranteedThroughput + item.value;
                     });
-                    resolve(guaranteedIOPS / result.items[0].aggregatedDatapoints.length)
+                    resolve(guaranteedThroughput / result.items[0].aggregatedDatapoints.length)
                 }else{
                     resolve(null);
                 }

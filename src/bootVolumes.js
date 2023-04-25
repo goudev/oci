@@ -36,22 +36,18 @@ class BootVolume {
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider}).getBootVolume({
                      bootVolumeId: volumeId
                 }).then(async result => {
+                        // result.bootVolume.metrics = {}
+                        // result.bootVolume.metrics.last30 = {}
+                        // await new Monitoring(this.#provider).getVolumeReadThroughput(result.bootVolume, 30).then(async metrics => {
+                        //     result.bootVolume.metrics.last30.readThroughputInMBs = metrics;
+                        // });
+                        // await new Monitoring(this.#provider).getVolumeWriteThroughput(result.bootVolume, 30).then(async metrics => {
+                        //     result.bootVolume.metrics.last30.writeThroughputInMBs = metrics;
+                        // });
+                        // await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(result.bootVolume, 30).then(async metrics => {
+                        //     result.bootVolume.metrics.last30.guaranteedThroughputInMBs = metrics;
+                        // });
                         result.bootVolume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
-                    // .then(async () => {
-                    //     result.bootVolume.metrics = {}
-                    //     result.bootVolume.metrics.readThroughputOps = {}
-                    //     result.bootVolume.metrics.writeThroughputOps = {}
-                    //     result.bootVolume.metrics.maxIOPS = {}
-                    //     await new Monitoring(this.#provider).getVolumeReadThroughput(result.bootVolume, 30).then(async metrics => {
-                    //         result.bootVolume.metrics.readThroughputOps['last30'] = metrics;
-                    //     });
-                    //     await new Monitoring(this.#provider).getVolumeWriteThroughput(result.bootVolume, 30).then(async metrics => {
-                    //         result.bootVolume.metrics.writeThroughputOps['last30'] = metrics;
-                    //     });
-                    //     await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.bootVolume, 30).then(async metrics => {
-                    //         result.bootVolume.metrics.maxIOPS = metrics;
-                    //     });
-                    // })
                     
                     resolve(result.bootVolume)
                 })
@@ -247,6 +243,55 @@ class BootVolume {
                 */
                 reject(error.message || error)
             }
+        })
+    }
+
+    getBootVolumesMetrics() {
+
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Define um array para armazenar
+             */
+            var bootVolumes = [];
+
+            /**
+             * Consulta a lista de bootVolumes
+             */
+            new resourceSearch(this.#provider).find("bootvolume resources where (lifecycleState = 'AVAILABLE')").then(async bvs => {
+
+                /**
+                 * Varre a lista de boot volumes
+                 */
+                for (const bv of bvs) {
+                    await this.getBootVolume(bv.identifier).then(async b => {
+                        b.metrics = {}
+                        b.metrics.last30 = {}
+                        await new Monitoring(this.#provider).getVolumeReadThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.readThroughputInMBs = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeWriteThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.writeThroughputInMBs = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.guaranteedThroughputInMBs = metrics;
+                        });
+                        bootVolumes.push(b);
+                    }).catch(error => {
+                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(bootVolumes)
+            }).catch(error => {
+                reject(error);
+            })
         })
     }
 }

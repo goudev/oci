@@ -37,22 +37,19 @@ class BlockVolume {
                 await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolume({
                     volumeId: volumeId
                 }).then(async result => {
-                        result.volume.backupPolicy = await this.getBackupPolicyAttachedToVolume(volumeId)
-                    // .then(async () => {
-                    //     result.volume.metrics = {}
-                    //     result.volume.metrics.readThroughputOps = {}
-                    //     result.volume.metrics.writeThroughputOps = {}
-                    //     result.volume.metrics.maxIOPS = {}
-                    //     await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
-                    //         result.volume.metrics.readThroughputOps['last30'] = metrics;
-                    //     });
-                    //     await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
-                    //         result.volume.metrics.writeThroughputOps['last30'] = metrics;
-                    //     });
-                    //     await new Monitoring(this.#provider).getVolumeGuaranteedIOPS(result.volume, 30).then(async metrics => {
-                    //         result.volume.metrics.maxIOPS = metrics;
-                    //     });
-                    // })
+                    // result.volume.metrics = {}
+                    // result.volume.metrics.last30 = {}
+                    // await new Monitoring(this.#provider).getVolumeReadThroughput(result.volume, 30).then(async metrics => {
+                    //     result.volume.metrics.last30.readThroughputInMBs = metrics;
+                    // });
+                    // await new Monitoring(this.#provider).getVolumeWriteThroughput(result.volume, 30).then(async metrics => {
+                    //     result.volume.metrics.last30.writeThroughputInMBs = metrics;
+                    // });
+                    // await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(result.volume, 30).then(async metrics => {
+                    //     result.volume.metrics.last30.guaranteedThroughputInMBs = metrics;
+                    // });
+                    result.volume.backupPolicy = await this.getBackupPolicyAttachedToVolume(result.volume.id)
+                
                     /**
                      * Habilita novamente o console
                      */
@@ -434,6 +431,55 @@ class BlockVolume {
                     reject(error.message);
                 })
             }
+        })
+    }
+
+    getBlockVolumesMetrics() {
+
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Define um array para armazenar
+             */
+            var blockVolumes = [];
+
+            /**
+             * Consulta a lista de blockVolumes
+             */
+            new resourceSearch(this.#provider).find("volume resources where (lifecycleState = 'AVAILABLE')").then(async bvs => {
+
+                /**
+                 * Varre a lista de block volumes
+                 */
+                for (const bv of bvs) {
+                    await this.getBlockVolume(bv.identifier).then(async b => {
+                        b.metrics = {}
+                        b.metrics.last30 = {}
+                        await new Monitoring(this.#provider).getVolumeReadThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.readThroughputInMBs = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeWriteThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.writeThroughputInMBs = metrics;
+                        });
+                        await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
+                            b.metrics.last30.guaranteedThroughputInMBs = metrics;
+                        });
+                        blockVolumes.push(b);
+                    }).catch(error => {
+                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
+                    })
+                }
+
+                /**
+                 * Retorna
+                 */
+                resolve(blockVolumes)
+            }).catch(error => {
+                reject(error);
+            })
         })
     }
 }
