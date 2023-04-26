@@ -2,7 +2,7 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
-const Monitoring = require('./monitoring')
+
 class BootVolume {
 
     #provider = "";
@@ -243,55 +243,6 @@ class BootVolume {
                 */
                 reject(error.message || error)
             }
-        })
-    }
-
-    getBootVolumesMetrics() {
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async (resolve, reject) => {
-
-            /**
-             * Define um array para armazenar
-             */
-            var bootVolumes = [];
-
-            /**
-             * Consulta a lista de bootVolumes
-             */
-            new resourceSearch(this.#provider).find("bootvolume resources where (lifecycleState = 'AVAILABLE')").then(async bvs => {
-
-                /**
-                 * Varre a lista de boot volumes
-                 */
-                for (const bv of bvs) {
-                    await this.getBootVolume(bv.identifier).then(async b => {
-                        b.metrics = {}
-                        b.metrics.last30 = {}
-                        await new Monitoring(this.#provider).getVolumeReadThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.readThroughputInMBs = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeWriteThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.writeThroughputInMBs = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.guaranteedThroughputInMBs = metrics;
-                        });
-                        bootVolumes.push(b);
-                    }).catch(error => {
-                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
-                    })
-                }
-
-                /**
-                 * Retorna
-                 */
-                resolve(bootVolumes)
-            }).catch(error => {
-                reject(error);
-            })
         })
     }
 }

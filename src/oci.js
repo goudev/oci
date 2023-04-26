@@ -21,6 +21,7 @@ var ResourceActions = require("./resourceactions")
 var Users = require("./users")
 var Groups = require("./groups")
 var Policies = require("./policies")
+var Metrics = require('./metrics')
 
 module.exports = class oci {
 
@@ -411,10 +412,14 @@ module.exports = class oci {
     }
 
     getBlockVolumesMetrics() {
-        return new BlockVolumes(this.#provider).getBlockVolumesMetrics()
+        return new Metrics(this.#provider).getBlockVolumesMetrics()
     }
 
     getBootVolumesMetrics() {
-        return new BootVolumes(this.#provider).getBootVolumesMetrics()
+        return new Metrics(this.#provider).getBootVolumesMetrics()
+    }
+
+    getInstancesMetrics() {
+        return new Metrics(this.#provider).getInstancesMetrics()
     }
 }

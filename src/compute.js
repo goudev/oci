@@ -1,7 +1,6 @@
 let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
-const monitoring = require('./monitoring');
 
 class Compute {
 
@@ -131,15 +130,13 @@ class Compute {
                 await new core.ComputeClient({ authenticationDetailsProvider: this.#provider}).getInstance({
                     instanceId: instanceId
                 }).then(async result=>{
-                    result.instance.metrics = {}
-                    result.instance.metrics.cpu = {}
-                    result.instance.metrics.memory = {}
-                    await new monitoring(this.#provider).getCpuUsage(result.instance,30).then(async metrics=>{
-                        result.instance.metrics.cpu["last30"]=metrics;
-                    });
-                    await new monitoring(this.#provider).getMemoryUsage(result.instance,30).then(async metrics=>{
-                        result.instance.metrics.memory["last30"]=metrics;
-                    });
+                    // result.instance.metrics = {}
+                    // result.instance.metrics.cpu = {}
+                    // result.instance.metrics.memory = {}
+                    // result.instance.metrics.cpu["last30"]=await new Monitoring(this.#provider).getCpuUsage(result.instance,30)
+                    // await new monitoring(this.#provider).getMemoryUsage(result.instance,30).then(async metrics=>{
+                    //     result.instance.metrics.memory["last30"]=metrics;
+                    // });
 //                     await new monitoring(this.#provider).getCpuUsage(result.instance,15).then(async metrics=>{
 //                         result.instance.metrics.cpu["last15"]=metrics;
 //                     })

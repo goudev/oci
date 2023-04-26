@@ -2,7 +2,6 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
-const Monitoring = require('./monitoring');
 
 class BlockVolume {
 
@@ -431,55 +430,6 @@ class BlockVolume {
                     reject(error.message);
                 })
             }
-        })
-    }
-
-    getBlockVolumesMetrics() {
-
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async (resolve, reject) => {
-
-            /**
-             * Define um array para armazenar
-             */
-            var blockVolumes = [];
-
-            /**
-             * Consulta a lista de blockVolumes
-             */
-            new resourceSearch(this.#provider).find("volume resources where (lifecycleState = 'AVAILABLE')").then(async bvs => {
-
-                /**
-                 * Varre a lista de block volumes
-                 */
-                for (const bv of bvs) {
-                    await this.getBlockVolume(bv.identifier).then(async b => {
-                        b.metrics = {}
-                        b.metrics.last30 = {}
-                        await new Monitoring(this.#provider).getVolumeReadThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.readThroughputInMBs = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeWriteThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.writeThroughputInMBs = metrics;
-                        });
-                        await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
-                            b.metrics.last30.guaranteedThroughputInMBs = metrics;
-                        });
-                        blockVolumes.push(b);
-                    }).catch(error => {
-                        reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
-                    })
-                }
-
-                /**
-                 * Retorna
-                 */
-                resolve(blockVolumes)
-            }).catch(error => {
-                reject(error);
-            })
         })
     }
 }
