@@ -367,7 +367,7 @@ module.exports = class oci {
     }
 
     getMemoryMetrics(instanceData, days, interval) {
-        return new Monitoring(this.#provider).getMemoryMetrics(instanceData, days, interval);
+        return new Monitoring(this.#provider).getMemoryMetrics(instanceData, days, interval);   
     }
 
 
@@ -404,6 +404,14 @@ module.exports = class oci {
         const User = new Users(this.#provider);
         for await (const user of User.listUsers()) {
             yield user;
+        }
+    }
+
+    async* searchResourceIterator(queryString) {
+        const Search = new ResourceSearch(this.#provider);
+
+        for await (const resource of Search.findIterator(queryString)) {
+            yield resource;
         }
     }
 

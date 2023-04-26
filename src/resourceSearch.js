@@ -12,6 +12,36 @@ class RessourceSearch {
         return this;
     }
 
+    async* findIterator(queryString) {
+        try {
+            const searchClient = new rs.ResourceSearchClient({
+                authenticationDetailsProvider: this.#provider,
+            });
+
+            const searchDetails = {
+                searchDetails: {
+                    query: `QUERY ${queryString}`,
+                    type: "Structured",
+                    matchingContextType: rs.models.SearchDetails.MatchingContextType.None,
+                },
+                limit: 1,
+            };
+
+            let hasPages = true;
+
+            while(hasPages){
+                const result = await searchClient.searchResources(searchDetails);
+                if (result.opcNextPage) searchDetails.page = result.opcNextPage;
+                else hasPages = false;
+                console.log(result)
+                yield result.resourceSummaryCollection.items[0];
+            }
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * Obtem um volume
      */
