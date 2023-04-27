@@ -49,7 +49,6 @@ class Metrics {
                         await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
                             b.metrics.last30.guaranteedThroughputInMBs = metrics;
                         });
-                        console.log(b)
                         bootVolumes.push(b);
                     }).catch(error => {
                         reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
@@ -99,7 +98,6 @@ class Metrics {
                         await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(b, 30).then(async metrics => {
                             b.metrics.last30.guaranteedThroughputInMBs = metrics;
                         });
-                        console.log(b)
                         blockVolumes.push(b);
                     }).catch(error => {
                         reject("Erro ao consultar o disco " + bv.identifier + "\n\n" + error)
@@ -146,7 +144,6 @@ class Metrics {
                         await new Monitoring(this.#provider).getMemoryUsage(i, 30).then(async metrics => {
                             i.metrics.last30.memory = metrics;
                         });
-                        console.log(i)
                         instances.push(i);
                     }).catch(error => {
                         reject("Erro ao consultar a instance " + inst.identifier + "\n\n" + error)
