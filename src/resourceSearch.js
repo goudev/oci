@@ -33,7 +33,6 @@ class RessourceSearch {
                 const result = await searchClient.searchResources(searchDetails);
                 if (result.opcNextPage) searchDetails.page = result.opcNextPage;
                 else hasPages = false;
-                console.log(result)
                 yield result.resourceSummaryCollection.items[0];
             }
 

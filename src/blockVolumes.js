@@ -80,6 +80,19 @@ class BlockVolume {
         })
     }
 
+    async* listBlockVolumesIterator() {
+        try {
+            const Search = new resourceSearch(this.#provider);
+            const query = "volume resources where (lifecycleState = 'AVAILABLE')";
+            for await (const volume of Search.findIterator(query)) {
+                const blockvolume = await this.getBlockVolume(volume.identifier);
+                yield blockvolume;
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * Obtem a lista de todos os boot-volumes
      */

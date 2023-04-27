@@ -152,6 +152,13 @@ module.exports = class oci {
         return new BlockVolumes(this.#provider).listBlockVolumes();
     }
 
+    async* listBlockVolumesIterator() {
+        const Volume = new BlockVolumes(this.#provider);
+        for await (const volume of Volume.listBlockVolumesIterator()) {
+            yield volume;
+        }
+    }
+
     getBudget(budgetId) {
         return new Budgets(this.#provider).getBudget(budgetId);
     }
