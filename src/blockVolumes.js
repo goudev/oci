@@ -299,7 +299,13 @@ class BlockVolume {
                     }).catch(error => {
                         reject("Erro ao consultar a politica de backup " + bvp.identifier + "\n\n" + error)
                     })
-                }
+                } 
+
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this. #provider }).listVolumeBackupPolicies({}).then(async oracleBackupPolicies => {
+                    for (const obp of oracleBackupPolicies.items) {
+                        backupPolicies.push(obp);
+                    }
+                })
 
                 /**
                 * Retorna
