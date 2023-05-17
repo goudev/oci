@@ -57,12 +57,19 @@ class Metrics {
              */
             try {
                 ins.metrics = {}
-                ins.metrics.last1 = {}
-                await new Monitoring(this.#provider).getCpuUsage(ins, 1).then(async metrics => {
-                    ins.metrics.last1.cpu = metrics;
+                ins.metrics.last24h = {}
+                ins.metrics.last24hAverage = {}
+                await new Monitoring(this.#provider).getCpuUsageByIntervals(ins, 1).then(async metrics => {
+                    ins.metrics.last24h.cpu = metrics;
                 });
-                await new Monitoring(this.#provider).getMemoryUsage(ins, 1).then(async metrics => {
-                    ins.metrics.last1.memory = metrics;
+                await new Monitoring(this.#provider).getMemoryUsageByIntervals(ins, 1).then(async metrics => {
+                    ins.metrics.last24h.memory = metrics;
+                });
+                await new Monitoring(this.#provider).getCpuUsageAverage(ins, 1).then(async metrics => {
+                    ins.metrics.last24hAverage.cpu = metrics;
+                });
+                await new Monitoring(this.#provider).getMemoryUsageAverage(ins, 1).then(async metrics => {
+                    ins.metrics.last24hAverage.memory = metrics;
                 });
                 
                 /**
@@ -70,7 +77,7 @@ class Metrics {
                  */
                 resolve(ins)
             } catch (error) {
-                reject("Erro ao consultar a instance " + ar.id + "\n\n" + error)
+                reject("Erro ao consultar a instance " + ins.id + "\n\n" + error)
             }
             
         

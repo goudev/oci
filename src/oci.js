@@ -395,16 +395,16 @@ module.exports = class oci {
         return new BlockVolumes(this.#provider).listVolumeGroups();
     }
 
-    getVolumeWriteThroughput(data, days, interval) {
-        return new Monitoring(this.#provider).getVolumeWriteThroughput(data, days, interval);
+    getVolumeWriteThroughputAverage(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeWriteThroughputAverage(data, days, interval);
     }
 
-    getVolumeReadThroughput(data, days, interval) {
-        return new Monitoring(this.#provider).getVolumeReadThroughput(data, days, interval);
+    getVolumeReadThroughputAverage(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeReadThroughputAverage(data, days, interval);
     }
 
-    getVolumeGuaranteedThroughput(data, days, interval) {
-        return new Monitoring(this.#provider).getVolumeGuaranteedThroughput(data, days, interval);
+    getVolumeGuaranteedThroughputAverage(data, days, interval) {
+        return new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(data, days, interval);
     }
 
     async* listUsers() {

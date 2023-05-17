@@ -118,7 +118,7 @@ class Monitoring {
      * @param {int} interval intervalo de valores
      * @returns 
      */
-    getCpuUsage(instanceData,days,interval=60){
+    getAverageCpuUsage(instanceData,days,interval=60){
         /**
          * Retorna a promise
          */
@@ -150,6 +150,7 @@ class Monitoring {
                         }else{
                             resolve(null);
                         }
+                    
                     }).catch(error=>{
                         reject(error)
                     })
@@ -178,7 +179,7 @@ class Monitoring {
      * @param {int} interval intervalo de valores
      * @returns 
      */
-    getMemoryUsage(instanceData,days,interval=60){
+    getMemoryUsageAverage(instanceData,days,interval=60){
         /**
          * Retorna a promise
          */
@@ -231,7 +232,7 @@ class Monitoring {
         })
     }
 
-    getVolumeReadThroughput(data,days,interval=60) {
+    getVolumeReadThroughputAverage(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -284,7 +285,7 @@ class Monitoring {
        })
     }
 
-    getVolumeWriteThroughput(data,days,interval=60) {
+    getWriteThroughputAverage(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -321,6 +322,7 @@ class Monitoring {
                        reject(error)
                    })
                }, 500)
+               
 
             } catch (error) {
 
@@ -337,7 +339,7 @@ class Monitoring {
        })
     }
 
-    getVolumeGuaranteedThroughput(data,days,interval=60) {
+    getVolumeGuaranteedThroughputAverage(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -375,6 +377,7 @@ class Monitoring {
                    })
                }, 500)
                
+
             } catch (error) {
 
                 /**
@@ -388,6 +391,119 @@ class Monitoring {
                reject(error.message || error)
             }
        })
+    }
+
+     /**
+     * 
+     * @param {string} instanceId ocid da instância
+     * @param {int} days intervalo dos dias em que a metrica sera exibida
+     * @param {int} interval intervalo de valores
+     * @returns 
+     */
+     getCpuUsageByIntervals(instanceData,days,interval=60){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+             try {
+
+                /**
+                 * Obtem a metrica
+                 */
+                setTimeout(() => {
+                    new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                        {
+                            compartmentId: instanceData.compartmentId,
+                            summarizeMetricsDataDetails: {
+                                namespace: "oci_computeagent",
+                                query: `(CPUUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
+                                startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                                endTime: new Date(),
+                            }
+                        }
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            resolve(result.items[0].aggregatedDatapoints)
+                        }else{
+                            resolve(null);
+                        }
+                    
+                    }).catch(error=>{
+                        reject(error)
+                    })
+                }, 500)
+                
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                reject(error.message || error)
+             }
+        })
+    }
+
+    /**
+     * 
+     * @param {string} instanceId ocid da instância
+     * @param {int} days intervalo dos dias em que a metrica sera exibida
+     * @param {int} interval intervalo de valores
+     * @returns 
+     */
+    getMemoryUsageByIntervals(instanceData,days,interval=60){
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+             try {
+
+                /**
+                 * Obtem a metrica
+                 */
+                setTimeout(() => {
+                    new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                        {
+                            compartmentId: instanceData.compartmentId,
+                            summarizeMetricsDataDetails: {
+                                namespace: "oci_computeagent",
+                                query: `(MemoryUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
+                                startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                                endTime: new Date(),
+                            }
+                        }
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            resolve(result.items[0].aggregatedDatapoints)
+                        }else{
+                            resolve(null);
+                        }
+                    }).catch(error=>{
+                        reject(error)
+                    })
+                }, 500)
+                
+
+             } catch (error) {
+
+                 /**
+                  * Habilita o console
+                  */
+                this.#util.enableConsole();
+
+                 /**
+                  * Rejeita a promise
+                  */
+                reject(error.message || error)
+             }
+        })
     }
 }
 
