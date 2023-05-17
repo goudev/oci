@@ -426,15 +426,11 @@ module.exports = class oci {
         return new Compartments(this.#provider).compartmentPath(compartmentId)
     }
 
-    getBlockVolumesMetrics() {
-        return new Metrics(this.#provider).getBlockVolumesMetrics()
+    getDiskMetrics(bv) {
+        return new Metrics(this.#provider).getDiskMetrics(bv)
     }
 
-    getBootVolumesMetrics() {
-        return new Metrics(this.#provider).getBootVolumesMetrics()
-    }
-
-    getInstancesMetrics() {
-        return new Metrics(this.#provider).getInstancesMetrics()
+    getInstanceMetrics(ins) {
+        return new Metrics(this.#provider).getInstanceMetrics(ins)
     }
 }

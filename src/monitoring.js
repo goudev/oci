@@ -129,29 +129,32 @@ class Monitoring {
                 /**
                  * Obtem a metrica
                  */
-                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                    {
-                        compartmentId: instanceData.compartmentId,
-                        summarizeMetricsDataDetails: {
-                            namespace: "oci_computeagent",
-                            query: `(CPUUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
-                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                            endTime: new Date(),
+                setTimeout(() => {
+                    new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                        {
+                            compartmentId: instanceData.compartmentId,
+                            summarizeMetricsDataDetails: {
+                                namespace: "oci_computeagent",
+                                query: `(CPUUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
+                                startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                                endTime: new Date(),
+                            }
                         }
-                    }
-                ).then(result=>{
-                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                        let cpu = 0;
-                        result.items[0].aggregatedDatapoints.forEach(item => {
-                            cpu = cpu + item.value;
-                        });
-                        resolve(cpu / result.items[0].aggregatedDatapoints.length)
-                    }else{
-                        resolve(null);
-                    }
-                }).catch(error=>{
-                    reject(error)
-                })
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            let cpu = 0;
+                            result.items[0].aggregatedDatapoints.forEach(item => {
+                                cpu = cpu + item.value;
+                            });
+                            resolve(cpu / result.items[0].aggregatedDatapoints.length)
+                        }else{
+                            resolve(null);
+                        }
+                    }).catch(error=>{
+                        reject(error)
+                    })
+                }, 500)
+                
 
              } catch (error) {
 
@@ -186,29 +189,32 @@ class Monitoring {
                 /**
                  * Obtem a metrica
                  */
-                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                    {
-                        compartmentId: instanceData.compartmentId,
-                        summarizeMetricsDataDetails: {
-                            namespace: "oci_computeagent",
-                            query: `(MemoryUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
-                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                            endTime: new Date(),
+                setTimeout(() => {
+                    new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                        {
+                            compartmentId: instanceData.compartmentId,
+                            summarizeMetricsDataDetails: {
+                                namespace: "oci_computeagent",
+                                query: `(MemoryUtilization[${interval}m]{resourceId = "${instanceData.id}"}.mean())`,
+                                startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                                endTime: new Date(),
+                            }
                         }
-                    }
-                ).then(result=>{
-                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                        let memory = 0;
-                        result.items[0].aggregatedDatapoints.forEach(item => {
-                            memory = memory + item.value;
-                        });
-                        resolve(memory / result.items[0].aggregatedDatapoints.length)
-                    }else{
-                        resolve(null);
-                    }
-                }).catch(error=>{
-                    reject(error)
-                })
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            let memory = 0;
+                            result.items[0].aggregatedDatapoints.forEach(item => {
+                                memory = memory + item.value;
+                            });
+                            resolve(memory / result.items[0].aggregatedDatapoints.length)
+                        }else{
+                            resolve(null);
+                        }
+                    }).catch(error=>{
+                        reject(error)
+                    })
+                }, 500)
+                
 
              } catch (error) {
 
@@ -236,31 +242,33 @@ class Monitoring {
                /**
                 * Obtem a metrica
                 */
-               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                {
-                    compartmentId: data.compartmentId,
-                    summarizeMetricsDataDetails: {
-                        namespace: "oci_blockstore",
-                        query: `(VolumeReadThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
-                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                        endTime: new Date(),
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeReadThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
                     }
-                }
-                ).then(result=>{
-                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                        let readThroughput = 0;
-                        result.items[0].aggregatedDatapoints.forEach(item => {
-                            readThroughput = readThroughput + item.value;
-                        });
-                        resolve((readThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
-                    }else{
-                        resolve(null);
-                    }
-
-               }).catch(error=>{
-                   reject(error)
-               })
-
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            let readThroughput = 0;
+                            result.items[0].aggregatedDatapoints.forEach(item => {
+                                readThroughput = readThroughput + item.value;
+                            });
+                            resolve((readThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
+                        }else{
+                            resolve(null);
+                        }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
+               
             } catch (error) {
 
                 /**
@@ -287,30 +295,32 @@ class Monitoring {
                /**
                 * Obtem a metrica
                 */
-               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                {
-                    compartmentId: data.compartmentId,
-                    summarizeMetricsDataDetails: {
-                        namespace: "oci_blockstore",
-                        query: `(VolumeWriteThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
-                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                        endTime: new Date(),
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeWriteThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
                     }
-                }
-            ).then(result=>{
-                if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                    let writeThroughput = 0;
-                    result.items[0].aggregatedDatapoints.forEach(item => {
-                        writeThroughput = writeThroughput + item.value;
-                    });
-                    resolve((writeThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
-                }else{
-                    resolve(null);
-                }
-
-               }).catch(error=>{
-                   reject(error)
-               })
+                ).then(result=>{
+                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                        let writeThroughput = 0;
+                        result.items[0].aggregatedDatapoints.forEach(item => {
+                            writeThroughput = writeThroughput + item.value;
+                        });
+                        resolve((writeThroughput / result.items[0].aggregatedDatapoints.length)/1024**2)
+                    }else{
+                        resolve(null);
+                    }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
 
             } catch (error) {
 
@@ -338,31 +348,33 @@ class Monitoring {
                /**
                 * Obtem a metrica
                 */
-               new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
-                {
-                    compartmentId: data.compartmentId,
-                    summarizeMetricsDataDetails: {
-                        namespace: "oci_blockstore",
-                        query: `(VolumeGuaranteedThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
-                        startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
-                        endTime: new Date(),
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeGuaranteedThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
                     }
-                }
-            ).then(result=>{
-                if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
-                    let guaranteedThroughput = 0;
-                    result.items[0].aggregatedDatapoints.forEach(item => {
-                        guaranteedThroughput = guaranteedThroughput + item.value;
-                    });
-                    resolve(guaranteedThroughput / result.items[0].aggregatedDatapoints.length)
-                }else{
-                    resolve(null);
-                }
-
-               }).catch(error=>{
-                   reject(error)
-               })
-
+                ).then(result=>{
+                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                        let guaranteedThroughput = 0;
+                        result.items[0].aggregatedDatapoints.forEach(item => {
+                            guaranteedThroughput = guaranteedThroughput + item.value;
+                        });
+                        resolve(guaranteedThroughput / result.items[0].aggregatedDatapoints.length)
+                    }else{
+                        resolve(null);
+                    }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
+               
             } catch (error) {
 
                 /**
