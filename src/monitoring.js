@@ -118,7 +118,7 @@ class Monitoring {
      * @param {int} interval intervalo de valores
      * @returns 
      */
-    getAverageCpuUsage(instanceData,days,interval=60){
+    getCpuUsageAverage(instanceData,days,interval=60){
         /**
          * Retorna a promise
          */
@@ -285,7 +285,7 @@ class Monitoring {
        })
     }
 
-    getWriteThroughputAverage(data,days,interval=60) {
+    getVolumeWriteThroughputAverage(data,days,interval=60) {
         /**
          * Retorna a promise
          */
@@ -504,6 +504,161 @@ class Monitoring {
                 reject(error.message || error)
              }
         })
+    }
+
+    getVolumeReadThroughputByIntervals(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeReadThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
+                    }
+                    ).then(result=>{
+                        if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                            result.items[0].aggregatedDatapoints.forEach(item => {
+                                item.value = item.value/1024**2
+                            });
+                            resolve(result.items[0].aggregatedDatapoints)
+                        }else{
+                            resolve(null);
+                        }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
+               
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
+    }
+
+    getVolumeWriteThroughputByIntervals(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeWriteThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
+                    }
+                ).then(result=>{
+                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                        result.items[0].aggregatedDatapoints.forEach(item => {
+                            item.value = item.value/1024**2
+                        });
+                        resolve(result.items[0].aggregatedDatapoints)
+                    }else{
+                        resolve(null);
+                    }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
+               
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
+    }
+
+    getVolumeGuaranteedThroughputByIntervals(data,days,interval=60) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async(resolve,reject)=>{
+
+            try {
+
+               /**
+                * Obtem a metrica
+                */
+               setTimeout(() => {
+                new monitoring.MonitoringClient({ authenticationDetailsProvider: this.#provider }).summarizeMetricsData(
+                    {
+                        compartmentId: data.compartmentId,
+                        summarizeMetricsDataDetails: {
+                            namespace: "oci_blockstore",
+                            query: `(VolumeGuaranteedThroughput[${interval}m]{resourceId = "${data.id}"}.mean())`,
+                            startTime: new Date( Date.now() - days * 24 * 60 * 60 * 1000),
+                            endTime: new Date(),
+                        }
+                    }
+                ).then(result=>{
+                    if(result.items && result.items[0] && result.items[0].aggregatedDatapoints){
+                        resolve(result.items[0].aggregatedDatapoints)
+                    }else{
+                        resolve(null);
+                    }
+    
+                   }).catch(error=>{
+                       reject(error)
+                   })
+               }, 500)
+               
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+               this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+               reject(error.message || error)
+            }
+       })
     }
 }
 

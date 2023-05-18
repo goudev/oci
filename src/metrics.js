@@ -18,21 +18,30 @@ class Metrics {
          */
         return new Promise(async (resolve, reject) => {
 
-            /** Obtém as metricas do disco
+            /** Obtém as metricas dos discos
              */
             try {
                 bv.metrics = {}
-                bv.metrics.last1 = {}
-                await new Monitoring(this.#provider).getVolumeReadThroughput(bv, 1).then(async metrics => {
-                    bv.metrics.last1.readThroughputInMBs = metrics;
+                bv.metrics.last24h = {}
+                bv.metrics.last24hAverage = {}
+                await new Monitoring(this.#provider).getVolumeReadThroughputByIntervals(bv, 1).then(async metrics => {
+                    bv.metrics.last24h.readThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeWriteThroughput(bv, 1).then(async metrics => {
-                    bv.metrics.last1.writeThroughputInMBs = metrics;
+                await new Monitoring(this.#provider).getVolumeWriteThroughputByIntervals(bv, 1).then(async metrics => {
+                    bv.metrics.last24h.writeThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeGuaranteedThroughput(bv, 1).then(async metrics => {
-                    bv.metrics.last1.guaranteedThroughputInMBs = metrics;
+                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputByIntervals(bv, 1).then(async metrics => {
+                    bv.metrics.last24h.guaranteedThroughputInMBs = metrics;
                 });
-                //console.log(bv)
+                await new Monitoring(this.#provider).getVolumeReadThroughputAverage(bv, 1).then(async metrics => {
+                    bv.metrics.last24hAverage.readThroughputInMBs = metrics;
+                });
+                await new Monitoring(this.#provider).getVolumeWriteThroughputAverage(bv, 1).then(async metrics => {
+                    bv.metrics.last24hAverage.writeThroughputInMBs = metrics;
+                });
+                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(bv, 1).then(async metrics => {
+                    bv.metrics.last24hAverage.guaranteedThroughputInMBs = metrics;
+                });
                 
                 /**
                  * Retorna
