@@ -29,7 +29,8 @@ class Usage {
       let currentMonth = new Date();
       let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
 
-      const services = {};
+      const categories = [];
+      const data = []
 
       for (let i = 0; i <= 12; i++) {
         const usageDetails = {
@@ -47,37 +48,17 @@ class Usage {
         let amount = 0;
 
         for (const item of result.usageAggregation.items) {
-          if (item.service === ' ') continue;
-
           amount += item.computedAmount;
-          if (!services[item.service]) {
-            services[item.service] = {};
-            Object.assign(services[item.service], { [month]: amount });
-          } else {
-            Object.assign(services[item.service], { [month]: amount });
-          }
         }
 
-        for(const service in services){
-          if(!(month in services[service])){
-            Object.assign(services[service], { [month]: 0 })
-          }
-        }
-
+        data.unshift(amount);
+        categories.unshift(month);
+  
         currentMonth.setMonth(currentMonth.getMonth() - 1);
         lastMonth.setMonth(lastMonth.getMonth() - 1);
       }
 
-      const series = [];
-      for (const service in services) {
-        const data = []
-        for (const month in services[service]) {
-          data.push(services[service][month])
-        }
-        series.push({ name: service, data })
-      }
-
-      console.log(series)
+      return { categories, data }
       // categories.add(String(item.timeUsageStarted).slice(0, 7) + '-01T00:00:00.000Z');
 
       // const overview = {};
