@@ -1,5 +1,6 @@
 let Util = require("./util");
 const usageapi = require("oci-usageapi");
+const { setTimeout } = require('timers/promises');
 
 class Usage {
 
@@ -16,6 +17,120 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
+  async listAccountOverview(startDate, endDate) {
+    try {
+      /**
+       * Usage API client
+      */
+      const client = new usageapi.UsageapiClient({
+        authenticationDetailsProvider: this.#provider,
+      });
+
+      let currentMonth = new Date();
+      let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
+
+      const services = {};
+
+      for (let i = 0; i <= 12; i++) {
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(new Date(lastMonth)),
+          timeUsageEnded: this.#dateToUTC(new Date(currentMonth)),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ['currency', 'unit', 'service', 'skuName'],
+        };
+
+        const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
+
+        const month = String(lastMonth.toISOString()).slice(0, 7) + '-01T00:00:00.000Z';
+        let amount = 0;
+
+        for (const item of result.usageAggregation.items) {
+          if (item.service === ' ') continue;
+
+          amount += item.computedAmount;
+          if (!services[item.service]) {
+            services[item.service] = {};
+            Object.assign(services[item.service], { [month]: amount });
+          } else {
+            Object.assign(services[item.service], { [month]: amount });
+          }
+        }
+
+        for(const service in services){
+          if(!(month in services[service])){
+            Object.assign(services[service], { [month]: 0 })
+          }
+        }
+
+        currentMonth.setMonth(currentMonth.getMonth() - 1);
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+      }
+
+      const series = [];
+      for (const service in services) {
+        const data = []
+        for (const month in services[service]) {
+          data.push(services[service][month])
+        }
+        series.push({ name: service, data })
+      }
+
+      console.log(series)
+      // categories.add(String(item.timeUsageStarted).slice(0, 7) + '-01T00:00:00.000Z');
+
+      // const overview = {};
+
+      // let currentMonth = new Date();
+      // let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
+
+      /**
+       * Últimos 12 meses
+       */
+      // for(let i = 0; i <= 12; i++){
+      //   const currentDate = this.#setToFirstDay(currentMonth);
+      //   const lastDate = this.#setToFirstDay(lastMonth);
+
+      //   /**
+      //    * Detalhes do request
+      //    */
+      //   const usageDetails = {
+      //     tenantId: this.#provider.getTenantId(),
+      //     timeUsageStarted: this.#dateToUTC(new Date(lastDate)),
+      //     timeUsageEnded: this.#dateToUTC(new Date(currentDate)),
+      //     granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+      //     queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+      //     groupBy: ['currency', 'unit', 'service', 'skuName'],
+      //   };
+
+      //   /**
+      //    * Atualizar o "timeUsageStarted"
+      //    * Atualizar o "timeUsageEnded"
+      //    */
+      //   currentMonth.setMonth(currentMonth.getMonth() - 1);
+      //   lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+      //   /**
+      //    * Criar um objeto com cada um dos últimos 12 meses
+      //    */
+      //   overview[lastDate.slice(0, 7)] = {};
+
+      //   /**
+      //    * Fazer o request
+      //    */
+      //   const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
+      //   for(const item of result.usageAggregation.items){
+      //     services.add(item.service);
+      //   }
+      //   console.log(services)
+      // }
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
   listSummarizedUsageByService(startDate, endDate, granularity) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -30,13 +145,6 @@ class Usage {
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity[granularity],
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
           groupBy: ['currency', 'unit', 'service', 'skuName'],
-          // filter: {
-          //   operator: usageapi.models.Filter.Operator.And,
-          //   dimensions: [{
-          //     key: 'service',
-          //     value: service
-          //   }]
-          // },
         };
 
         const usageRequest = {
