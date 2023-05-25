@@ -17,6 +17,10 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
+  #setDateToTheFirstDay(date) {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0))
+  }
+
   async listAccountOverview() {
     try {
       /**
@@ -27,10 +31,15 @@ class Usage {
       });
 
       let currentMonth = new Date();
+      currentMonth.setMonth(currentMonth.getMonth() + 1);
+      currentMonth.setDate(1);
+
       let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
+      lastMonth.setMonth(lastMonth.getMonth() + 1);
+      lastMonth.setDate(1);
 
       const categories = [];
-      const data = []
+      const data = [];
 
       for (let i = 0; i <= 12; i++) {
         const usageDetails = {
@@ -53,60 +62,17 @@ class Usage {
 
         data.unshift(amount);
         categories.unshift(month);
-  
+
         currentMonth.setMonth(currentMonth.getMonth() - 1);
         lastMonth.setMonth(lastMonth.getMonth() - 1);
       }
 
-      return { categories, data }
-      // categories.add(String(item.timeUsageStarted).slice(0, 7) + '-01T00:00:00.000Z');
+      const history = {
+        currentMonth: data[data.length-1],
+        lastMonth: data[data.length-2]
+      };
 
-      // const overview = {};
-
-      // let currentMonth = new Date();
-      // let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
-
-      /**
-       * Últimos 12 meses
-       */
-      // for(let i = 0; i <= 12; i++){
-      //   const currentDate = this.#setToFirstDay(currentMonth);
-      //   const lastDate = this.#setToFirstDay(lastMonth);
-
-      //   /**
-      //    * Detalhes do request
-      //    */
-      //   const usageDetails = {
-      //     tenantId: this.#provider.getTenantId(),
-      //     timeUsageStarted: this.#dateToUTC(new Date(lastDate)),
-      //     timeUsageEnded: this.#dateToUTC(new Date(currentDate)),
-      //     granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
-      //     queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-      //     groupBy: ['currency', 'unit', 'service', 'skuName'],
-      //   };
-
-      //   /**
-      //    * Atualizar o "timeUsageStarted"
-      //    * Atualizar o "timeUsageEnded"
-      //    */
-      //   currentMonth.setMonth(currentMonth.getMonth() - 1);
-      //   lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-      //   /**
-      //    * Criar um objeto com cada um dos últimos 12 meses
-      //    */
-      //   overview[lastDate.slice(0, 7)] = {};
-
-      //   /**
-      //    * Fazer o request
-      //    */
-      //   const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
-      //   for(const item of result.usageAggregation.items){
-      //     services.add(item.service);
-      //   }
-      //   console.log(services)
-      // }
-
+      return { categories, data, history };
     } catch (error) {
       throw error;
     }
