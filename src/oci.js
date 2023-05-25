@@ -152,6 +152,10 @@ module.exports = class oci {
         return new BlockVolumes(this.#provider).listBlockVolumes();
     }
 
+    listBlockVolumesBackup() {
+        return new BlockVolumes(this.#provider).listBlockVolumesBackup();
+    }
+
     async* listBlockVolumesIterator() {
         const Volume = new BlockVolumes(this.#provider);
         for await (const volume of Volume.listBlockVolumesIterator()) {
@@ -191,8 +195,8 @@ module.exports = class oci {
         return new Compartments(this.#provider).listCompartments();
     }
 
-    listAccountOverview(startDate, endDate){
-        return new Usage(this.#provider).listAccountOverview(startDate, endDate);
+    listAccountOverview(){
+        return new Usage(this.#provider).listAccountOverview();
     }
 
     listSummarizedUsage({ resourceId, startDate, endDate, granularity }) {

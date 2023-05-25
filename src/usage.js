@@ -17,7 +17,7 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
-  async listAccountOverview(startDate, endDate) {
+  async listAccountOverview() {
     try {
       /**
        * Usage API client
@@ -137,7 +137,12 @@ class Usage {
         const result = await client.requestSummarizedUsages(usageRequest);
 
         const usageByService = {};
+        let storage = 0;
         for (const item of result.usageAggregation.items) {
+          if (item.service === 'Object Storage' || item.service === 'Block Storage' || item.service === 'File Storage') {
+            storage += item.computedAmount;
+            usageByService['Storage'] = storage;
+          }
           if (!isNaN(usageByService[item.service])) {
             usageByService[item.service] += item.computedAmount;
           } else {
