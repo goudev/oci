@@ -1,6 +1,6 @@
 let Util = require("./util");
 const usageapi = require("oci-usageapi");
-const { setTimeout } = require('timers/promises');
+const servicesListOCI = require('../servicesListOCI');
 
 class Usage {
 
@@ -17,8 +17,108 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
-  #setDateToTheFirstDay(date) {
-    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0))
+  async listAccountOverviewByService() {
+    try {
+      /**
+       * Defining the client to get the information
+       */
+      const client = new usageapi.UsageapiClient({
+        authenticationDetailsProvider: this.#provider,
+      });
+
+      /**
+       * Getting the month's scope
+       */
+      let monthEndFirstDate = new Date();
+      monthEndFirstDate.setMonth(monthEndFirstDate.getMonth() + 1);
+      monthEndFirstDate.setDate(1);
+
+      let monthStartFirstDate = new Date();
+      monthStartFirstDate.setDate(1);
+
+      /**
+       * Defining the lists we will need to return
+       */
+      const categories = [];
+      const series = [];
+      const services = {};
+
+      /**
+       * Populating an object with all the services OCI have
+       */
+      servicesListOCI.forEach(service => {
+        services[service] = {};
+      });
+
+      /**
+       * Get the data of the last last 12 months
+       */
+      for (let i = 0; i <= 12; i++) {
+        /**
+         * Adding the month key to each service in the object
+        */
+        const monthString = String(monthStartFirstDate.toISOString()).slice(0, 7) + '-01T00:00:00.000Z';
+
+        for(const service in services) {
+          services[service][monthString] = 0;
+        }
+
+        /**
+         * Adding the month to a separated array
+         */
+        categories.push(monthString);
+        
+        /**
+         * Request details
+         */
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(new Date(monthStartFirstDate)),
+          timeUsageEnded: this.#dateToUTC(new Date(monthEndFirstDate)),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ['currency', 'unit', 'service'],
+        };
+
+        /**
+         * Making the request
+         */
+        const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
+        const { items } = result.usageAggregation;
+
+        /**
+         * Summing the cost for each specific month
+         */
+        items.forEach(usage => {
+          if(!usage.computedAmount) {
+            services[usage.service][monthString] += 0;
+          } else {
+            services[usage.service][monthString] += usage.computedAmount;
+          }
+        });
+
+        /**
+         * Changing the months
+        */
+       monthEndFirstDate.setMonth(monthEndFirstDate.getMonth() - 1);
+       monthStartFirstDate.setMonth(monthStartFirstDate.getMonth() - 1);
+      }
+
+      /**
+       * Formatting the output
+       */
+      for (const service in services) {
+        const data = [];
+        for (const month in services[service]){
+          data.push(services[service][month]);
+        }
+        series.push({ name: service === ' ' ? 'Outros' : service, data });
+      }
+
+      return { series, categories };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async listAccountOverview() {
@@ -34,8 +134,7 @@ class Usage {
       currentMonth.setMonth(currentMonth.getMonth() + 1);
       currentMonth.setDate(1);
 
-      let lastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
-      lastMonth.setMonth(lastMonth.getMonth() + 1);
+      let lastMonth = new Date();
       lastMonth.setDate(1);
 
       const categories = [];
@@ -68,8 +167,8 @@ class Usage {
       }
 
       const history = {
-        currentMonth: data[data.length-1],
-        lastMonth: data[data.length-2]
+        currentMonth: data[data.length - 1],
+        lastMonth: data[data.length - 2]
       };
 
       return { categories, data, history };
