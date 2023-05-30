@@ -33,5 +33,7 @@ module.exports = [
   'Content Management - DEV',
   ' ',
   'Edge Services',
-  'Oracle Web Application Firewall (WAF)'
+  'Oracle Web Application Firewall (WAF)',
+  'Integration Service',
+  'NoSQL Database'
 ];
