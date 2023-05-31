@@ -18,7 +18,7 @@ class Usage {
   }
 
   async listAccountOverviewByService() {
-    try {
+    return new Promise(async(resolve, reject) => {
       /**
        * Defining the client to get the information
        */
@@ -115,14 +115,12 @@ class Usage {
         series.push({ name: service === ' ' ? 'Outros' : service, data });
       }
 
-      return { series, categories };
-    } catch (error) {
-      console.log(error);
-    }
+      resolve ({ series, categories })
+    })
   }
 
   async listAccountOverview() {
-    try {
+    return new Promise(async(resolve, reject) => {
       /**
        * Usage API client
       */
@@ -171,10 +169,8 @@ class Usage {
         lastMonth: data[data.length - 2]
       };
 
-      return { categories, data, history };
-    } catch (error) {
-      throw error;
-    }
+      resolve ({ categories, data, history })
+    })
   }
 
   listSummarizedUsageByService(startDate, endDate, granularity) {
