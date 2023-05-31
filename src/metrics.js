@@ -48,7 +48,8 @@ class Metrics {
                  */
                 resolve(bv)
             } catch (error) {
-                reject("Erro ao consultar o disco " + bv.id + "\n\n" + error)
+                console.log("Erro ao consultar o disco " + bv.id + "\n\n" + error)
+                resolve()
             }
             
         
@@ -86,7 +87,8 @@ class Metrics {
                  */
                 resolve(ins)
             } catch (error) {
-                reject("Erro ao consultar a instance " + ins.id + "\n\n" + error)
+                console.log("Erro ao consultar a instance " + ins.id + "\n\n" + error)
+                resolve()
             }
             
         
