@@ -128,7 +128,19 @@ class Usage {
         for (const month in services[service]){
           data.push(services[service][month]);
         }
-        series.push({ name: service === ' ' ? 'Outros' : service, data });
+
+        let improvement = 0;
+        if (data[0] !== 0 && data[1] !== 0) {
+          improvement = (data[0] - data[1]) / data[1] * 100;
+        } else if (data[1] === 0) {
+          improvement = 100;
+        }
+
+        series.push({
+          name: service === ' ' ? 'Outros' : service,
+          data,
+          improvement,
+        });
       }
 
       resolve ({ series, categories })
