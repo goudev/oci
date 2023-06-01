@@ -17,6 +17,22 @@ class Usage {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
   }
 
+  async listAccountConfig() {
+    try {
+      const client = new usageapi.UsageapiClient({
+        authenticationDetailsProvider: this.#provider,
+      });
+
+      const result = await client.requestSummarizedConfigurations({
+        tenantId: this.#provider.getTenantId(),
+      });
+
+      return result
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async listAccountOverviewByService() {
     return new Promise(async(resolve, reject) => {
       /**

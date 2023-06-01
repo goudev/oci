@@ -195,6 +195,10 @@ module.exports = class oci {
         return new Compartments(this.#provider).listCompartments();
     }
 
+    listAccountConfig() {
+        return new Usage(this.#provider).listAccountConfig();
+    }
+
     listAccountOverview(){
         return new Usage(this.#provider).listAccountOverview();
     }
