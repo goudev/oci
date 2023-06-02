@@ -22,6 +22,7 @@ var Users = require("./users")
 var Groups = require("./groups")
 var Policies = require("./policies")
 var Metrics = require('./metrics')
+var Subscription = require('./subscription')
 
 module.exports = class oci {
 
@@ -448,5 +449,9 @@ module.exports = class oci {
 
     getInstanceMetrics(ins) {
         return new Metrics(this.#provider).getInstanceMetrics(ins)
+    }
+
+    listSubscriptions() {
+        return new Subscription(this.#provider).listSubscriptions()
     }
 }

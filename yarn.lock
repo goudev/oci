@@ -2152,6 +2152,25 @@
     "sshpk" "1.16.1"
     "uuid" "3.3.3"
 
+"oci-common@2.62.0":
+  "integrity" "sha512-AVFPROwXqpmoWcNcFISNdUDaCrmXHvzgdmHkmGF4OF7ixbTWYAwhGZwiHJyNM5ldip8RcuKx4UaHHvKGclMafA=="
+  "resolved" "https://registry.npmjs.org/oci-common/-/oci-common-2.62.0.tgz"
+  "version" "2.62.0"
+  dependencies:
+    "@types/isomorphic-fetch" "0.0.35"
+    "@types/jsonwebtoken" "9.0.0"
+    "@types/jssha" "2.0.0"
+    "@types/opossum" "4.1.1"
+    "@types/sshpk" "1.10.3"
+    "es6-promise" "4.2.6"
+    "http-signature" "1.3.1"
+    "isomorphic-fetch" "3.0.0"
+    "jsonwebtoken" "9.0.0"
+    "jssha" "2.4.1"
+    "opossum" "5.0.1"
+    "sshpk" "1.16.1"
+    "uuid" "3.3.3"
+
 "oci-containerengine@^2.54.0":
   "integrity" "sha512-c5RKNXUW0+OlsLKlIw2Zl/3gM/ltvm5W5CUcYTIRK2OkasXy1BiqbNafgFCsXiOt5TXMKwZ2eSXQsRM2FIhYKQ=="
   "resolved" "https://registry.npmjs.org/oci-containerengine/-/oci-containerengine-2.54.0.tgz"
@@ -2217,6 +2236,14 @@
     "oci-common" "2.55.1"
     "oci-workrequests" "2.55.1"
 
+"oci-osuborganizationsubscription@^2.62.0":
+  "integrity" "sha512-kslNTB7Rfo0/wrbyShPLjLW9qRDMXaRHlt0hJiXV/KBK6ywBbxIQSi96Uhf1wg/IhH6ap8FzzMWtSWHHIJEOJQ=="
+  "resolved" "https://registry.npmjs.org/oci-osuborganizationsubscription/-/oci-osuborganizationsubscription-2.62.0.tgz"
+  "version" "2.62.0"
+  dependencies:
+    "oci-common" "2.62.0"
+    "oci-workrequests" "2.62.0"
+
 "oci-resourcesearch@^2.50.0":
   "integrity" "sha512-zRokZpJ+sqoQoG4oO/eg+pdmcBKyOpM+mKsjjRTfohrCjawekUHLtOKFiwcxsNMYwdP1b7WUgwmRulQSgjaRrw=="
   "resolved" "https://registry.npmjs.org/oci-resourcesearch/-/oci-resourcesearch-2.50.0.tgz"
@@ -2272,6 +2299,14 @@
   dependencies:
     "oci-common" "2.55.1"
     "oci-workrequests" "2.55.1"
+
+"oci-workrequests@2.62.0":
+  "integrity" "sha512-AEXmasR+XPqJVA0KMZ2ysuhlGFhbVffxAqVwN6ZQKgwk/quDo4XiAzhL+20dI9XfPsw0ESnOCjBDAucFtSxDZw=="
+  "resolved" "https://registry.npmjs.org/oci-workrequests/-/oci-workrequests-2.62.0.tgz"
+  "version" "2.62.0"
+  dependencies:
+    "oci-common" "2.62.0"
+    "oci-workrequests" "2.62.0"
 
 "once@^1.3.0":
   "integrity" "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="
