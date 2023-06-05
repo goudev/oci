@@ -33,6 +33,47 @@ class Usage {
     }
   }
 
+  async listAccountOverviewFromTime(timeStart, timeEnd) {
+    try {
+      const client = new usageapi.UsageapiClient({
+        authenticationDetailsProvider: this.#provider,
+      });
+
+      timeStart = new Date(timeStart);
+      timeEnd = new Date(timeEnd) > new Date() ? new Date() : new Date(timeEnd);
+
+      let controller = new Date(timeStart);
+      controller.setMonth(timeStart.getMonth() + 1);
+
+      let currentSpent = 0;
+
+      while (timeStart < timeEnd) {
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(new Date(timeStart)),
+          timeUsageEnded: this.#dateToUTC(new Date(controller)),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ['currency', 'unit', 'service'],
+        };
+
+        const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
+        const { items } = result.usageAggregation;
+        
+        items.forEach(usage => {
+          currentSpent += usage.computedAmount;
+        });
+
+        timeStart.setMonth(timeStart.getMonth() + 1);
+        controller.setMonth(controller.getMonth() + 1);
+      }
+      
+      return currentSpent;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async listAccountOverviewByService() {
     return new Promise(async(resolve, reject) => {
       /**

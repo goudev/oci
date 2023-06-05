@@ -1,4 +1,5 @@
 let Util = require("./util");
+let Usage = require('./usage');
 const subscription = require('oci-osuborganizationsubscription')
 
 class Subscription {
@@ -15,33 +16,29 @@ class Subscription {
     /**
      * Obtem a lista de todos subscriptions
      */
-    listSubscriptions() {
+    async listSubscriptions() {
+        try {
+            const client =  new subscription.OrganizationSubscriptionClient({authenticationDetailsProvider: this.#provider});
 
-        /**
-         * Retorna a promise
-         */
-        return new Promise(async (resolve, reject) => {
-
-            var subscriptions = []
-
-            /**
-             * Consulta a lista de subscriptions
-             */
-            new subscription.OrganizationSubscriptionClient({authenticationDetailsProvider: this.#provider}).listOrganizationSubscriptions({
+            const result = await client.listOrganizationSubscriptions({
                 compartmentId: this.#provider.getTenantId(),
-            }).then(async subs => {
-                subs.items.forEach(sub => {
-                    subscriptions.push(sub)
-                })
+            });
+            
+            const { items } = result;
 
-                /**
-                * Retorna
-                */
-                resolve(subscriptions)
-            }).catch(error => {
-                reject(error);
-            })
-        })
+            const contracts = [];
+
+            for (const contract of items) {
+                const usage = new Usage(this.#provider)
+                let currentSpent = await usage.listAccountOverviewFromTime(contract.timeStart, contract.timeEnd);
+                contract.currentSpent = String(currentSpent);
+                contracts.push(contract);
+            }
+
+            return result.items;
+        } catch (error) {
+            throw error;
+        }
     }
 
 }
