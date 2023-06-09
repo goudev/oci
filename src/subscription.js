@@ -1,6 +1,6 @@
 let Util = require("./util");
 let Usage = require('./usage');
-const subscription = require('oci-osuborganizationsubscription')
+const subscription = require('oci-osuborganizationsubscription');
 
 class Subscription {
 
@@ -37,7 +37,9 @@ class Subscription {
 
             return result.items;
         } catch (error) {
-            throw error;
+            if (error.statusCode && error.statusCode === 401) {
+                return [{ serviceName: 'Pay as you go' }];
+            }
         }
     }
 
