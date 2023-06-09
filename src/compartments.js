@@ -80,6 +80,10 @@ class Compartments {
                     resources.push(item);
                 });
 
+                for(const comp of resources) {
+                    comp.recursiveCompartment = await this.compartmentPath(comp.id)
+                }
+
                 /**
                  * Valida se tem mais dados para serem buscados
                  */
