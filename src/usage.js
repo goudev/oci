@@ -59,7 +59,7 @@ class Usage {
 
         const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
         const { items } = result.usageAggregation;
-        
+
         items.forEach(usage => {
           currentSpent += usage.computedAmount;
         });
@@ -67,7 +67,7 @@ class Usage {
         timeStart.setMonth(timeStart.getMonth() + 1);
         controller.setMonth(controller.getMonth() + 1);
       }
-      
+
       return currentSpent;
     } catch (error) {
       throw error;
@@ -75,7 +75,7 @@ class Usage {
   }
 
   async listAccountOverviewByService() {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       /**
        * Defining the client to get the information
        */
@@ -116,7 +116,7 @@ class Usage {
         */
         const monthString = String(monthStartFirstDate.toISOString()).slice(0, 7) + '-01T00:00:00.000Z';
 
-        for(const service in services) {
+        for (const service in services) {
           services[service][monthString] = 0;
         }
 
@@ -124,7 +124,7 @@ class Usage {
          * Adding the month to a separated array
          */
         categories.push(monthString);
-        
+
         /**
          * Request details
          */
@@ -147,7 +147,7 @@ class Usage {
          * Summing the cost for each specific month
          */
         items.forEach(usage => {
-          if(!usage.computedAmount) {
+          if (!usage.computedAmount) {
             services[usage.service][monthString] += 0;
           } else {
             services[usage.service][monthString] += usage.computedAmount;
@@ -157,8 +157,8 @@ class Usage {
         /**
          * Changing the months
         */
-       monthEndFirstDate.setMonth(monthEndFirstDate.getMonth() - 1);
-       monthStartFirstDate.setMonth(monthStartFirstDate.getMonth() - 1);
+        monthEndFirstDate.setMonth(monthEndFirstDate.getMonth() - 1);
+        monthStartFirstDate.setMonth(monthStartFirstDate.getMonth() - 1);
       }
 
       /**
@@ -166,7 +166,7 @@ class Usage {
        */
       for (const service in services) {
         const data = [];
-        for (const month in services[service]){
+        for (const month in services[service]) {
           data.push(services[service][month]);
         }
 
@@ -184,12 +184,12 @@ class Usage {
         });
       }
 
-      resolve ({ series, categories })
+      resolve({ series, categories })
     })
   }
 
   async listAccountOverview() {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       /**
        * Usage API client
       */
@@ -238,7 +238,7 @@ class Usage {
         lastMonth: data[data.length - 2]
       };
 
-      resolve ({ categories, data, history })
+      resolve({ categories, data, history })
     })
   }
 
@@ -249,48 +249,75 @@ class Usage {
           authenticationDetailsProvider: this.#provider,
         });
 
-        const usageDetails = {
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(startDate),
-          timeUsageEnded: this.#dateToUTC(endDate),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity[granularity],
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ['currency', 'unit', 'service', 'skuName'],
-        };
+        const usageByServiceCurrent = {};
+        const usageByServiceLast = {};
 
-        const usageRequest = {
-          requestSummarizedUsagesDetails: usageDetails,
-          limit: 1,
-          page: 1
-        };
+        for (let i = 0; i < 2; i++) {
+          const result = await client.requestSummarizedUsages({
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: this.#dateToUTC(startDate),
+              timeUsageEnded: this.#dateToUTC(endDate),
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity[granularity],
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ['currency', 'unit', 'service', 'skuName'],
+            }
+          });
 
-        const result = await client.requestSummarizedUsages(usageRequest);
+          const { items } = result.usageAggregation;
 
-        const usageByService = {};
-        let storage = 0;
-        for (const item of result.usageAggregation.items) {
-          if (item.service === 'Object Storage' || item.service === 'Block Storage' || item.service === 'File Storage') {
-            storage += item.computedAmount;
-            usageByService['Storage'] = storage;
+          let storage = 0;
+          if (i === 0) { // Current month
+            for (const item of items) {
+              if (item.service.match(/storage/i)) {
+                storage += item.computedAmount;
+                usageByServiceCurrent['Storage'] = storage;
+              }
+              if (!isNaN(usageByServiceCurrent[item.service])) {
+                usageByServiceCurrent[item.service] += item.computedAmount;
+              } else {
+                usageByServiceCurrent[item.service] = 0;
+              }
+            }
+          } else { // Last month
+            for (const item of items) {
+              if (item.service.match(/storage/i)) {
+                storage += item.computedAmount;
+                usageByServiceLast['Storage'] = storage;
+              }
+              if (!isNaN(usageByServiceLast[item.service])) {
+                usageByServiceLast[item.service] += item.computedAmount;
+              } else {
+                usageByServiceLast[item.service] = 0;
+              }
+            }
           }
-          if (!isNaN(usageByService[item.service])) {
-            usageByService[item.service] += item.computedAmount;
-          } else {
-            usageByService[item.service] = 0;
-          }
+
+          startDate.setMonth(startDate.getMonth() - 1);
+          endDate.setMonth(endDate.getMonth() - 1);
         }
 
-        for (const service in usageByService) {
-          const formatted = usageByService[service].toLocaleString('pt-BR', {
+        for (const service in usageByServiceCurrent) {
+          let improvement = 0;
+          if (usageByServiceCurrent[service] !== 0 && usageByServiceLast[service] !== 0) {
+            improvement = (usageByServiceCurrent[service] - usageByServiceLast[service]) / usageByServiceLast[service] * 100;
+          } else if (usageByServiceLast[service] === 0) {
+            improvement = 0;
+          }
+          
+          const formatted = usageByServiceCurrent[service].toLocaleString('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 2,
           });
-
-          usageByService[service] = formatted;
+          
+          usageByServiceCurrent[service] = {
+            value: formatted,
+            improvement
+          };
         }
-
-        resolve(usageByService);
+        
+        resolve(usageByServiceCurrent);
       } catch (error) {
         reject(error);
       }
