@@ -23,7 +23,8 @@ class Metrics {
             try {
                 bv.metrics = {}
                 bv.metrics.last24h = {}
-                bv.metrics.last24hAverage = {}
+                bv.metrics.last30dAverage = {}
+
                 await new Monitoring(this.#provider).getVolumeReadThroughputByIntervals(bv, 1).then(async metrics => {
                     bv.metrics.last24h.readThroughputInMBs = metrics;
                 });
@@ -33,14 +34,14 @@ class Metrics {
                 await new Monitoring(this.#provider).getVolumeGuaranteedThroughputByIntervals(bv, 1).then(async metrics => {
                     bv.metrics.last24h.guaranteedThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeReadThroughputAverage(bv, 1).then(async metrics => {
-                    bv.metrics.last24hAverage.readThroughputInMBs = metrics;
+                await new Monitoring(this.#provider).getVolumeReadThroughputAverage(bv, 7).then(async metrics => {
+                    bv.metrics.last30dAverage.readThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeWriteThroughputAverage(bv, 1).then(async metrics => {
-                    bv.metrics.last24hAverage.writeThroughputInMBs = metrics;
+                await new Monitoring(this.#provider).getVolumeWriteThroughputAverage(bv, 7).then(async metrics => {
+                    bv.metrics.last30dAverage.writeThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(bv, 1).then(async metrics => {
-                    bv.metrics.last24hAverage.guaranteedThroughputInMBs = metrics;
+                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(bv, 7).then(async metrics => {
+                    bv.metrics.last30dAverage.guaranteedThroughputInMBs = metrics;
                 });
                 
                 /**
@@ -68,18 +69,18 @@ class Metrics {
             try {
                 ins.metrics = {}
                 ins.metrics.last24h = {}
-                ins.metrics.last24hAverage = {}
+                ins.metrics.last30dAverage = {}
                 await new Monitoring(this.#provider).getCpuUsageByIntervals(ins, 1).then(async metrics => {
                     ins.metrics.last24h.cpu = metrics;
                 });
                 await new Monitoring(this.#provider).getMemoryUsageByIntervals(ins, 1).then(async metrics => {
                     ins.metrics.last24h.memory = metrics;
                 });
-                await new Monitoring(this.#provider).getCpuUsageAverage(ins, 1).then(async metrics => {
-                    ins.metrics.last24hAverage.cpu = metrics;
+                await new Monitoring(this.#provider).getCpuUsageAverage(ins, 7).then(async metrics => {
+                    ins.metrics.last30dAverage.cpu = metrics;
                 });
-                await new Monitoring(this.#provider).getMemoryUsageAverage(ins, 1).then(async metrics => {
-                    ins.metrics.last24hAverage.memory = metrics;
+                await new Monitoring(this.#provider).getMemoryUsageAverage(ins, 7).then(async metrics => {
+                    ins.metrics.last30dAverage.memory = metrics;
                 });
                 
                 /**
