@@ -34,13 +34,13 @@ class Metrics {
                 await new Monitoring(this.#provider).getVolumeGuaranteedThroughputByIntervals(bv, 1).then(async metrics => {
                     bv.metrics.last24h.guaranteedThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeReadThroughputAverage(bv, 7).then(async metrics => {
+                await new Monitoring(this.#provider).getVolumeReadThroughputAverage(bv, 30).then(async metrics => {
                     bv.metrics.last30dAverage.readThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeWriteThroughputAverage(bv, 7).then(async metrics => {
+                await new Monitoring(this.#provider).getVolumeWriteThroughputAverage(bv, 30).then(async metrics => {
                     bv.metrics.last30dAverage.writeThroughputInMBs = metrics;
                 });
-                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(bv, 7).then(async metrics => {
+                await new Monitoring(this.#provider).getVolumeGuaranteedThroughputAverage(bv, 30).then(async metrics => {
                     bv.metrics.last30dAverage.guaranteedThroughputInMBs = metrics;
                 });
                 
@@ -76,10 +76,10 @@ class Metrics {
                 await new Monitoring(this.#provider).getMemoryUsageByIntervals(ins, 1).then(async metrics => {
                     ins.metrics.last24h.memory = metrics;
                 });
-                await new Monitoring(this.#provider).getCpuUsageAverage(ins, 7).then(async metrics => {
+                await new Monitoring(this.#provider).getCpuUsageAverage(ins, 30).then(async metrics => {
                     ins.metrics.last30dAverage.cpu = metrics;
                 });
-                await new Monitoring(this.#provider).getMemoryUsageAverage(ins, 7).then(async metrics => {
+                await new Monitoring(this.#provider).getMemoryUsageAverage(ins, 30).then(async metrics => {
                     ins.metrics.last30dAverage.memory = metrics;
                 });
                 
