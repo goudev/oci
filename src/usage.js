@@ -27,8 +27,19 @@ class Usage {
         tenantId: this.#provider.getTenantId(),
       });
 
-      return result
+      const { items } = result.configurationAggregation;
+
+      const accountConfig = {};
+      for (const config of items) {
+        const { key, values } = config;
+        accountConfig[key] = values;
+      }
+
+      return accountConfig;
     } catch (error) {
+      if(error.statusCode === 503) {
+        throw error.message;
+      }
       throw error;
     }
   }
