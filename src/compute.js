@@ -68,43 +68,51 @@ class Compute {
     }
 
     /**
-     * Obtem a lista de todos os vnics
+     * Obtem a lista de todas as images
      */
-    listImages(){
-        
+    async listImages() {
+
         /**
          * Retorna a promise
          */
-        return new Promise(async(resolve,reject)=>{
+        return new Promise(async (resolve, reject) => {
 
-            /**
-             * Define um array para armazenar
-             */
-            var limagesList = [];
-
-            /**
-             * Consulta a lista de bootVolumes
-             */
-            new resourceSearch(this.#provider).find("image resources where (lifecycleState = 'AVAILABLE')").then(async imgs=>{
-                
+            try {
                 /**
-                 * Varre a lista de boot volumes
+                 * Obtem a lista de Instancias
                  */
-                for (const img of imgs) {
-                    await this.getImage(img.identifier).then(i=>{
-                        limagesList.push(i);
-                    }).catch(error=>{
-                        console.log("Erro ao consultar a imagem " + img.identifier + "\n\n" + error)
+                var instances = []
+                await this.listInstances().then(async insts => {
+                    insts.forEach(async i => {
+                        instances.push(i)
+                    })
+                })
+                /**
+                 * Obtem a lista de images
+                 */
+                var images = [];
+                for (const inst of instances) {
+                    /**
+                     * Obtem a lista de images
+                     */
+                    await this.getImage(inst.imageId).then(image => {
+                        images.push(image)
+                    }).catch(error => {
+                        reject(`Erro ao consultar a image ${inst.imageId}. ` + error)
                     })
                 }
-
+                resolve(images)
+            } catch (error) {
                 /**
-                 * Retorna
+                 * Rejeita a promise
                  */
-                resolve(limagesList)
-            }).catch(error=>{
-                reject(error);
-            })
+                reject(error.message || error)
+            }
+
+            
+                
+        }).catch(error => {
+            reject(error)
         })
     }
 
