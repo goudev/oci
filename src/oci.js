@@ -203,9 +203,9 @@ module.exports = class oci {
     listAccountOverview(){
         return new Usage(this.#provider).listAccountOverview();
     }
-
-    listAccountOverviewByService(){
-        return new Usage(this.#provider).listAccountOverviewByService();
+    
+    listAccountOverviewByService(services){
+        return new Usage(this.#provider).listAccountOverviewByService(services);
     }
 
     listSummarizedUsage({ resourceId, startDate, endDate, granularity }) {
