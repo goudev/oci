@@ -115,6 +115,15 @@ class Network {
                             reject(error)
                         })
                     }
+
+                    await this.listVnicAttachments(this.#provider.getTenantId()).then(result=>{
+                        result.forEach(b => {
+                            vnicsa.push(b)
+                        });
+                    }).catch(error=>{
+                        reject(error)
+                    })
+
                     resolve(vnicsa)
                 }).catch(error=>{
 
