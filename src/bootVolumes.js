@@ -185,6 +185,14 @@ class BootVolume {
                             reject(error.message || error)
                         })
                     }
+
+                    await this.listBootVolumeAttachments(this.#provider.getTenantId()).then(result=>{
+                        result.forEach(b => {
+                            bva.push(b)
+                        });
+                    }).catch(error=>{
+                        reject(error.message || error)
+                    })
                     resolve(bva)
                 }).catch(error=>{
 
