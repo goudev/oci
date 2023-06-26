@@ -45,7 +45,7 @@ class Usage {
     const categories = [];
 
     for (let i = 0; i <= quantity; i++) {
-      const monthString = String(this.#dateToUTC(new Date()));
+      const monthString = new Date(String(this.#dateToUTC(monthStartFirstDate)));
       categories.push(monthString);
       monthStartFirstDate.setMonth(monthStartFirstDate.getMonth() - 1);
     }
@@ -180,7 +180,6 @@ class Usage {
 
         for (let i = 0; i <= 11; i++) {
           const result = await this.showServiceUsage(service, monthStartFirstDate, monthEndFirstDate);
-
           /**
            * Summing the value of each month
           */
@@ -206,8 +205,22 @@ class Usage {
         series.push({ name: service, data, improvement });
       }
 
+      /**
+       * Merging storage services
+       */
+      const storageData = [];
+      for (const service of series) {
+        if (service.name.match(/storage/i) || service.name.match(/store/i)) {
+            for (let i = 0; i < service.data.length; i++) {
+              if(!storageData[i]) storageData[i] = service.data[i];
+              else storageData[i] += service.data[i];
+            }
+        }
+      }
+
+      series.push({ name: 'STORAGE', data: storageData })
       const categories = this.#listUsageCategories(11);
-      return { series, categories };
+      return { categories, series};
     } catch (error) {
       throw error;
     }
