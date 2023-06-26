@@ -1,6 +1,6 @@
 let Util = require("./util");
 const usageapi = require("oci-usageapi");
-const servicesListOCI = require('../servicesListOCI');
+const { DateTime } = require('luxon');
 
 class Usage {
 
@@ -14,7 +14,7 @@ class Usage {
   }
 
   #dateToUTC(date) {
-    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDay(), 0, 0, 0, 0))
+    return new Date(DateTime.fromJSDate(date).toUTC().toFormat('ccc LLL d 00:00:00 \'UTC\' yyyy'));
   }
 
   /**
@@ -38,6 +38,21 @@ class Usage {
     return improvement;
   }
 
+  #listUsageCategories(quantity) {
+    let monthStartFirstDate = new Date();
+    monthStartFirstDate.setDate(1);
+
+    const categories = [];
+
+    for (let i = 0; i <= quantity; i++) {
+      const monthString = String(this.#dateToUTC(new Date()));
+      categories.push(monthString);
+      monthStartFirstDate.setMonth(monthStartFirstDate.getMonth() - 1);
+    }
+
+    return categories;
+  }
+
   async showServiceUsage(service, startDate, endDate) {
     try {
       const client = new usageapi.UsageapiClient({
@@ -48,19 +63,19 @@ class Usage {
         requestSummarizedUsagesDetails: {
           isAggregateByTime: true,
           tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(startDate),
-          timeUsageEnded: this.#dateToUTC(endDate),
+          timeUsageStarted: this.#dateToUTC(new Date(startDate)),
+          timeUsageEnded: this.#dateToUTC(new Date(endDate)),
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ['currency', 'unit'],
+          groupBy: ['service'],
           filter: {
-            operator: usageapi.models.Filter.Operator.Or,
+            operator: usageapi.models.Filter.Operator.And,
             dimensions: [
               {
-                key: "service",
+                key: 'service',
                 value: service
               }
-            ],
+            ]
           }
         }
       });
@@ -70,7 +85,7 @@ class Usage {
       throw error;
     }
   }
-  
+
   async listAccountConfig() {
     try {
       const client = new usageapi.UsageapiClient({
@@ -91,7 +106,7 @@ class Usage {
 
       return accountConfig;
     } catch (error) {
-      if(error.statusCode === 503) {
+      if (error.statusCode === 503) {
         throw error.message;
       }
       throw error;
@@ -144,37 +159,31 @@ class Usage {
       /**
        * Consulting each service
       */
-     const series = [];
-     const categories = new Set();
-     
-     for(const service of services) {
+      const series = [];
+    
+
+      for (const service of services) {
         /**
          * Getting the month's scope
          */
         let monthEndFirstDate = new Date();
         monthEndFirstDate.setMonth(monthEndFirstDate.getMonth() + 1);
         monthEndFirstDate.setDate(1);
-   
+
         let monthStartFirstDate = new Date();
         monthStartFirstDate.setDate(1);
-        
+
         /**
          * Consulting each month of the last year
         */
         const data = [];
 
-        for (let i = 0; i <= 12; i++) {
-          /**
-           * Save month's date
-           */
-          const monthString = String(monthStartFirstDate.toISOString()).slice(0, 7) + '-01T00:00:00.000Z';
-          categories.add(monthString);
-
+        for (let i = 0; i <= 11; i++) {
           const result = await this.showServiceUsage(service, monthStartFirstDate, monthEndFirstDate);
-          
+
           /**
            * Summing the value of each month
-           */
+          */
           let amount = 0;
 
           for (const item of result) {
@@ -197,6 +206,7 @@ class Usage {
         series.push({ name: service, data, improvement });
       }
 
+      const categories = this.#listUsageCategories(11);
       return { series, categories };
     } catch (error) {
       throw error;
@@ -319,19 +329,19 @@ class Usage {
           } else if (usageByServiceLast[service] === 0) {
             improvement = 0;
           }
-          
+
           const formatted = usageByServiceCurrent[service].toLocaleString('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 2,
           });
-          
+
           usageByServiceCurrent[service] = {
             value: formatted,
             improvement
           };
         }
-        
+
         resolve(usageByServiceCurrent);
       } catch (error) {
         reject(error);

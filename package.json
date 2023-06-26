@@ -18,6 +18,7 @@
   "homepage": "https://github.com/goudev/oci#readme",
   "dependencies": {
     "debug": "^4.3.4",
+    "luxon": "^3.3.0",
     "object-hash": "^3.0.0",
     "oci-announcementsservice": "^2.55.0",
     "oci-budget": "^2.55.1",
