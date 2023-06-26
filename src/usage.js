@@ -160,7 +160,7 @@ class Usage {
        * Consulting each service
       */
       const series = [];
-    
+
 
       for (const service of services) {
         /**
@@ -211,30 +211,33 @@ class Usage {
       const storageData = [];
       for (const service of series) {
         if (service.name.match(/storage/i) || service.name.match(/store/i)) {
-            for (let i = 0; i < service.data.length; i++) {
-              if(!storageData[i]) storageData[i] = service.data[i];
-              else storageData[i] += service.data[i];
-            }
+          for (let i = 0; i < service.data.length; i++) {
+            if (!storageData[i]) storageData[i] = service.data[i];
+            else storageData[i] += service.data[i];
+          }
         }
       }
 
       series.push({ name: 'STORAGE', data: storageData })
       const categories = this.#listUsageCategories(11);
-      return { categories, series};
+      return { categories, series };
     } catch (error) {
       throw error;
     }
   }
 
   async listAccountOverview() {
-    return new Promise(async (resolve, reject) => {
+    try {
       /**
-       * Usage API client
-      */
+       * Client to connect to the OCI
+       */
       const client = new usageapi.UsageapiClient({
         authenticationDetailsProvider: this.#provider,
       });
 
+      /**
+       * Setting up MONTH's scope
+       */
       let currentMonth = new Date();
       currentMonth.setMonth(currentMonth.getMonth() + 1);
       currentMonth.setDate(1);
@@ -242,30 +245,34 @@ class Usage {
       let lastMonth = new Date();
       lastMonth.setDate(1);
 
+      /**
+       * Valores agregados
+       */
       const categories = [];
       const data = [];
 
       for (let i = 0; i <= 12; i++) {
-        const usageDetails = {
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(new Date(lastMonth)),
-          timeUsageEnded: this.#dateToUTC(new Date(currentMonth)),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ['currency', 'unit', 'service', 'skuName'],
-        };
+        const result = await client.requestSummarizedUsages({
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(new Date(lastMonth)),
+            timeUsageEnded: this.#dateToUTC(new Date(currentMonth)),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          }
+        });
 
-        const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
+        const { items } = result.usageAggregation;
 
-        const month = String(lastMonth.toISOString()).slice(0, 7) + '-01T00:00:00.000Z';
         let amount = 0;
-
-        for (const item of result.usageAggregation.items) {
+        for (const item of items) {
           amount += item.computedAmount;
         }
 
-        data.unshift(amount);
-        categories.unshift(month);
+        const month = new Date(String(this.#dateToUTC(lastMonth)))
+
+        data.push(amount);
+        categories.push(month);
 
         currentMonth.setMonth(currentMonth.getMonth() - 1);
         lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -276,8 +283,10 @@ class Usage {
         lastMonth: data[data.length - 2]
       };
 
-      resolve({ categories, data, history })
-    })
+      return { categories, data, history };
+    } catch (error) {
+      throw error;
+    }
   }
 
   listSummarizedUsageByService(startDate, endDate, granularity) {
