@@ -57,9 +57,17 @@ class Usage {
     try {
       const client = new usageapi.UsageapiClient({
         authenticationDetailsProvider: this.#provider,
+      }, { 
+        retryConfiguration: {
+          delayStrategy: new common.ExponentialBackoffDelayStrategy(30),
+          terminationStrategy: new common.MaxTimeTerminationStrategy(60 * 60), 
+        }
       });
-
+      
       const result = await client.requestSummarizedUsages({
+        retryConfiguration: {
+          terminationStrategy: common.TerminationStrategy
+        },
         requestSummarizedUsagesDetails: {
           isAggregateByTime: true,
           tenantId: this.#provider.getTenantId(),
