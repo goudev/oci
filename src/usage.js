@@ -226,7 +226,8 @@ class Usage {
         }
       }
 
-      series.push({ name: 'STORAGE', data: storageData })
+      const improvement = this.#calcImprovement(storageData[0], storageData[1]);
+      series.push({ name: 'STORAGE', data: storageData, improvement })
       const categories = this.#listUsageCategories(11);
       return { categories, series };
     } catch (error) {
