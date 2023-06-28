@@ -1,5 +1,6 @@
 let Util = require("./util");
 const usageapi = require("oci-usageapi");
+const common = require("oci-common");
 const { DateTime } = require('luxon');
 
 class Usage {
@@ -288,8 +289,8 @@ class Usage {
       }
 
       const history = {
-        currentMonth: data[data.length - 1],
-        lastMonth: data[data.length - 2]
+        currentMonth: data[0],
+        lastMonth: data[1]
       };
 
       return { categories, data, history };
