@@ -453,6 +453,89 @@ class Usage {
       }
     })
   }
+
+  listInstancesUsage() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+
+        /**
+         * Client
+         */
+        const client = new usageapi.UsageapiClient({
+          authenticationDetailsProvider: this.#provider,
+        });
+
+        /**
+         * Usage details
+         */
+        let monthStart = new Date();
+        monthStart.setDate(1);
+
+        let monthEnd = new Date();
+        monthEnd.setMonth(monthEnd.getMonth() + 1);
+        monthEnd.setDate(1);
+
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["resourceId", "service"]
+        };
+
+        /**
+         * Request details
+         */
+        const usageRequest = {
+          requestSummarizedUsagesDetails: usageDetails
+        };
+
+        /**
+         * Making the request
+         */
+        const result = await client.requestSummarizedUsages(usageRequest)
+
+        /**
+         * Get only the instances
+         */
+        var instances = []
+        result.usageAggregation.items.forEach(ins => {
+          var instance = ins.resourceId?.split('.')
+          if(ins.service == 'Compute' && instance[1] == 'instance') {
+            instances.push(ins)
+          }
+        })
+
+        resolve(instances);
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
 }
 
 module.exports = Usage

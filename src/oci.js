@@ -454,4 +454,8 @@ module.exports = class oci {
     listSubscriptions() {
         return new Subscription(this.#provider).listSubscriptions()
     }
+
+    listInstancesUsage() {
+        return new Usage(this.#provider).listInstancesUsage()
+    }
 }
