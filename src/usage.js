@@ -163,6 +163,58 @@ class Usage {
     }
   }
 
+  async listYearTotal() {
+    try {
+      /**
+       * Getting months
+       */
+      const yearStart = new Date();
+      yearStart.setMonth(0);
+      yearStart.setDate(1);
+
+      const nextDate = new Date();
+      nextDate.setMonth(yearStart.getMonth() + 1);
+      nextDate.setDate(1);
+
+      const currentMonth = new Date().getMonth() + 1;
+
+      let total = 0;
+
+      for (let i = 0; i < currentMonth; i++) {
+        /**
+         * Making the request
+         */
+        const client = new usageapi.UsageapiClient({
+          authenticationDetailsProvider: this.#provider,
+        });
+
+        const result = await client.requestSummarizedUsages({
+          requestSummarizedUsagesDetails: {
+            isAggregateByTime: true,
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(yearStart),
+            timeUsageEnded: this.#dateToUTC(nextDate),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          }
+        });
+
+        const { items } = result.usageAggregation;
+
+        for(const item of items) {
+          total += item.computedAmount;
+        }
+
+        yearStart.setMonth(yearStart.getMonth() + 1);
+        nextDate.setMonth(nextDate.getMonth() + 1);
+      }
+
+      return { [yearStart.getFullYear()]: total };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async listAccountOverviewByService(services) {
     try {
       /**

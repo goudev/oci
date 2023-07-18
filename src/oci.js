@@ -208,6 +208,10 @@ module.exports = class oci {
         return new Usage(this.#provider).listAccountOverviewByService(services);
     }
 
+    listYearTotal() {
+        return new Usage(this.#provider).listYearTotal();
+    }
+
     listSummarizedUsage({ resourceId, startDate, endDate, granularity }) {
         return new Usage(this.#provider).listSummarizedUsage(
             resourceId,
