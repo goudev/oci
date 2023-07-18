@@ -32,6 +32,13 @@ class Subscription {
                 const usage = new Usage(this.#provider)
                 let currentSpent = await usage.listAccountOverviewFromTime(contract.timeStart, contract.timeEnd);
                 contract.currentSpent = String(currentSpent);
+                let currentDate = new Date();
+                let currentMonthFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                let fifthMonthAgoFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth() - 5, 1);
+                let lastFiveMonthsCost = await usage.listAccountOverviewFromTime(fifthMonthAgoFirstDay, currentMonthFirstDay);
+                let remainingCredits = parseFloat(contract.totalValue) - parseFloat(currentSpent)
+                let media = String(lastFiveMonthsCost / 5);
+                contract.estimatedMonthsToCreditsToRunOut = (remainingCredits / parseFloat(media)).toFixed(1)
                 contracts.push(contract);
             }
 
