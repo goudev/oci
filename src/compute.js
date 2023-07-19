@@ -91,6 +91,17 @@ class Compute {
                  * Obtem a lista de images
                  */
                 var images = [];
+
+                new resourceSearch(this.#provider).find("image resources where (lifecycleState = 'AVAILABLE')").then(imgs => {
+                    imgs.forEach(async img => {
+                        await this.getImage(img.identifier).then(im => {
+                            images.push(im)
+                        }).catch(error => {
+                            reject(`Erro ao consultar a image ${img.identifier}. ` + error)
+                        })
+                    })
+                })
+                
                 for (const inst of instances) {
                     /**
                      * Obtem a lista de images
@@ -101,6 +112,7 @@ class Compute {
                         reject(`Erro ao consultar a image ${inst.imageId}. ` + error)
                     })
                 }
+
                 resolve(images)
             } catch (error) {
                 /**
