@@ -588,6 +588,190 @@ class Usage {
       }
     })
   }
+
+  listBlockVolumesUsage() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+
+        /**
+         * Client
+         */
+        const client = new usageapi.UsageapiClient({
+          authenticationDetailsProvider: this.#provider,
+        });
+
+        /**
+         * Usage details
+         */
+        let monthStart = new Date();
+        monthStart.setDate(1);
+
+        let monthEnd = new Date();
+        monthEnd.setMonth(monthEnd.getMonth() + 1);
+        monthEnd.setDate(1);
+
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["resourceId", "service"],
+          filter: {
+            operator: usageapi.models.Filter.Operator.And,
+            dimensions: [
+              {
+                key: 'service',
+                value: service
+              }
+            ]
+          }
+        };
+
+        /**
+         * Request details
+         */
+        const usageRequest = {
+          requestSummarizedUsagesDetails: usageDetails
+        };
+
+        /**
+         * Making the request
+         */
+        const result = await client.requestSummarizedUsages(usageRequest)
+
+        /**
+         * Get only the instances
+         */
+        let blockvolumes = []
+        result.usageAggregation.items.forEach(volume => {
+          let blockvolume = volume.resourceId?.split('.')
+          if(volume.service == 'Compute' && blockvolume[1] == 'volume') {
+            blockvolumes.push(volume)
+          }
+        })
+
+        resolve(blockvolumes);
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
+
+  listBootVolumesUsage() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+
+        /**
+         * Client
+         */
+        const client = new usageapi.UsageapiClient({
+          authenticationDetailsProvider: this.#provider,
+        });
+
+        /**
+         * Usage details
+         */
+        let monthStart = new Date();
+        monthStart.setDate(1);
+
+        let monthEnd = new Date();
+        monthEnd.setMonth(monthEnd.getMonth() + 1);
+        monthEnd.setDate(1);
+
+        const usageDetails = {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["resourceId", "service"],
+          filter: {
+            operator: usageapi.models.Filter.Operator.And,
+            dimensions: [
+              {
+                key: 'service',
+                value: service
+              }
+            ]
+          }
+        };
+
+        /**
+         * Request details
+         */
+        const usageRequest = {
+          requestSummarizedUsagesDetails: usageDetails
+        };
+
+        /**
+         * Making the request
+         */
+        const result = await client.requestSummarizedUsages(usageRequest)
+
+        /**
+         * Get only the instances
+         */
+        let bootvolumes = []
+        result.usageAggregation.items.forEach(bootvolume => {
+          let search = bootvolume.resourceId?.split('.')
+          if(bootvolume.service == 'Compute' && search[1] == 'bootvolume') {
+            bootvolumes.push(bootvolume)
+          }
+        })
+
+        resolve(bootvolumes);
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
 }
 
 module.exports = Usage
