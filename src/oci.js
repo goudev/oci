@@ -462,12 +462,4 @@ module.exports = class oci {
     getIndividualResourcesActualUsage(service, resource) {
         return new Usage(this.#provider).getIndividualResourcesActualUsage(service, resource)
     }
-
-    listBootVolumesUsage() {
-        return new Usage(this.#provider).listBootVolumesUsage();
-    }
-
-    listBlockVolumesUsage() {
-        return new Usage(this.#provider).listBlockVolumesUsage();
-    }
 }
