@@ -506,7 +506,7 @@ class Usage {
     })
   }
 
-  listInstancesUsage() {
+  getIndividualResourcesActualUsage(service, resource) {
     /**
      * Retorna a promise
      */
@@ -518,16 +518,6 @@ class Usage {
 
       try {
 
-        /**
-         * Client
-         */
-        const client = new usageapi.UsageapiClient({
-          authenticationDetailsProvider: this.#provider,
-        });
-
-        /**
-         * Usage details
-         */
         let monthStart = new Date();
         monthStart.setDate(1);
 
@@ -535,39 +525,30 @@ class Usage {
         monthEnd.setMonth(monthEnd.getMonth() + 1);
         monthEnd.setDate(1);
 
-        const usageDetails = {
-          tenantId: this.#provider.getTenantId(),
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { tenantId: this.#provider.getTenantId(),
           timeUsageStarted: this.#dateToUTC(monthStart),
           timeUsageEnded: this.#dateToUTC(monthEnd),
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["resourceId", "service"]
-        };
+          groupBy: ["resourceId", "service"]}
+        }).then(result => {
+          /**
+           * Get only the resources passed as a parameter
+           */
+          var resources = []
+          result.usageAggregation.items.forEach(res => {
+            var resourceName = res.resourceId?.split('.')
+            if(res.service = service && resourceName[1] == resource) {
+              resources.push(res)
+            }
+          })
 
-        /**
-         * Request details
-         */
-        const usageRequest = {
-          requestSummarizedUsagesDetails: usageDetails
-        };
-
-        /**
-         * Making the request
-         */
-        const result = await client.requestSummarizedUsages(usageRequest)
-
-        /**
-         * Get only the instances
-         */
-        var instances = []
-        result.usageAggregation.items.forEach(ins => {
-          var instance = ins.resourceId?.split('.')
-          if(ins.service == 'Compute' && instance[1] == 'instance') {
-            instances.push(ins)
-          }
+          resolve(resources);
         })
-
-        resolve(instances);
 
         /**
          * Habilita o console

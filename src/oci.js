@@ -459,7 +459,7 @@ module.exports = class oci {
         return new Subscription(this.#provider).listSubscriptions()
     }
 
-    listInstancesUsage() {
-        return new Usage(this.#provider).listInstancesUsage()
+    getIndividualResourcesActualUsage(service, resource) {
+        return new Usage(this.#provider).getIndividualResourcesActualUsage(service, resource)
     }
 }
