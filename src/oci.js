@@ -462,4 +462,16 @@ module.exports = class oci {
     getIndividualResourcesActualUsage(service, resource) {
         return new Usage(this.#provider).getIndividualResourcesActualUsage(service, resource)
     }
+
+    getLast12MUsageByServices() {
+        return new Usage(this.#provider).getLast12MUsageByServices()
+    }
+    
+    getActualYearTotalUsage() {
+        return new Usage(this.#provider).getActualYearTotalUsage()
+    }
+
+    getLast12MTotalUsageByMonth() {
+        return new Usage(this.#provider).getLast12MTotalUsageByMonth()
+    }
 }
