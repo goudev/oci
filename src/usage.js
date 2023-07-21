@@ -596,6 +596,7 @@ class Usage {
           function groupByService(data) {
             const groupedData = {};
             groupedData['Database'] = []
+            groupedData['File Storage'] = []
             data.forEach((item) => {
               const { service, timeUsageStarted, computedAmount } = item;
               if (!groupedData[service]) {
@@ -738,15 +739,12 @@ class Usage {
       this.#util.disableConsole();
 
       try {
-        const months = [];
         var today = new Date();
         var year = today.getFullYear();
         var month = today.getMonth() + 1
         var monthEnd = new Date(year, month, 1)
         var monthStart = new Date(year, month - 12, 1)
-        for (let i = 0; i < 12; i++) {
-          months.push(new Date(year, month - i, 1));
-        }
+
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: { 
           tenantId: this.#provider.getTenantId(),
