@@ -589,7 +589,7 @@ class Usage {
           timeUsageEnded: this.#dateToUTC(monthEnd),
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"]
+          groupBy: ["service", "resourceId"]
         }}).then(async result => {
 
           // Função para agrupar por "service"
@@ -603,6 +603,15 @@ class Usage {
               }
               groupedData[service].push({ timeUsageStarted, computedAmount });
             });
+            data.forEach(resource => {
+              var { computedAmount, timeUsageStarted } = resource
+              if(resource.resourceId.split('.')[1] == 'instance') {
+                if(!groupedData['Instance']) {
+                  groupedData['Instance'] = []
+                }
+                groupedData['Instance'].push({timeUsageStarted, computedAmount})
+              }
+            })
             return groupedData;
           }
           
@@ -657,9 +666,6 @@ class Usage {
           // Preenche com valores padrão caso não tenha "timeUsageStarted"
           const finalResult = fillMissingTimeUsage(summedComputedAmounts);
 
-          // Pega os custos das instances
-          finalResult['Instances'] = await this.getLast12MInstancesUsage()
-
           function isStorage(name) {
             return name.toLowerCase().includes('storage') || name.toLowerCase().includes('store');
           }
@@ -691,8 +697,8 @@ class Usage {
 
           for (const service in finalResult) {
             const serviceData = finalResult[service].slice(0, 2);
-            const t = serviceData.map((item) => item.computedAmount);
-            finalResult[service]['improvement'] = this.#calcImprovement(t[0], t[1])
+            const recentTwoValues = serviceData.map((item) => item.computedAmount);
+            finalResult[service].push({improvement: this.#calcImprovement(recentTwoValues[0], recentTwoValues[1]) }) 
           }
 
         
