@@ -597,6 +597,7 @@ class Usage {
             const groupedData = {};
             groupedData['Database'] = []
             groupedData['File Storage'] = []
+            groupedData['Container Engine for Kubernetes'] = []
             data.forEach((item) => {
               const { service, timeUsageStarted, computedAmount } = item;
               if (!groupedData[service]) {
