@@ -70,90 +70,59 @@ class Announcements {
     /**
      * Obtem a lista de todos os announcements
      */
-    listAnnouncements(compartmentId) {
+    listAnnouncements() {
 
         /**
          * Retorna a promise
          */
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async(resolve, reject) => {
 
             /**
              * Define um array para armazenar
              */
-            var announcements = [];
+           
+            var announcements = []
 
             /**
-             * Se foi passado um compartimento
+             * Habilita o console
              */
-            if (compartmentId) {
+            this.#util.disableConsole();
+
+            /**
+             * Realiza a consulta
+             */
+            await new announcementsservice.AnnouncementClient({ authenticationDetailsProvider: this.#provider }).listAnnouncements({
+                compartmentId: this.#provider.getTenantId(),
+                lifecycleState: announcementsservice.requests.ListAnnouncementsRequest.LifecycleState.Active
+            }).then(async result => {
+                
+                for(const announcement of result.announcementsCollection.items) {
+                    const an = await this.getAnnouncement(announcement.id)
+                    announcements.push(an)
+                }
+                /**
+                 * Habilita novamente o console
+                 */
+                this.#util.enableConsole();
 
                 /**
+                 * Retorna o bootVolume
+                 */
+                resolve(announcements);
+
+            }).catch(error => {
+                    /**
                  * Habilita o console
                  */
-                this.#util.disableConsole();
+                this.#util.enableConsole();
 
                 /**
-                 * Realiza a consulta
+                 * Rejeita a promise
                  */
-                new announcementsservice.AnnouncementClient({ authenticationDetailsProvider: this.#provider }).listAnnouncements({
-                    compartmentId: compartmentId
-                }).then(result => {
+                reject("Erro ao obter a lista de Announcements. \n\n" + error.message || error);
+            });
 
-                    /**
-                     * Habilita novamente o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * Retorna o bootVolume
-                     */
-                    resolve(result.announcementsCollection.items);
-
-                }).catch(error => {
-                     /**
-                     * Habilita o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject("Erro ao obter a lista de Announcements. \n\n" + error.message || error);
-                });
-
-            }else{
-
-                /**
-                 * Obtem a lista de compartimentos
-                 */
-                new Compartments(this.#provider).listCompartments().then(async compartments => {
-                    for(const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.listAnnouncements(compartment.id).then(result => {
-                            result.forEach(announcement => {
-                                this.getAnnouncement(announcement.id).then(an => {
-                                    announcements.push(an)
-                                })
-                            })
-
-                        }).catch(error => {
-                            reject(error.message || error)
-                        })
-                    }
-
-                    resolve(announcements)
-                }).catch(error => {
-
-
-                    /**
-                     * Rejeita a promise
-                     */
-                reject(error);
-            })
-        }})
+        })
     
     }
 
