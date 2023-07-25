@@ -212,6 +212,10 @@ module.exports = class oci {
         return new Usage(this.#provider).listYearTotal();
     }
 
+    listForecasting({ resourceId = null, days }) {
+        return new Usage(this.#provider).listForecasting({ resourceId, days });
+    }
+
     listSummarizedUsage({ resourceId, startDate, endDate, granularity }) {
         return new Usage(this.#provider).listSummarizedUsage(
             resourceId,

@@ -7,10 +7,16 @@ class Usage {
 
   #provider = "";
   #util = ""
+  #client;
 
   constructor(provider) {
     this.#provider = provider;
     this.#util = new Util();
+
+    this.#client = new usageapi.UsageapiClient({
+      authenticationDetailsProvider: this.#provider,
+    });
+
     return this;
   }
 
@@ -66,9 +72,6 @@ class Usage {
       });
       
       const result = await client.requestSummarizedUsages({
-        retryConfiguration: {
-          terminationStrategy: common.TerminationStrategy
-        },
         requestSummarizedUsagesDetails: {
           isAggregateByTime: true,
           tenantId: this.#provider.getTenantId(),
@@ -88,6 +91,7 @@ class Usage {
           }
         }
       });
+      
       const { items } = result.usageAggregation;
       return items;
     } catch (error) {
@@ -210,6 +214,73 @@ class Usage {
       }
 
       return { [yearStart.getFullYear()]: total };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async listForecasting({ resourceId = null, days }) {
+    try {
+      const timeStarted = new Date();
+      timeStarted.setDate(1);
+
+      const forecastStarted = new Date();
+      forecastStarted.setDate(forecastStarted.getUTCDate() - 1);
+
+      const forecastEnded = new Date();
+      forecastEnded.setDate(forecastStarted.getUTCDate() + days + 1);
+
+      let requestSummarizedUsagesDetails;
+
+      if (resourceId) {
+        requestSummarizedUsagesDetails = {
+          tenantId: this.#provider.getTenantId(),
+          isForecast: true,
+          timeUsageStarted: this.#dateToUTC(timeStarted),
+          timeUsageEnded: this.#dateToUTC(forecastStarted),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          forecast: {
+            forecastType: usageapi.models.Forecast.ForecastType.Basic,
+            timeForecastStarted: this.#dateToUTC(forecastStarted),
+            timeForecastEnded: this.#dateToUTC(forecastEnded)
+          },
+          filter: {
+            operator: usageapi.models.Filter.Operator.And,
+            dimensions: [
+              {
+                key: 'resourceId',
+                value: resourceId,
+              }
+            ]
+          }
+        };
+      } else  {
+        requestSummarizedUsagesDetails = {
+          tenantId: this.#provider.getTenantId(),
+          isForecast: true,
+          timeUsageStarted: this.#dateToUTC(timeStarted),
+          timeUsageEnded: this.#dateToUTC(forecastStarted),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          forecast: {
+            forecastType: usageapi.models.Forecast.ForecastType.Basic,
+            timeForecastStarted: this.#dateToUTC(forecastStarted),
+            timeForecastEnded: this.#dateToUTC(forecastEnded)
+          },
+        };
+      }
+
+      const result = await this.#client.requestSummarizedUsages({
+        requestSummarizedUsagesDetails,
+      });
+
+      let forecastCost = 0;
+      for(const i of result.usageAggregation.items) {
+        forecastCost += i.computedAmount;
+      }
+
+      return { forecastCost, forecastStarted, forecastEnded };
     } catch (error) {
       throw error;
     }
