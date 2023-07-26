@@ -609,6 +609,9 @@ class Usage {
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
           groupBy: ["resourceId", "service"]
         }}).then(result => {
+          result.usageAggregation.items.forEach(i => {
+            if(i.computedAmount == null) i.computedAmount = 0
+          })
 
           resolve(result.usageAggregation.items);
         })
