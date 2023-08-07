@@ -232,6 +232,10 @@ class Usage {
 
       let requestSummarizedUsagesDetails;
 
+      if(!days) {
+        return { forecastCost: 0, forecastStarted, forecastEnded };
+      }
+      
       if (resourceId) {
         requestSummarizedUsagesDetails = {
           tenantId: this.#provider.getTenantId(),
