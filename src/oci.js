@@ -386,8 +386,24 @@ module.exports = class oci {
         return new ResourceActions(this.#provider).getResourceAction(recommendationId);
     }
 
-    listResourceActions() {
-        return new ResourceActions(this.#provider).listResourceActions();
+    listResourceActions(recommendationName) {
+        return new ResourceActions(this.#provider).listResourceActions(recommendationName);
+    }
+
+    listRecommendations() {
+        return new ResourceActions(this.#provider).listRecommendations();
+    }
+
+    getRecommendation(recommendationId) {
+        return new ResourceActions(this.#provider).getRecommendation(recommendationId);
+    }
+
+    listCategories() {
+        return new ResourceActions(this.#provider).listCategories();
+    }
+
+    getCategory(categoryId) {
+        return new ResourceActions(this.#provider).getCategory(categoryId);
     }
 
     listRegionSubscriptions() {
