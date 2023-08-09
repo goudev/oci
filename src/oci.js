@@ -386,8 +386,8 @@ module.exports = class oci {
         return new ResourceActions(this.#provider).getResourceAction(recommendationId);
     }
 
-    listResourceActions(recommendationName) {
-        return new ResourceActions(this.#provider).listResourceActions(recommendationName);
+    listResourceActions() {
+        return new ResourceActions(this.#provider).listResourceActions();
     }
 
     listRecommendations() {

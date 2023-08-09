@@ -96,7 +96,6 @@ class ResourceActions {
                 for(const recommendation of recommendations) {
                     var category = await this.getCategory(recommendation.categoryId)
                     recommendation.categoryName = category.name
-                    recommendation.resources = await this.listResourceActions(recommendation.name)
                 }
                 /**
                  * Habilita o console
@@ -106,7 +105,7 @@ class ResourceActions {
                 /**
                  * retorna a promise
                  */
-                resolve(recommendations);
+                resolve(result.recommendationCollection.items);
 
             }).catch(error => {
                 /**
@@ -174,7 +173,7 @@ class ResourceActions {
         })
     }
 
-    listResourceActions(recommendationName) {
+    listResourceActions() {
 
         /**
          * Retorna a promise
@@ -191,8 +190,7 @@ class ResourceActions {
              */
             new optimizer.OptimizerClient({ authenticationDetailsProvider: this.#provider }).listResourceActions({
                 compartmentId: this.#provider.getTenantId(),
-                compartmentIdInSubtree: true,
-                recommendationName: recommendationName
+                compartmentIdInSubtree: true
             }).then(result => {
 
                 /**
