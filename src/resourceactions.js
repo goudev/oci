@@ -94,6 +94,11 @@ class ResourceActions {
                 })
 
                 for(const recommendation of recommendations) {
+                    let total = 0
+                    recommendation.resourceCounts.forEach(tot => {
+                        total += tot.count
+                    })
+                    recommendation.totalCount = total
                     var category = await this.getCategory(recommendation.categoryId)
                     recommendation.categoryName = category.name
                 }
@@ -179,42 +184,44 @@ class ResourceActions {
          * Retorna a promise
          */
         return new Promise(async (resolve, reject) => {
+            try {
+                /**
+                 * Habilita o console
+                 */
+                this.#util.disableConsole();
 
-            /**
-             * Habilita o console
-             */
-            this.#util.disableConsole();
+                const recommendations = await this.listRecommendations()
+                const resourceActions = []
 
-            /**
-             * Realiza a consulta
-             */
-            new optimizer.OptimizerClient({ authenticationDetailsProvider: this.#provider }).listResourceActions({
-                compartmentId: this.#provider.getTenantId(),
-                compartmentIdInSubtree: true
-            }).then(result => {
+                for(const rec of recommendations) {
+                    await new optimizer.OptimizerClient({ authenticationDetailsProvider: this.#provider }).listResourceActions({
+                        compartmentId: this.#provider.getTenantId(),
+                        compartmentIdInSubtree: true,
+                        recommendationId: rec.id
+                    }).then(result => {
+                        resourceActions.push(...result.resourceActionCollection.items)
+                    })
+                }
 
                 /**
                  * Habilita o console
                  */
                 this.#util.enableConsole();
 
-                /**
-                 * retorna a promise
-                 */
-                resolve(result.resourceActionCollection.items);
+                resolve(resourceActions);
 
-            }).catch(error => {
-                /**
+            } catch (error) {
+                 /**
                  * Habilita o console
                  */
                 this.#util.enableConsole();
 
-                /**
+                 /**
                  * Rejeita a promise
                  */
                 reject("Erro ao obter a lista de Resource Actions. \n\n" + error.message || error);
-            });
-            
+            }
+        
         })
     }
 
