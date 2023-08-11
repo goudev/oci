@@ -38,7 +38,8 @@ class Subscription {
                 let lastFiveMonthsCost = await usage.listAccountOverviewFromTime(fifthMonthAgoFirstDay, currentMonthFirstDay);
                 let remainingCredits = parseFloat(contract.totalValue) - parseFloat(currentSpent)
                 let media = String(lastFiveMonthsCost / 5);
-                contract.estimatedMonthsToCreditsToRunOut = (remainingCredits / parseFloat(media)).toFixed(1)
+                contract.estimatedDaysToCreditsToRunOut = Math.ceil((remainingCredits / parseFloat(media)) * 31)
+                contract.estimatedDateToCreditToRunOut = new Date(currentDate.getTime() + contract.estimatedDaysToCreditsToRunOut * 24 * 60 * 60 * 1000)
                 contracts.push(contract);
             }
 
