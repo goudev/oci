@@ -199,6 +199,9 @@ class ResourceActions {
                         compartmentIdInSubtree: true,
                         recommendationId: rec.id
                     }).then(result => {
+                        result.resourceActionCollection.items.forEach(res => {
+                            res.resourceName = rec.name
+                        })
                         resourceActions.push(...result.resourceActionCollection.items)
                     })
                 }
