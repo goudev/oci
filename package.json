@@ -34,7 +34,8 @@
     "oci-osuborganizationsubscription": "^2.62.0",
     "oci-resourcesearch": "^2.50.0",
     "oci-sdk": "^2.62.3",
-    "oci-usageapi": "^2.53.1"
+    "oci-usageapi": "^2.53.1",
+    "oci-vulnerabilityscanning": "^2.68.1"
   },
   "devDependencies": {
     "jest": "^29.5.0",

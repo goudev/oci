@@ -2239,6 +2239,25 @@
     "sshpk" "1.16.1"
     "uuid" "3.3.3"
 
+"oci-common@2.68.1":
+  "integrity" "sha512-d9Qt+oX9/n+Sc2A4Fl84jyWHwgCNyxsm+rx3VBcay+PGD3PBJD8QSgBY0xYW1IKxzDbgH2MZKVT01Sh8LOpqKw=="
+  "resolved" "https://registry.npmjs.org/oci-common/-/oci-common-2.68.1.tgz"
+  "version" "2.68.1"
+  dependencies:
+    "@types/isomorphic-fetch" "0.0.35"
+    "@types/jsonwebtoken" "9.0.0"
+    "@types/jssha" "2.0.0"
+    "@types/opossum" "4.1.1"
+    "@types/sshpk" "1.10.3"
+    "es6-promise" "4.2.6"
+    "http-signature" "1.3.1"
+    "isomorphic-fetch" "3.0.0"
+    "jsonwebtoken" "9.0.0"
+    "jssha" "2.4.1"
+    "opossum" "5.0.1"
+    "sshpk" "1.16.1"
+    "uuid" "3.3.3"
+
 "oci-computeinstanceagent@2.62.3":
   "integrity" "sha512-okREWmTpZcifoaKNkm/sJhhU0TuRXXBTtOsTTkKb1lnISrybjXjfivE76LbDgx7T6a5F+fzO5I9qra42V5OzdA=="
   "resolved" "https://registry.npmjs.org/oci-computeinstanceagent/-/oci-computeinstanceagent-2.62.3.tgz"
@@ -3100,6 +3119,14 @@
     "oci-common" "2.62.3"
     "oci-workrequests" "2.62.3"
 
+"oci-vulnerabilityscanning@^2.68.1":
+  "integrity" "sha512-W5/C+budnEkfvrAB/lrrmF1fjpzxPA4qakKSNQV7/fpJJwWW7j5pLRz+OnSmUopdsiDpfEcK7u7BBP0xvM5Dkw=="
+  "resolved" "https://registry.npmjs.org/oci-vulnerabilityscanning/-/oci-vulnerabilityscanning-2.68.1.tgz"
+  "version" "2.68.1"
+  dependencies:
+    "oci-common" "2.68.1"
+    "oci-workrequests" "2.68.1"
+
 "oci-vulnerabilityscanning@2.62.3":
   "integrity" "sha512-guAOdabn6rAyfqR01C2C+D3+gOJKls1B+BRA0mJqftI+C1+iHFcZoWzzgbhXjJWy8kpenXoMgW6G3+wwNbXEMQ=="
   "resolved" "https://registry.npmjs.org/oci-vulnerabilityscanning/-/oci-vulnerabilityscanning-2.62.3.tgz"
@@ -3139,6 +3166,14 @@
   dependencies:
     "oci-common" "2.62.3"
     "oci-workrequests" "2.62.3"
+
+"oci-workrequests@2.68.1":
+  "integrity" "sha512-c8+eUlyaQYqsxNMpXZAUWlkkpiKzsVgk3g9AJnh1R0HkOagm8UL9aqZ5axgjhdos6LVMhnZdMyNsLQqwvtMX5g=="
+  "resolved" "https://registry.npmjs.org/oci-workrequests/-/oci-workrequests-2.68.1.tgz"
+  "version" "2.68.1"
+  dependencies:
+    "oci-common" "2.68.1"
+    "oci-workrequests" "2.68.1"
 
 "once@^1.3.0":
   "integrity" "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="

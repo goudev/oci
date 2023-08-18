@@ -23,6 +23,7 @@ var Groups = require("./groups")
 var Policies = require("./policies")
 var Metrics = require('./metrics')
 var Subscription = require('./subscription')
+var Vulnerabilities = require('./vulnerabilities')
 
 module.exports = class oci {
 
@@ -493,5 +494,13 @@ module.exports = class oci {
 
     getLast12MTotalUsageByMonth() {
         return new Usage(this.#provider).getLast12MTotalUsageByMonth()
+    }
+
+    listVulnerabilities() {
+        return new Vulnerabilities(this.#provider).listVulnerabilities()
+    }
+
+    listVulnerabilityImpactedHosts(vulnerabilityId) {
+        return new Vulnerabilities(this.#provider).listVulnerabilityImpactedHosts(vulnerabilityId)
     }
 }
