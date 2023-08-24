@@ -808,125 +808,6 @@ class Usage {
     })
   }
 
-  // Pega o uso total por mês dos últimos 12 meses das instances
-  getLast12MInstancesUsage() {
-    /**
-     * Retorna a promise
-     */
-    return new Promise(async (resolve, reject) => {
-      /**
-       * Desabilita o console
-       */
-      this.#util.disableConsole();
-
-      try {
-        var today = new Date();
-        var year = today.getFullYear();
-        var month = today.getMonth() + 1
-        var monthEnd = new Date(year, month, 1)
-        var monthStart = new Date(year, month - 12, 1)
-
-        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service", "resourceId"]
-        }}).then(result => {
-          const instances = []
-          result.usageAggregation.items.forEach(res => {
-            if(res.service == "Compute" && res.resourceId.split('.')[1] == 'instance') instances.push(res)
-          })
-
-          // função para agrupar por "instances"
-          function groupByInstance(data) {
-            const groupedData = {};
-            data.forEach((item) => {
-              const { timeUsageStarted, computedAmount } = item;
-              if (!groupedData['Instance']) {
-                groupedData['Instance'] = [];
-              }
-              groupedData['Instance'].push({ timeUsageStarted, computedAmount });
-            });
-            return groupedData;
-          }
-          
-          // Função para calcular a soma dos "computedAmount" com base no "timeUsageStarted"
-          function sumComputedAmounts(groupedData) {
-            for (const service in groupedData) {
-              const entries = groupedData[service];
-              const sums = {};
-              entries.forEach((entry) => {
-                const { timeUsageStarted, computedAmount } = entry;
-                sums[timeUsageStarted] = (sums[timeUsageStarted] || 0) + computedAmount;
-              });
-              groupedData[service] = Object.entries(sums).map(([timeUsageStarted, computedAmount]) => ({
-                timeUsageStarted,
-                computedAmount,
-              }));
-            }
-            return groupedData;
-          }
-          
-          // Função para preencher com valores padrão caso não tenha "timeUsageStarted"
-          function fillMissingTimeUsage(groupedData) {
-            const timeUsages = new Set();
-            for (const service in groupedData) {
-              const entries = groupedData[service];
-              entries.forEach((entry) => {
-                timeUsages.add(entry.timeUsageStarted);
-              });
-            }
-            const sortedTimeUsages = Array.from(timeUsages).sort((a, b) => new Date(b) - new Date(a));
-          
-            for (const service in groupedData) {
-              const entries = groupedData[service];
-              const timeUsageSet = new Set(entries.map((entry) => entry.timeUsageStarted));
-              sortedTimeUsages.forEach((timeUsage) => {
-                if (!timeUsageSet.has(timeUsage)) {
-                  entries.push({ timeUsageStarted: timeUsage, computedAmount: 0 });
-                }
-              });
-              entries.sort((a, b) => new Date(b.timeUsageStarted) - new Date(a.timeUsageStarted));
-            }
-          
-            return groupedData;
-          }
-          
-          // Agrupa os objetos por "service"
-          const groupedByService = groupByInstance(instances);
-          
-          // Calcula a soma dos "computedAmount" por "timeUsageStarted"
-          const summedComputedAmounts = sumComputedAmounts(groupedByService);
-          
-          // Preenche com valores padrão caso não tenha "timeUsageStarted"
-          const finalResult = fillMissingTimeUsage(summedComputedAmounts);
-
-          resolve(finalResult.Instance);
-        })
-        
-        /**
-         * Habilita o console
-         */
-        this.#util.enableConsole();
-
-      } catch (error) {
-
-        /**
-         * Habilita o console
-         */
-        this.#util.enableConsole();
-
-        /**
-         * Rejeita a promise
-         */
-        reject(error.message || error)
-      }
-    })
-  }
-
   // Pega o gasto total do ano atual
   getActualYearTotalUsage() {
     /**
@@ -1174,11 +1055,129 @@ class Usage {
             // Add the processed result at the end of the service entry
             serviceData.push({improvement: processedResult});
           }
+
+          groupedSummedAndFilledData['Instance'] = await this.getLast12MInstancesUsage()
           
           resolve(groupedSummedAndFilledData)
         })
         
         
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
+
+  // Pega o uso total por mês dos últimos 12 meses das instances
+  getLast12MInstancesUsage() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1
+        var monthEnd = new Date(year, month, 1)
+        var monthStart = new Date(year, month - 12, 1)
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["service", "resourceId"],
+          filter: {
+            operator: usageapi.models.Filter.Operator.And,
+            dimensions: [
+              {
+                key: "service",
+                value: "COMPUTE"
+              }
+            ]}
+        }}).then(async result => {
+          var x = []
+          result.usageAggregation.items.forEach(i => {
+            if(i.resourceId.split('.')[1] == 'instance') {
+              x.push(i)
+            }
+          })
+          const uniqueTimeUsageStarted = [...new Set(x.map(entry => entry.timeUsageStarted))];
+
+          // Create an empty object to store the grouped, summed, and filled data
+          const groupedSummedAndFilledData = {};
+
+          // Iterate through the usageData array to initialize the structure and sum services with "storage" or "store" in their names
+          x.forEach(entry => {
+            const timeUsageStarted = entry.timeUsageStarted;
+            const computedAmount = entry.computedAmount;
+
+            if (!groupedSummedAndFilledData["Instance"]) {
+              groupedSummedAndFilledData["Instance"] = []
+            }
+            
+              groupedSummedAndFilledData["Instance"].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
+           
+          });
+
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
+          // Fill in missing timeUsageStarted entries with a computedAmount of 0
+          for (const service in groupedSummedAndFilledData) {
+            for (const time of uniqueTimeUsageStarted) {
+              const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
+              
+              
+              if (!entry) {
+                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+              }
+            }
+          }
+          // Sort the entries within each service based on timeUsageStarted
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const sortedServiceData = this.groupAndSum(serviceData);
+            
+            groupedSummedAndFilledData[service] = sortedServiceData;
+          }
+        
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const firstTwoValues = serviceData.slice(0, 2).map((entry) => entry.computedAmount);
+            const processedResult = this.#calcImprovement(...firstTwoValues);
+            
+            // Add the processed result at the end of the service entry
+            serviceData.push({improvement: processedResult});
+          }
+          
+          resolve(groupedSummedAndFilledData.Instance)
+      
+        })
         /**
          * Habilita o console
          */
