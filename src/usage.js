@@ -1172,7 +1172,7 @@ class Usage {
             const processedResult = this.#calcImprovement(...firstTwoValues);
             
             // Add the processed result at the end of the service entry
-            serviceData.improvement = processedResult;
+            serviceData.push({improvement: processedResult});
           }
           
           resolve(groupedSummedAndFilledData)
