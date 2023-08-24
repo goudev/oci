@@ -503,4 +503,8 @@ module.exports = class oci {
     listVulnerabilityImpactedHosts(vulnerabilityId) {
         return new Vulnerabilities(this.#provider).listVulnerabilityImpactedHosts(vulnerabilityId)
     }
+
+    listLast12MUsageByService() {
+        return new Usage(this.#provider).listLast12MUsageByService()
+    }
 }
