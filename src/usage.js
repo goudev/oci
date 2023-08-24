@@ -652,6 +652,7 @@ class Usage {
       this.#util.disableConsole();
 
       try {
+        var x = []
         var today = new Date();
         var year = today.getFullYear();
         var month = today.getMonth() + 1
@@ -1041,6 +1042,128 @@ class Usage {
           resolve({data: resultado, history: history});
           
         })
+        
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
+
+
+  listLast12MUsageByService() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1
+        var monthEnd = new Date(year, month, 1)
+        var monthStart = new Date(year, month - 12, 1)
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["service"]
+        }}).then(async result => {
+
+          const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
+
+          // Create an empty object to store the grouped, summed, and filled data
+          const groupedSummedAndFilledData = {};
+
+          // Iterate through the usageData array to initialize the structure and sum services with "storage" or "store" in their names
+          result.usageAggregation.items.forEach(entry => {
+            const service = entry.service;
+            const timeUsageStarted = entry.timeUsageStarted;
+
+            // Check if the service name contains "storage" or "store"
+            const isStorageService = /storage|store/i.test(service);
+
+            if (!groupedSummedAndFilledData[service]) {
+              groupedSummedAndFilledData[service] = {};
+            }
+
+            if (!groupedSummedAndFilledData[service][timeUsageStarted]) {
+              groupedSummedAndFilledData[service][timeUsageStarted] = entry.computedAmount;
+            }
+
+            if (isStorageService) {
+              if (!groupedSummedAndFilledData["Storage"]) {
+                groupedSummedAndFilledData["Storage"] = {};
+              }
+
+              if (!groupedSummedAndFilledData["Storage"][timeUsageStarted]) {
+                groupedSummedAndFilledData["Storage"][timeUsageStarted] = entry.computedAmount;
+              } else {
+                groupedSummedAndFilledData["Storage"][timeUsageStarted] += entry.computedAmount;
+              }
+            }
+          });
+
+          // Fill in missing timeUsageStarted entries with a computedAmount of 0
+          for (const service in groupedSummedAndFilledData) {
+            for (const time of uniqueTimeUsageStarted) {
+              if (!groupedSummedAndFilledData[service][time]) {
+                groupedSummedAndFilledData[service][time] = 0;
+              }
+            }
+          }
+
+          // Sort the uniqueTimeUsageStarted values in descending order
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
+
+          // Sort the entries within each service based on timeUsageStarted
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const sortedServiceData = {};
+
+            Object.keys(serviceData)
+              .sort((a, b) => new Date(b) - new Date(a))
+              .forEach(time => {
+                sortedServiceData[time] = serviceData[time];
+              });
+
+            groupedSummedAndFilledData[service] = sortedServiceData;
+          }
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const firstTwoValues = Object.values(serviceData).slice(0, 2);
+            const processedResult = this.#calcImprovement(...firstTwoValues);
+            
+            // Add the processed result at the end of the service entry
+            serviceData.improvement = processedResult;
+          }
+          
+          resolve(groupedSummedAndFilledData)
+        })
+        
         
         /**
          * Habilita o console
