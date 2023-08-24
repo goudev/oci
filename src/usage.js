@@ -2,6 +2,7 @@ let Util = require("./util");
 const usageapi = require("oci-usageapi");
 const common = require("oci-common");
 const { DateTime } = require('luxon');
+const _ = require('lodash');
 
 class Usage {
 
@@ -1064,6 +1065,17 @@ class Usage {
   }
 
 
+  groupAndSum(data) {
+    return _.chain(data)
+      .groupBy('timeUsageStarted')
+      .map((group, timeUsageStarted) => ({
+        timeUsageStarted,
+        computedAmount: _.sumBy(group, 'computedAmount')
+      }))
+      .orderBy('timeUsageStarted', 'desc')
+      .value();
+  }
+
   listLast12MUsageByService() {
     /**
      * Retorna a promise
@@ -1102,59 +1114,61 @@ class Usage {
           result.usageAggregation.items.forEach(entry => {
             const service = entry.service;
             const timeUsageStarted = entry.timeUsageStarted;
+            const computedAmount = entry.computedAmount;
 
             // Check if the service name contains "storage" or "store"
             const isStorageService = /storage|store/i.test(service);
 
             if (!groupedSummedAndFilledData[service]) {
-              groupedSummedAndFilledData[service] = {};
+              groupedSummedAndFilledData[service] = []
             }
-
-            if (!groupedSummedAndFilledData[service][timeUsageStarted]) {
-              groupedSummedAndFilledData[service][timeUsageStarted] = entry.computedAmount;
-            }
-
+            
+           
+              groupedSummedAndFilledData[service].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
+           
             if (isStorageService) {
               if (!groupedSummedAndFilledData["Storage"]) {
-                groupedSummedAndFilledData["Storage"] = {};
+                groupedSummedAndFilledData["Storage"] = [];
               }
 
-              if (!groupedSummedAndFilledData["Storage"][timeUsageStarted]) {
-                groupedSummedAndFilledData["Storage"][timeUsageStarted] = entry.computedAmount;
-              } else {
-                groupedSummedAndFilledData["Storage"][timeUsageStarted] += entry.computedAmount;
-              }
+              
+                groupedSummedAndFilledData["Storage"].push({
+                  timeUsageStarted,
+                  computedAmount: computedAmount || 0
+                })            
             }
           });
 
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
           // Fill in missing timeUsageStarted entries with a computedAmount of 0
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
-              if (!groupedSummedAndFilledData[service][time]) {
-                groupedSummedAndFilledData[service][time] = 0;
+              const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
+              
+              
+              if (!entry) {
+                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
               }
             }
           }
 
           // Sort the uniqueTimeUsageStarted values in descending order
-          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
-
+          
           // Sort the entries within each service based on timeUsageStarted
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
-            const sortedServiceData = {};
-
-            Object.keys(serviceData)
-              .sort((a, b) => new Date(b) - new Date(a))
-              .forEach(time => {
-                sortedServiceData[time] = serviceData[time];
-              });
-
+            const sortedServiceData = this.groupAndSum(serviceData);
+            
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
+          
+
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
-            const firstTwoValues = Object.values(serviceData).slice(0, 2);
+            const firstTwoValues = serviceData.slice(0, 2).map((entry) => entry.computedAmount);
             const processedResult = this.#calcImprovement(...firstTwoValues);
             
             // Add the processed result at the end of the service entry
