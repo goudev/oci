@@ -952,7 +952,7 @@ class Usage {
           timeUsageEnded: this.#dateToUTC(nextMonth),
           granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service", "resourceId"]
+          groupBy: ["service"]
         }}).then(result => {
           var amount = 0
           result.usageAggregation.items.forEach(res => {
