@@ -77,58 +77,47 @@ class Compute {
          */
         return new Promise(async (resolve, reject) => {
 
-            try {
-                /**
-                 * Obtem a lista de Instancias
-                 */
-                var instances = []
-                await this.listInstances().then(async insts => {
-                    insts.forEach(async i => {
-                        instances.push(i)
-                    })
-                })
+            /**
+             * Obtem a lista de Instancias
+             */
+            var instances = await this.listInstances()
+
+            /**
+             * Obtem a lista de images
+             */
+            var images = [];
+
+            var imagesSearch = await new resourceSearch(this.#provider).find("image resources where (lifecycleState = 'AVAILABLE')")
+
+            await Promise.all(imagesSearch.map(async img => {
+                try {
+                    const im = await this.getImage(img.identifier)
+                    images.push(im)
+                } catch (error) {
+                    console.log(error)
+                }
+            }))
+            
+            for (const inst of instances) {
                 /**
                  * Obtem a lista de images
                  */
-                var images = [];
-
-                new resourceSearch(this.#provider).find("image resources where (lifecycleState = 'AVAILABLE')").then(imgs => {
-                    imgs.forEach(async img => {
-                        await this.getImage(img.identifier).then(im => {
-                            images.push(im)
-                        }).catch(error => {
-                            reject(`Erro ao consultar a image ${img.identifier}. ` + error)
-                        })
-                    })
-                })
-                
-                for (const inst of instances) {
-                    /**
-                     * Obtem a lista de images
-                     */
-                    await this.getImage(inst.imageId).then(image => {
-                        images.push(image)
-                    }).catch(error => {
-                        reject(`Erro ao consultar a image ${inst.imageId}. ` + error)
-                    })
+                try {
+                    const image = await this.getImage(inst.imageId)
+                    images.push(image)
+                } catch (error) {
+                    console.log(error)
                 }
-
-                resolve(images)
-            } catch (error) {
-                /**
-                 * Rejeita a promise
-                 */
-                reject(error.message || error)
             }
 
-            
+            resolve(images)
                 
         }).catch(error => {
             reject(error)
         })
     }
 
-        /**
+    /**
      * Obtem um volume
      */
     getInstance(instanceId){
