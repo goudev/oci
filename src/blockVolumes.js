@@ -366,89 +366,93 @@ class BlockVolume {
         })
     }
 
-    listVolumeGroups(compartmentId) {
-
+    /**
+     * Obtem um volume group
+     */
+    getVolumeGroup(volumeGroupId) {
         /**
          * Retorna a promise
          */
         return new Promise(async (resolve, reject) => {
 
             /**
-             * Cria um array para armazenar as informações
+             * Desabilita o console
              */
-            var volumeGroups = [];
+            this.#util.disableConsole();
 
-            /**
-             * Se foi passado um compartimento
-             */
-            if (compartmentId) {
+            try {
+                /**
+                 * 
+                 */
+                await new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).getVolumeGroup({
+                    volumeGroupId: volumeGroupId
+                }).then(async result => {
+                    result.volumeGroup.backupPolicy = await this.getBackupPolicyAttachedToVolume(result.volumeGroup.id)
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna o bootVolume
+                     */
+                    resolve(result.volumeGroup)
+                })
 
                 /**
                  * Habilita o console
                  */
-                this.#util.disableConsole();
+                this.#util.enableConsole();
+
+            } catch (error) {
 
                 /**
-                 * Realiza a consulta
+                 * Habilita o console
                  */
-                new core.BlockstorageClient({ authenticationDetailsProvider: this.#provider }).listVolumeGroups({
-                    compartmentId: compartmentId
-                }).then(result => {
-
-                    /**
-                     * Habilita o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * retorna a promise
-                     */
-                    resolve(result.items);
-
-                }).catch(error => {
-                    /**
-                     * Habilita o console
-                     */
-                    this.#util.enableConsole();
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject("Erro ao obter a lista de Volume Groups. \n\n" + error.message || error);
-                });
-
-            } else {
+                this.#util.enableConsole();
 
                 /**
-                 * Obtem a lista de compartimentos
+                 * Rejeita a promise
                  */
-                new resourceSearch(this.#provider).find("compartment resources where (lifecycleState = 'ACTIVE')").then(async compartments => {
-                    for (const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.listVolumeGroups(compartment.identifier).then(result => {
-                            result.forEach(async vg => {
-                                volumeGroups.push(vg)
-                            });
-                        }).catch(error => {
-                            reject(error.message || error)
-                        })
-                    }
-                    
-                    for(const vg of volumeGroups) {
-                        vg.backupPolicy = await this.getBackupPolicyAttachedToVolume(vg.id)
-                    }
-                    resolve(volumeGroups)
-                }).catch(error => {
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
-                })
+                reject(error.message || error)
             }
+        })
+    }
+
+
+    listVolumeGroups() {
+        /**
+        * Retorna a promise
+        */
+        return new Promise(async (resolve, reject) => {
+
+            try {
+                /**
+                * Define um array para armazenar
+                */
+                var volumeGroups = [];
+                /**
+                * Consulta a lista de volume groups
+                */
+                const vgs = await new resourceSearch(this.#provider).find("volumegroup resources")
+                
+                for (const bvp of vgs) {
+                    try {
+                        const vg = await this.getVolumeGroup(bvp.identifier)
+                        volumeGroups.push(vg)
+                    } catch (error) {
+                        console.log(error)
+                    }
+                } 
+                /**
+                * Retorna
+                */
+                resolve(volumeGroups)
+                
+            } catch (error) {
+                reject(error)
+            }
+            
         })
     }
 }
