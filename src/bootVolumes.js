@@ -2,6 +2,7 @@ let Util = require("./util");
 const core = require('oci-core');
 const resourceSearch = require('./resourceSearch');
 const Compartments = require("./compartments");
+const Compute = require("./compute")
 
 class BootVolume {
 
@@ -123,6 +124,12 @@ class BootVolume {
          */
         return new Promise(async(resolve,reject)=>{
 
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+            /**
+             * Obtem a lista de compartimentos
+             */
+            var compartments = await new resourceSearch(this.#provider).find("compartment resources where (lifecycleState = 'ACTIVE')")
+
             /**
              * Cria um array para armazenar as informações
              */
@@ -168,39 +175,26 @@ class BootVolume {
                 })
             }else{
 
-                /**
-                 * Obtem a lista de compartimentos
-                 */
-                new Compartments(this.#provider).listCompartments().then(async compartments=>{
-                    for (const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.listBootVolumeAttachments(compartment.id).then(result=>{
-                            result.forEach(b => {
-                                bva.push(b)
-                            });
-                        }).catch(error=>{
-                            reject(error.message || error)
-                        })
+                try {
+                    for(const comp of compartments) {
+                        const attachments = await this.listBootVolumeAttachments(comp.identifier)
+                        for(const a of attachments) {
+                            bva.push(a)
+                        }
+                        await delay(100)
                     }
+                } catch (error) {
+                    console.log(error)
+                }
 
-                    await this.listBootVolumeAttachments(this.#provider.getTenantId()).then(result=>{
-                        result.forEach(b => {
-                            bva.push(b)
-                        });
-                    }).catch(error=>{
-                        reject(error.message || error)
-                    })
-                    resolve(bva)
+                await this.listBootVolumeAttachments(this.#provider.getTenantId()).then(result=>{
+                    result.forEach(b => {
+                        bva.push(b)
+                    });
                 }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
+                    reject(error.message || error)
                 })
+                resolve(bva)
             }
         })
     }

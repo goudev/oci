@@ -25,6 +25,12 @@ class Network {
          */
         return new Promise(async(resolve,reject)=>{
 
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+            /**
+             * Obtem a lista de compartimentos
+             */
+            var compartments = await new resourceSearch(this.#provider).find("compartment resources where (lifecycleState = 'ACTIVE')")
+
             /**
              * Cria um array para armazenar as informações
              */
@@ -82,56 +88,36 @@ class Network {
                 trace(`Obtendo a lista de compartmentos para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
                 /**
-                 * Obtem a lista de compartimentos
+                 * Trace
                  */
-                new Compartments(this.#provider).listCompartments().then(async compartments=>{
+                trace(`Encontrado ${compartments.length} compartimentos para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
 
-                    /**
-                     * Trace
-                     */
-                    trace(`Encontrado ${compartments.length} compartimentos para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
-
+                try {
                     for (const compartment of compartments) {
-
                         /**
                          * Trace
                          */
                         trace(`Consultando a lista de vnics no compartimento ${compartment.name} para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
-
-                        /**
-                         * Obtem a lista de vnics
-                         */
-                        await this.listVnicAttachments(compartment.id).then(result=>{
-
-                            /**
-                             * Trace
-                             */
-                            trace(`Encontrado ${result.length} vnics no compartimento ${compartment.name} para tenancy ${this.#provider.delegate.tenancy} na região ${this.#provider.getRegion()._regionId}`);
-
-                            result.forEach(b => {
-                                vnicsa.push(b)
-                            });
-                        }).catch(error=>{
-                            reject(error)
-                        })
+                        
+                        const vnicsatt = await this.listVnicAttachments(compartment.identifier)
+                        for(const vna of vnicsatt) {
+                            vnicsa.push(vna)
+                        }
+                        await delay(100)
                     }
-
-                    await this.listVnicAttachments(this.#provider.getTenantId()).then(result=>{
-                        result.forEach(b => {
-                            vnicsa.push(b)
-                        });
-                    }).catch(error=>{
-                        reject(error)
-                    })
-
-                    resolve(vnicsa)
+                } catch (error) {
+                    console.log(error)
+                }
+                
+                await this.listVnicAttachments(this.#provider.getTenantId()).then(result=>{
+                    result.forEach(b => {
+                        vnicsa.push(b)
+                    });
                 }).catch(error=>{
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error);
+                    reject(error)
                 })
+
+                resolve(vnicsa)
             }
         })
     }

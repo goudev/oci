@@ -144,6 +144,12 @@ class BlockVolume {
          */
         return new Promise(async (resolve, reject) => {
 
+            const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+            /**
+             * Obtem a lista de compartimentos
+             */
+            var compartments = await new resourceSearch(this.#provider).find("compartment resources where (lifecycleState = 'ACTIVE')")
+
             /**
              * Cria um array para armazenar as informações
              */
@@ -190,31 +196,26 @@ class BlockVolume {
 
             } else {
 
-                /**
-                 * Obtem a lista de compartimentos
-                 */
-                new Compartments(this.#provider).listCompartments().then(async compartments => {
-                    for (const compartment of compartments) {
-
-                        /**
-                         * Obtem a lista de compartimentos
-                         */
-                        await this.listBlockVolumeAttachments(compartment.id).then(result => {
-                            result.forEach(b => {
-                                bva.push(b)
-                            });
-                        }).catch(error => {
-                            reject(error.message || error)
-                        })
+                try {
+                    for(const comp of compartments) {
+                        const attachments = await this.listBlockVolumeAttachments(comp.identifier)
+                        for(const a of attachments) {
+                            bva.push(a)
+                        }
+                        await delay(100)
                     }
-                    resolve(bva)
-                }).catch(error => {
-
-                    /**
-                     * Rejeita a promise
-                     */
-                    reject(error.message);
+                } catch (error) {
+                    console.log(error)
+                }
+                
+                await this.listBlockVolumeAttachments(this.#provider.getTenantId()).then(result=>{
+                    result.forEach(b => {
+                        bva.push(b)
+                    });
+                }).catch(error=>{
+                    reject(error.message || error)
                 })
+                resolve(bva)
             }
         })
     }
