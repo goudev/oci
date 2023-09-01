@@ -2258,6 +2258,25 @@
     "sshpk" "1.16.1"
     "uuid" "3.3.3"
 
+"oci-common@2.69.0":
+  "integrity" "sha512-JKTbPw0eO6Ml4xcQSXNDRyzwCVKeaYRoe7kLJwq+TUbIGc/EXOi2zTnDS2hWuSy6i2PAu6WW/Oo+yudw2Y3XIA=="
+  "resolved" "https://registry.npmjs.org/oci-common/-/oci-common-2.69.0.tgz"
+  "version" "2.69.0"
+  dependencies:
+    "@types/isomorphic-fetch" "0.0.35"
+    "@types/jsonwebtoken" "9.0.0"
+    "@types/jssha" "2.0.0"
+    "@types/opossum" "4.1.1"
+    "@types/sshpk" "1.10.3"
+    "es6-promise" "4.2.6"
+    "http-signature" "1.3.1"
+    "isomorphic-fetch" "3.0.0"
+    "jsonwebtoken" "9.0.0"
+    "jssha" "2.4.1"
+    "opossum" "5.0.1"
+    "sshpk" "1.16.1"
+    "uuid" "3.3.3"
+
 "oci-computeinstanceagent@2.62.3":
   "integrity" "sha512-okREWmTpZcifoaKNkm/sJhhU0TuRXXBTtOsTTkKb1lnISrybjXjfivE76LbDgx7T6a5F+fzO5I9qra42V5OzdA=="
   "resolved" "https://registry.npmjs.org/oci-computeinstanceagent/-/oci-computeinstanceagent-2.62.3.tgz"
@@ -2803,13 +2822,29 @@
     "oci-common" "2.62.3"
     "oci-workrequests" "2.62.3"
 
-"oci-osuborganizationsubscription@^2.62.0", "oci-osuborganizationsubscription@2.62.3":
+"oci-osuborganizationsubscription@^2.69.0":
+  "integrity" "sha512-PzwMAry+uh9rgqHwZL6iI0JtWxzD2LPxRH+MS5Gwh1QuUnkjog4HI+Y0fCjLUQglp5QeFt09GdwkGXjHnBFOww=="
+  "resolved" "https://registry.npmjs.org/oci-osuborganizationsubscription/-/oci-osuborganizationsubscription-2.69.0.tgz"
+  "version" "2.69.0"
+  dependencies:
+    "oci-common" "2.69.0"
+    "oci-workrequests" "2.69.0"
+
+"oci-osuborganizationsubscription@2.62.3":
   "integrity" "sha512-aaE8uJxaaw+AflLw9FQdPtPFTBoLMrWEP/8nmWnK+L/4zdaAEoyEE8vDzxfB2VBJRcAqwrSCB8olQeyqj3iMDg=="
   "resolved" "https://registry.npmjs.org/oci-osuborganizationsubscription/-/oci-osuborganizationsubscription-2.62.3.tgz"
   "version" "2.62.3"
   dependencies:
     "oci-common" "2.62.3"
     "oci-workrequests" "2.62.3"
+
+"oci-osubsubscription@^2.69.0":
+  "integrity" "sha512-NTMYTXq4NYGH2GuMOFfeVwaNQypM9uVelExXKwiQxkfrqlj6AQRZW5yaCmbEVCHydJmi3ZJel6jm/hCB1PZ1cQ=="
+  "resolved" "https://registry.npmjs.org/oci-osubsubscription/-/oci-osubsubscription-2.69.0.tgz"
+  "version" "2.69.0"
+  dependencies:
+    "oci-common" "2.69.0"
+    "oci-workrequests" "2.69.0"
 
 "oci-osubsubscription@2.62.3":
   "integrity" "sha512-+2JB3W6Qsrn5nhY3SRNkhU7DxpmnS7Wyba2qlu++VBBsPU+J8BNWxihZwbPKsRiXj17yfm9reRkuYd7CYITF+g=="
@@ -3174,6 +3209,14 @@
   dependencies:
     "oci-common" "2.68.1"
     "oci-workrequests" "2.68.1"
+
+"oci-workrequests@2.69.0":
+  "integrity" "sha512-zon+NDMB0o8+e03cvXFWS5ROdi79cnLXbppEhn5cyLek6FdM4rEO+wsrSHz5SubX0wHrLvjn/amFKU2gppULzw=="
+  "resolved" "https://registry.npmjs.org/oci-workrequests/-/oci-workrequests-2.69.0.tgz"
+  "version" "2.69.0"
+  dependencies:
+    "oci-common" "2.69.0"
+    "oci-workrequests" "2.69.0"
 
 "once@^1.3.0":
   "integrity" "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="

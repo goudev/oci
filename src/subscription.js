@@ -1,6 +1,7 @@
 let Util = require("./util");
-let Usage = require('./usage');
+const Usage = require('./usage');
 const subscription = require('oci-osuborganizationsubscription');
+const osubsubscription = require('oci-osubsubscription')
 
 class Subscription {
 
@@ -27,20 +28,25 @@ class Subscription {
             const { items } = result;
 
             const contracts = [];
-
-            for (const contract of items) {
-                const usage = new Usage(this.#provider)
-                let currentSpent = await usage.listAccountOverviewFromTime(contract.timeStart, contract.timeEnd);
-                contract.currentSpent = String(currentSpent);
-                let currentDate = new Date();
-                let currentMonthFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-                let fifthMonthAgoFirstDay = new Date(currentDate.getFullYear(), currentDate.getMonth() - 5, 1);
-                let lastFiveMonthsCost = await usage.listAccountOverviewFromTime(fifthMonthAgoFirstDay, currentMonthFirstDay);
-                let remainingCredits = parseFloat(contract.totalValue) - parseFloat(currentSpent)
-                let media = String(lastFiveMonthsCost / 5);
-                contract.estimatedDaysToCreditsToRunOut = Math.ceil((remainingCredits / parseFloat(media)) * 31)
-                contract.estimatedDateToCreditToRunOut = new Date(currentDate.getTime() + contract.estimatedDaysToCreditsToRunOut * 24 * 60 * 60 * 1000)
-                contracts.push(contract);
+            var availableAmount = 0
+            var usedAmount = 0
+            
+            for(const subscription of items) {
+                subscription.contracts = await this.listContracts(subscription.id)
+                for(const contract of subscription.contracts) {
+                    usedAmount += parseFloat(contract.usedAmount)
+                    if(contract.status === 'ACTIVE') {
+                        availableAmount += parseFloat(contract.availableAmount)
+                    }
+                }
+                subscription.availableAmount = availableAmount
+                subscription.currentSpent = usedAmount
+                let lastThreeMonthsCost = await new Usage(this.#provider).getLast3MUsage();
+                let media = String(lastThreeMonthsCost / 3)
+                subscription.estimatedDaysToCreditsToRunOut = Math.ceil((availableAmount / parseFloat(media)) * 31)
+                let currentDate = new Date()
+                subscription.estimatedDateToCreditToRunOut = new Date(currentDate.getTime() + subscription.estimatedDaysToCreditsToRunOut * 24 * 60 * 60 * 1000)
+                contracts.push(subscription)
             }
 
             return result.items;
@@ -49,6 +55,57 @@ class Subscription {
                 return [{ serviceName: 'Pay as you go' }];
             }
         }
+    }
+
+    listContracts(subscriptionId) {
+        /**
+         * Retorna a promise
+         */
+        return new Promise(async (resolve, reject) => {
+
+            /**
+             * Desabilita o console
+             */
+            this.#util.disableConsole();
+
+            try {
+
+                /**
+                 * 
+                 */
+                await new osubsubscription.SubscriptionClient({ authenticationDetailsProvider: this.#provider }).listSubscriptions({
+                    compartmentId: this.#provider.getTenantId(),
+                    subscriptionId: subscriptionId
+                }).then(result => {
+                    /**
+                     * Habilita novamente o console
+                     */
+                    this.#util.enableConsole();
+
+                    /**
+                     * Retorna os contratos
+                     */
+                    resolve(result.items[0].subscribedServices)
+                })
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.enableConsole();
+
+            } catch (error) {
+
+                /**
+                 * Habilita o console
+                 */
+                this.#util.enableConsole();
+
+                /**
+                 * Rejeita a promise
+                 */
+                reject(error.message || error)
+            }
+        })
     }
 
 }

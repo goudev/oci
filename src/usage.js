@@ -127,45 +127,61 @@ class Usage {
     }
   }
 
-  async listAccountOverviewFromTime(timeStart, timeEnd) {
-    try {
-      const client = new usageapi.UsageapiClient({
-        authenticationDetailsProvider: this.#provider,
-      });
+  async getLast3MUsage() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
 
-      timeStart = new Date(timeStart);
-      timeEnd = new Date(timeEnd) > new Date() ? new Date() : new Date(timeEnd);
+      try {
+        var total = 0
 
-      let controller = new Date(timeStart);
-      controller.setMonth(timeStart.getMonth() + 1);
-
-      let currentSpent = 0;
-
-      while (timeStart < timeEnd) {
-        const usageDetails = {
+        var today = new Date();
+        var monthEnd = new Date()
+        monthEnd.setDate(today.getDate() - 1)
+        monthEnd.setHours(0,0,0,0)
+        var monthStart = new Date(monthEnd)
+        monthStart.setMonth(monthStart.getMonth() - 3)
+        
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
           tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(new Date(timeStart)),
-          timeUsageEnded: this.#dateToUTC(new Date(controller)),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          timeUsageStarted: this.#dateToUTC(new Date(monthStart)),
+          timeUsageEnded: this.#dateToUTC(new Date(monthEnd)),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
           queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ['currency', 'unit', 'service'],
-        };
-
-        const result = await client.requestSummarizedUsages({ requestSummarizedUsagesDetails: usageDetails });
-        const { items } = result.usageAggregation;
-
-        items.forEach(usage => {
-          currentSpent += usage.computedAmount;
-        });
-
-        timeStart.setMonth(timeStart.getMonth() + 1);
-        controller.setMonth(controller.getMonth() + 1);
+          groupBy: ["service"]
+        }}).then(result => {
+          result.usageAggregation.items.forEach(res => {
+          
+            if(res.computedAmount === null ) res.computedAmount = 0
+  
+            total += res.computedAmount
+  
+          })
+  
+          resolve(total)
+        })
+            
+      } catch (error) {
+        console.log(error)
       }
 
-      return currentSpent;
-    } catch (error) {
-      throw error;
-    }
+    
+      /**
+       * Habilita o console
+       */
+      this.#util.enableConsole();
+
+      
+    })
   }
 
   async listYearTotal() {
