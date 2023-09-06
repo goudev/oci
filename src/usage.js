@@ -1213,6 +1213,323 @@ class Usage {
       }
     })
   }
+
+  forecastInstances() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+      
+      var forecasts = [7, 15, 30, 60]
+      var today = new Date();
+      var monthEnd = new Date()
+      monthEnd.setDate(today.getDate() - 1)
+      monthEnd.setHours(0,0,0,0)
+      var monthStart = new Date(monthEnd)
+      monthStart.setMonth(monthStart.getMonth() - 1)
+      var forecastResults = []
+
+      try {
+        for(const day of forecasts) {
+          var forecastEnd = new Date(today)
+          forecastEnd.setDate(today.getDate() + day)
+            /**
+           * Client
+           */
+          const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+            requestSummarizedUsagesDetails: { 
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            forecast: {
+              forecastType: usageapi.models.Forecast.ForecastType.Basic,
+              timeForecastStarted: this.#dateToUTC(monthEnd),
+              timeForecastEnded: this.#dateToUTC(forecastEnd)
+            },
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["resourceId"],
+            filter: {
+              operator: usageapi.models.Filter.Operator.And,
+              dimensions: [
+                {
+                  key: "service",
+                  value: "COMPUTE"
+                }
+              ]
+            }
+          }})
+            
+          result.usageAggregation.items.forEach(i => {
+            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'instance') {
+              if(i.computedAmount == null) i.computedAmount = 0
+              const existingResource = forecastResults.find(
+                o => o.resourceId === i.resourceId
+              );
+  
+              if (existingResource) {
+                existingResource.forecast[day] =
+                  (existingResource.forecast[day] || 0) + i.computedAmount;
+              } else {
+                forecastResults.push({
+                  resourceId: i.resourceId,
+                  forecast: { [day]: i.computedAmount }
+                });
+              }
+            }
+          })
+            
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    
+      resolve(forecastResults)
+      
+      /**
+       * Habilita o console
+       */
+      this.#util.enableConsole();
+
+    })
+  }
+
+  forecastBlockVolumes() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+      
+      var forecasts = [7, 15, 30, 60]
+      var today = new Date();
+      var monthEnd = new Date()
+      monthEnd.setDate(today.getDate() - 1)
+      monthEnd.setHours(0,0,0,0)
+      var monthStart = new Date(monthEnd)
+      monthStart.setMonth(monthStart.getMonth() - 1)
+      var forecastResults = []
+
+      try {
+        for(const day of forecasts) {
+          var forecastEnd = new Date(today)
+          forecastEnd.setDate(today.getDate() + day)
+            /**
+           * Client
+           */
+          const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+            requestSummarizedUsagesDetails: { 
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            forecast: {
+              forecastType: usageapi.models.Forecast.ForecastType.Basic,
+              timeForecastStarted: this.#dateToUTC(monthEnd),
+              timeForecastEnded: this.#dateToUTC(forecastEnd)
+            },
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["resourceId"],
+            filter: {
+              operator: usageapi.models.Filter.Operator.And,
+              dimensions: [
+                {
+                  key: "service",
+                  value: "BLOCK_STORAGE"
+                }
+              ]
+            }
+          }})
+            
+          result.usageAggregation.items.forEach(i => {
+            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'volume') {
+              if(i.computedAmount == null) i.computedAmount = 0
+              const existingResource = forecastResults.find(
+                o => o.resourceId === i.resourceId
+              );
+  
+              if (existingResource) {
+                existingResource.forecast[day] =
+                  (existingResource.forecast[day] || 0) + i.computedAmount;
+              } else {
+                forecastResults.push({
+                  resourceId: i.resourceId,
+                  forecast: { [day]: i.computedAmount }
+                });
+              }
+            }
+          })
+            
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    
+      resolve(forecastResults)
+      
+      /**
+       * Habilita o console
+       */
+      this.#util.enableConsole();
+
+    })
+  }
+
+  forecastBootVolumes() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+      
+      var forecasts = [7, 15, 30, 60]
+      var today = new Date();
+      var monthEnd = new Date()
+      monthEnd.setDate(today.getDate() - 1)
+      monthEnd.setHours(0,0,0,0)
+      var monthStart = new Date(monthEnd)
+      monthStart.setMonth(monthStart.getMonth() - 1)
+      var forecastResults = []
+
+      try {
+        for(const day of forecasts) {
+          var forecastEnd = new Date(today)
+          forecastEnd.setDate(today.getDate() + day)
+            /**
+           * Client
+           */
+          const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+            requestSummarizedUsagesDetails: { 
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            forecast: {
+              forecastType: usageapi.models.Forecast.ForecastType.Basic,
+              timeForecastStarted: this.#dateToUTC(monthEnd),
+              timeForecastEnded: this.#dateToUTC(forecastEnd)
+            },
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["resourceId"],
+            filter: {
+              operator: usageapi.models.Filter.Operator.And,
+              dimensions: [
+                {
+                  key: "service",
+                  value: "BLOCK_STORAGE"
+                }
+              ]
+            }
+          }})
+            
+          result.usageAggregation.items.forEach(i => {
+            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'bootvolume') {
+              if(i.computedAmount == null) i.computedAmount = 0
+              const existingResource = forecastResults.find(
+                o => o.resourceId === i.resourceId
+              );
+  
+              if (existingResource) {
+                existingResource.forecast[day] =
+                  (existingResource.forecast[day] || 0) + i.computedAmount;
+              } else {
+                forecastResults.push({
+                  resourceId: i.resourceId,
+                  forecast: { [day]: i.computedAmount }
+                });
+              }
+            }
+          })
+            
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    
+      resolve(forecastResults)
+      
+      /**
+       * Habilita o console
+       */
+      this.#util.enableConsole();
+
+    })
+  }
+
+  forecastEnvironment() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+      
+      var forecasts = [7, 15, 30, 60, 90, 180]
+      var today = new Date();
+      var monthEnd = new Date()
+      monthEnd.setDate(today.getDate() - 1)
+      monthEnd.setHours(0,0,0,0)
+      var monthStart = new Date(monthEnd)
+      monthStart.setMonth(monthStart.getMonth() - 1)
+      var forecast = {}
+
+      try {
+        for(const day of forecasts) {
+          var forecastEnd = new Date(today)
+          forecastEnd.setDate(today.getDate() + day)
+            /**
+           * Client
+           */
+          const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+            requestSummarizedUsagesDetails: { 
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            forecast: {
+              forecastType: usageapi.models.Forecast.ForecastType.Basic,
+              timeForecastStarted: this.#dateToUTC(monthEnd),
+              timeForecastEnded: this.#dateToUTC(forecastEnd)
+            },
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service"]
+          }})
+            
+          result.usageAggregation.items.forEach(i => {
+            
+            if(i.isForecast === true ) {
+              if(i.computedAmount == null) i.computedAmount = 0
+
+              forecast[day] = (forecast[day] || 0) + i.computedAmount;
+              
+            }
+          })
+            
+        }
+      } catch (error) {
+        console.log(error)
+      }
+      resolve(forecast)
+      
+      /**
+       * Habilita o console
+       */
+      this.#util.enableConsole();
+
+    })
+  }
 }
 
 module.exports = Usage

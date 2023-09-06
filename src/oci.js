@@ -507,4 +507,21 @@ module.exports = class oci {
     listLast12MUsageByService() {
         return new Usage(this.#provider).listLast12MUsageByService()
     }
+
+    forecastInstances() {
+        return new Usage(this.#provider).forecastInstances()
+    }
+
+    forecastBlockVolumes() {
+        return new Usage(this.#provider).forecastBlockVolumes()
+    }
+    
+    forecastBootVolumes() {
+        return new Usage(this.#provider).forecastBootVolumes()
+    }
+
+    forecastEnvironment() {
+        return new Usage(this.#provider).forecastEnvironment()
+    }
+
 }
