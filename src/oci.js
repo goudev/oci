@@ -524,4 +524,8 @@ module.exports = class oci {
         return new Usage(this.#provider).forecastEnvironment()
     }
 
+    listLast12MUsageByRegion() {
+        return new Usage(this.#provider).listLast12MUsageByRegion()
+    }
+
 }

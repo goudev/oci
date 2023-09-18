@@ -1530,6 +1530,105 @@ class Usage {
 
     })
   }
+
+  listLast12MUsageByRegion() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1
+        var monthEnd = new Date(year, month, 1)
+        var monthStart = new Date(year, month - 12, 1)
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["region"]
+        }}).then(async result => {
+
+          const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
+
+          // Create an empty object to store the grouped, summed, and filled data
+          const groupedSummedAndFilledData = {};
+
+          result.usageAggregation.items.forEach(entry => {
+            const region = entry.region;
+            const timeUsageStarted = entry.timeUsageStarted;
+            const computedAmount = entry.computedAmount;
+
+
+            if (!groupedSummedAndFilledData[region]) {
+              groupedSummedAndFilledData[region] = []
+            }
+            
+           
+              groupedSummedAndFilledData[region].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
+           
+          });
+
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
+          // Fill in missing timeUsageStarted entries with a computedAmount of 0
+          for (const service in groupedSummedAndFilledData) {
+            for (const time of uniqueTimeUsageStarted) {
+              const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
+              
+              
+              if (!entry) {
+                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+              }
+            }
+          }
+
+          
+          // Sort the entries within each service based on timeUsageStarted
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const sortedServiceData = this.groupAndSum(serviceData);
+            
+            groupedSummedAndFilledData[service] = sortedServiceData;
+          }
+        
+          
+          resolve(groupedSummedAndFilledData)
+        })
+        
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
+
 }
 
 module.exports = Usage
