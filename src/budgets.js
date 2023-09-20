@@ -82,7 +82,9 @@ class Budgets {
              * Realiza a consulta
              */
             new budget.BudgetClient({ authenticationDetailsProvider: this.#provider }).listBudgets({
-                compartmentId: this.#provider.getTenantId()
+                compartmentId: this.#provider.getTenantId(),
+                lifecycleState: budget.models.LifecycleState.Active,
+                targetType: budget.requests.ListBudgetsRequest.TargetType.All
             }).then(result => {
                 result.items.forEach(budget => {
                     budgets.push(budget)
