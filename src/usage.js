@@ -834,7 +834,7 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-
+      
       try {
         var today = new Date();
         var year = today.getFullYear();
@@ -855,7 +855,7 @@ class Usage {
           result.usageAggregation.items.forEach(res => {
             amount += res.computedAmount
           })
-
+        
           resolve({[year]: amount});
         })
         
@@ -911,7 +911,6 @@ class Usage {
           
           function groupAndSumByTimeUsageStarted(objects) {
             const groups = {};
-          
             objects.forEach((obj) => {
               const timeUsageStarted = obj.timeUsageStarted;
               if (!groups[timeUsageStarted]) {
@@ -930,14 +929,17 @@ class Usage {
             return sortedGroups;
           }
 
-          const resultado = groupAndSumByTimeUsageStarted(result.usageAggregation.items);
+          const resultParsed = groupAndSumByTimeUsageStarted(result.usageAggregation.items);
 
-          var twoRecentCosts = resultado.slice(0, 2).map(item => item.computedAmountSum);
-          var history = {}
-          history['currentMonth'] = twoRecentCosts[0]
-          history['lastMonth'] = twoRecentCosts[1]
+          var twoRecentCosts = resultParsed.slice(0, 2).map(item => item.computedAmountSum);
+          var history = {
+            currentMonth:twoRecentCosts[0] || 0,
+            lastMonth: twoRecentCosts[1] || 0,
+          }
+
+          
         
-          resolve({data: resultado, history: history});
+          resolve({data: result, history });
           
         })
         
@@ -992,6 +994,8 @@ class Usage {
         /**
          * Client
          */
+        
+
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: { 
           tenantId: this.#provider.getTenantId(),
