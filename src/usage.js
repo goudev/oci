@@ -834,7 +834,7 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-
+      
       try {
         var today = new Date();
         var year = today.getFullYear();
@@ -855,7 +855,7 @@ class Usage {
           result.usageAggregation.items.forEach(res => {
             amount += res.computedAmount
           })
-
+        
           resolve({[year]: amount});
         })
         
@@ -911,7 +911,6 @@ class Usage {
           
           function groupAndSumByTimeUsageStarted(objects) {
             const groups = {};
-          
             objects.forEach((obj) => {
               const timeUsageStarted = obj.timeUsageStarted;
               if (!groups[timeUsageStarted]) {
@@ -930,14 +929,17 @@ class Usage {
             return sortedGroups;
           }
 
-          const resultado = groupAndSumByTimeUsageStarted(result.usageAggregation.items);
+          const resultParsed = groupAndSumByTimeUsageStarted(result.usageAggregation.items);
 
-          var twoRecentCosts = resultado.slice(0, 2).map(item => item.computedAmountSum);
-          var history = {}
-          history['currentMonth'] = twoRecentCosts[0]
-          history['lastMonth'] = twoRecentCosts[1]
+          var twoRecentCosts = resultParsed.slice(0, 2).map(item => item.computedAmountSum);
+          var history = {
+            currentMonth:twoRecentCosts[0] || 0,
+            lastMonth: twoRecentCosts[1] || 0,
+          }
+
+          
         
-          resolve({data: resultado, history: history});
+          resolve({data: result, history });
           
         })
         
@@ -973,6 +975,204 @@ class Usage {
       .value();
   }
 
+  listCostDaily() {
+    return new Promise(async (resolve, reject) => {
+      this.#util.disableConsole();
+
+      try {
+        const today = new Date();
+        const firstDate = new Date(today)
+        firstDate.setDate(today.getDate() - 90)
+        
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["service"],
+          
+        }}).then(async result => {
+          const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
+          const groupedSummedAndFilledData = {};
+
+          // Iterate through the usageData array to initialize the structure and sum services with "storage" or "store" in their names
+          result.usageAggregation.items.forEach(entry => {
+            const service = entry.service;
+            const timeUsageStarted = entry.timeUsageStarted;
+            const computedAmount = entry.computedAmount;
+
+            // Check if the service name contains "storage" or "store"
+            const isStorageService = /storage|store/i.test(service);
+
+            if (!groupedSummedAndFilledData[service]) {
+              groupedSummedAndFilledData[service] = []
+            }
+            
+           
+              groupedSummedAndFilledData[service].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
+           
+            if (isStorageService) {
+              if (!groupedSummedAndFilledData["Storage"]) {
+                groupedSummedAndFilledData["Storage"] = [];
+              }
+
+              
+                groupedSummedAndFilledData["Storage"].push({
+                  timeUsageStarted,
+                  computedAmount: computedAmount || 0
+                })            
+            }
+          });
+
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
+          // Fill in missing timeUsageStarted entries with a computedAmount of 0
+          for (const service in groupedSummedAndFilledData) {
+            for (const time of uniqueTimeUsageStarted) {
+              const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
+              
+              
+              if (!entry) {
+                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+              }
+            }
+          }
+
+          // Sort the uniqueTimeUsageStarted values in descending order
+          
+          // Sort the entries within each service based on timeUsageStarted
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const sortedServiceData = this.groupAndSum(serviceData);
+            
+            groupedSummedAndFilledData[service] = sortedServiceData;
+          }
+          
+          groupedSummedAndFilledData['Instance'] = await this.listCostDailyInstances()
+          
+          resolve(groupedSummedAndFilledData)
+        })
+      } catch (error) {        
+         this.#util.enableConsole();
+         reject(error.message || error)
+      }
+    })
+  }
+
+  listCostDailyInstances() {
+    /**
+     * Retorna a promise
+     */
+    return new Promise(async (resolve, reject) => {
+      /**
+       * Desabilita o console
+       */
+      this.#util.disableConsole();
+
+      try {
+        const today = new Date();
+        const firstDate = new Date(today)
+        firstDate.setDate(today.getDate() - 90)
+        
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+        /**
+         * Client
+         */
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: { 
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: this.#dateToUTC(monthStart),
+          timeUsageEnded: this.#dateToUTC(monthEnd),
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          groupBy: ["service", "resourceId"],
+          filter: {
+            operator: usageapi.models.Filter.Operator.And,
+            dimensions: [
+              {
+                key: "service",
+                value: "COMPUTE"
+              }
+            ]}
+        }}).then(async result => {
+          var x = []
+          result.usageAggregation.items.forEach(i => {
+            if(i.resourceId.split('.')[1] == 'instance') {
+              x.push(i)
+            }
+          })
+          const uniqueTimeUsageStarted = [...new Set(x.map(entry => entry.timeUsageStarted))];
+
+          // Create an empty object to store the grouped, summed, and filled data
+          const groupedSummedAndFilledData = {};
+
+          // Iterate through the usageData array to initialize the structure and sum services with "storage" or "store" in their names
+          x.forEach(entry => {
+            const timeUsageStarted = entry.timeUsageStarted;
+            const computedAmount = entry.computedAmount;
+
+            if (!groupedSummedAndFilledData["Instance"]) {
+              groupedSummedAndFilledData["Instance"] = []
+            }
+            
+              groupedSummedAndFilledData["Instance"].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
+           
+          });
+
+          uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
+          // Fill in missing timeUsageStarted entries with a computedAmount of 0
+          for (const service in groupedSummedAndFilledData) {
+            for (const time of uniqueTimeUsageStarted) {
+              const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
+              
+              
+              if (!entry) {
+                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+              }
+            }
+          }
+          // Sort the entries within each service based on timeUsageStarted
+          for (const service in groupedSummedAndFilledData) {
+            const serviceData = groupedSummedAndFilledData[service];
+            const sortedServiceData = this.groupAndSum(serviceData);
+            
+            groupedSummedAndFilledData[service] = sortedServiceData;
+          }     
+          
+          resolve(groupedSummedAndFilledData.Instance)
+      
+        })
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+      } catch (error) {
+
+        /**
+         * Habilita o console
+         */
+        this.#util.enableConsole();
+
+        /**
+         * Rejeita a promise
+         */
+        reject(error.message || error)
+      }
+    })
+  }
+
   listLast12MUsageByService() {
     /**
      * Retorna a promise
@@ -992,6 +1192,8 @@ class Usage {
         /**
          * Client
          */
+        
+
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: { 
           tenantId: this.#provider.getTenantId(),
