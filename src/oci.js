@@ -508,6 +508,10 @@ module.exports = class oci {
         return new Usage(this.#provider).listLast12MUsageByService()
     }
 
+    listCostDaily(params) {
+        return new Usage(this.#provider).listCostDaily(params)
+    }
+
     forecastInstances() {
         return new Usage(this.#provider).forecastInstances()
     }
