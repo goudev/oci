@@ -975,16 +975,17 @@ class Usage {
       .value();
   }
 
-  listCostDaily(params = {}) {
+  listCostDaily() {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
 
       try {
-        var today = new Date();
-        var year = params.year ?? today.getFullYear();
-        var month = params.month ?? today.getMonth()
-        var monthStart = new Date(year, month, 1)
-        var monthEnd = new Date(year, month, 31)
+        const today = new Date();
+        const firstDate = new Date(today)
+        firstDate.setDate(today.getDate() - 90)
+        
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: { 
@@ -1054,7 +1055,7 @@ class Usage {
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
           
-          groupedSummedAndFilledData['Instance'] = await this.listCostDailyInstances({year, month})
+          groupedSummedAndFilledData['Instance'] = await this.listCostDailyInstances()
           
           resolve(groupedSummedAndFilledData)
         })
@@ -1065,7 +1066,7 @@ class Usage {
     })
   }
 
-  listCostDailyInstances(params) {
+  listCostDailyInstances() {
     /**
      * Retorna a promise
      */
@@ -1076,11 +1077,12 @@ class Usage {
       this.#util.disableConsole();
 
       try {
-        var today = new Date();
-        var year = params.year ?? today.getFullYear();
-        var month = params.month ?? today.getMonth()
-        var monthEnd = new Date(year, month, 31)
-        var monthStart = new Date(year, month , 1)
+        const today = new Date();
+        const firstDate = new Date(today)
+        firstDate.setDate(today.getDate() - 90)
+        
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
         /**
          * Client
          */
