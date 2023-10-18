@@ -512,6 +512,10 @@ module.exports = class oci {
         return new Usage(this.#provider).listCostDaily()
     }
 
+    listCostDailyWithTags() {
+        return new Usage(this.#provider).listCostDailyWithTags()
+    }
+
     forecastInstances() {
         return new Usage(this.#provider).forecastInstances()
     }

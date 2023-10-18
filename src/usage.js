@@ -1066,6 +1066,79 @@ class Usage {
     })
   }
 
+  listCostDailyWithTags() {
+    return new Promise(async (resolve, reject) => {
+      this.#util.disableConsole();
+  
+      try {
+        const today = new Date();
+        const firstDate = new Date(today);
+        firstDate.setDate(today.getDate() - 90);
+  
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate());
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["tagNamespace", "tagKey", "tagValue", "service"]
+          }
+        }).then(async result => {
+          var itens = [];
+          result.usageAggregation.items.forEach(entry => {
+            itens.push({
+              service: entry.service == null ? " " : entry.service,
+              timeUsageStarted: entry.timeUsageStarted,
+              currency: entry.currency,
+              computedAmount: entry.computedAmount,
+              tags: entry.tags
+            });
+          });
+  
+          // Agrupar por data e por serviço
+          const groupedItems = itens.reduce((acc, item) => {
+            const day = item.timeUsageStarted.split('T')[0]; // Obtém apenas a parte da data
+  
+            acc[day] = acc[day] || {};
+            acc[day][item.service] = acc[day][item.service] || [];
+            acc[day][item.service].push(item);
+  
+            return acc;
+          }, {});
+  
+          // Obter e ordenar as chaves (datas)
+          const sortedDates = Object.keys(groupedItems).sort();
+  
+          // Criar um novo objeto ordenado
+          const orderedGroupedItems = {};
+          sortedDates.forEach(day => {
+            orderedGroupedItems[day] = groupedItems[day];
+          });
+  
+          // Ordenar cada grupo por serviço e por data
+          for (const day in orderedGroupedItems) {
+            for (const service in orderedGroupedItems[day]) {
+              orderedGroupedItems[day][service] = orderedGroupedItems[day][service].sort((a, b) => {
+                const valueA = a['timeUsageStarted'];
+                const valueB = b['timeUsageStarted'];
+                return valueA < valueB ? -1 : (valueA > valueB ? 1 : 0);
+              });
+            }
+          }
+          
+          resolve(orderedGroupedItems);
+        });
+      } catch (error) {
+        this.#util.enableConsole();
+        reject(error.message || error);
+      }
+    });
+  }
+
   listCostDailyInstances() {
     /**
      * Retorna a promise
