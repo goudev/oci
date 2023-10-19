@@ -1139,6 +1139,41 @@ class Usage {
     });
   }
 
+  filterPeriodCostWithTags(startAt, finishAt) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const monthStart = new Date(startAt.getFullYear(), startAt.getMonth(), startAt.getDate());
+        const monthEnd = new Date(finishAt.getFullYear(), finishAt.getMonth(), finishAt.getDate());
+
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["tagNamespace", "tagKey", "tagValue", "service"]
+          }
+        }).then(async result => {
+          var itens = [];
+          result.usageAggregation.items.forEach(entry => {
+            itens.push({
+              service: entry.service == null ? " " : entry.service,
+              timeUsageStarted: entry.timeUsageStarted,
+              currency: entry.currency,
+              computedAmount: entry.computedAmount,
+              tags: entry.tags
+            });
+          });
+
+          resolve(itens);
+        });
+      } catch (error) {
+        reject(error.message || error);
+      }
+    });
+  }
+
   listCostDailyInstances() {
     /**
      * Retorna a promise
