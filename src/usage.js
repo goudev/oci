@@ -1092,13 +1092,16 @@ class Usage {
             timeUsageEnded: this.#dateToUTC(monthEnd),
             granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["tagNamespace", "tagKey", "tagValue", "service"]
+            groupBy: ["service"]
           }
         }).then(async result => {
           var itens = [];
           result.usageAggregation.items.forEach(entry => {
+            const isStorageService = /storage|store/i.test(entry.service);
+            var service = isStorageService ? "Storage" : entry.service
+
             itens.push({
-              service: entry.service == null ? " " : entry.service,
+              service: service,
               timeUsageStarted: entry.timeUsageStarted,
               currency: entry.currency,
               computedAmount: entry.computedAmount,
@@ -1156,7 +1159,7 @@ class Usage {
             timeUsageEnded: this.#dateToUTC(finishAt),
             granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["tagNamespace", "tagKey", "tagValue", "service"]
+            groupBy: ["service"]
           }
         }).then(async result => {
           var itens = [];
