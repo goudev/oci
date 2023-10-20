@@ -1142,14 +1142,11 @@ class Usage {
   filterPeriodCostWithTags(startAt, finishAt) {
     return new Promise(async (resolve, reject) => {
       try {
-        const monthStart = new Date(startAt.getFullYear(), startAt.getMonth(), startAt.getDate());
-        const monthEnd = new Date(finishAt.getFullYear(), finishAt.getMonth(), finishAt.getDate());
-
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: {
             tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
+            timeUsageStarted: this.#dateToUTC(startAt),
+            timeUsageEnded: this.#dateToUTC(finishAt),
             granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
             groupBy: ["tagNamespace", "tagKey", "tagValue", "service"]
