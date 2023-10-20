@@ -65,13 +65,13 @@ class Usage {
     try {
       const client = new usageapi.UsageapiClient({
         authenticationDetailsProvider: this.#provider,
-      }, { 
+      }, {
         retryConfiguration: {
           delayStrategy: new common.ExponentialBackoffDelayStrategy(30),
-          terminationStrategy: new common.MaxTimeTerminationStrategy(60 * 60), 
+          terminationStrategy: new common.MaxTimeTerminationStrategy(60 * 60),
         }
       });
-      
+
       const result = await client.requestSummarizedUsages({
         requestSummarizedUsagesDetails: {
           isAggregateByTime: true,
@@ -92,7 +92,7 @@ class Usage {
           }
         }
       });
-      
+
       const { items } = result.usageAggregation;
       return items;
     } catch (error) {
@@ -143,44 +143,45 @@ class Usage {
         var today = new Date();
         var monthEnd = new Date()
         monthEnd.setDate(today.getDate() - 1)
-        monthEnd.setHours(0,0,0,0)
+        monthEnd.setHours(0, 0, 0, 0)
         var monthStart = new Date(monthEnd)
         monthStart.setMonth(monthStart.getMonth() - 3)
-        
+
         /**
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(new Date(monthStart)),
-          timeUsageEnded: this.#dateToUTC(new Date(monthEnd)),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"]
-        }}).then(result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(new Date(monthStart)),
+            timeUsageEnded: this.#dateToUTC(new Date(monthEnd)),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service"]
+          }
+        }).then(result => {
           result.usageAggregation.items.forEach(res => {
-          
-            if(res.computedAmount === null ) res.computedAmount = 0
-  
+
+            if (res.computedAmount === null) res.computedAmount = 0
+
             total += res.computedAmount
-  
+
           })
-  
+
           resolve(total)
         })
-            
+
       } catch (error) {
         console.log(error)
       }
 
-    
+
       /**
        * Habilita o console
        */
       this.#util.enableConsole();
 
-      
+
     })
   }
 
@@ -222,7 +223,7 @@ class Usage {
 
         const { items } = result.usageAggregation;
 
-        for(const item of items) {
+        for (const item of items) {
           total += item.computedAmount;
         }
 
@@ -249,10 +250,10 @@ class Usage {
 
       let requestSummarizedUsagesDetails;
 
-      if(!days) {
+      if (!days) {
         return { forecastCost: 0, forecastStarted, forecastEnded };
       }
-      
+
       if (resourceId) {
         requestSummarizedUsagesDetails = {
           tenantId: this.#provider.getTenantId(),
@@ -276,7 +277,7 @@ class Usage {
             ]
           }
         };
-      } else  {
+      } else {
         requestSummarizedUsagesDetails = {
           tenantId: this.#provider.getTenantId(),
           isForecast: true,
@@ -297,7 +298,7 @@ class Usage {
       });
 
       let forecastCost = 0;
-      for(const i of result.usageAggregation.items) {
+      for (const i of result.usageAggregation.items) {
         forecastCost += i.computedAmount;
       }
 
@@ -622,16 +623,17 @@ class Usage {
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["resourceId", "service"]
-        }}).then(result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["resourceId", "service"]
+          }
+        }).then(result => {
           result.usageAggregation.items.forEach(i => {
-            if(i.computedAmount == null) i.computedAmount = 0
+            if (i.computedAmount == null) i.computedAmount = 0
           })
 
           resolve(result.usageAggregation.items);
@@ -679,14 +681,15 @@ class Usage {
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service", "resourceId"]
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service", "resourceId"]
+          }
+        }).then(async result => {
 
           // Função para agrupar por "service"
           function groupByService(data) {
@@ -703,16 +706,16 @@ class Usage {
             });
             data.forEach(resource => {
               var { computedAmount, timeUsageStarted } = resource
-              if(resource.resourceId.split('.')[1] == 'instance') {
-                if(!groupedData['Instance']) {
+              if (resource.resourceId.split('.')[1] == 'instance') {
+                if (!groupedData['Instance']) {
                   groupedData['Instance'] = []
                 }
-                groupedData['Instance'].push({timeUsageStarted, computedAmount})
+                groupedData['Instance'].push({ timeUsageStarted, computedAmount })
               }
             })
             return groupedData;
           }
-          
+
           // Função para calcular a soma dos "computedAmount" com base no "timeUsageStarted"
           function sumComputedAmounts(groupedData) {
             for (const service in groupedData) {
@@ -729,7 +732,7 @@ class Usage {
             }
             return groupedData;
           }
-          
+
           // Função para preencher com valores padrão caso não tenha "timeUsageStarted"
           function fillMissingTimeUsage(groupedData) {
             const timeUsages = new Set();
@@ -740,7 +743,7 @@ class Usage {
               });
             }
             const sortedTimeUsages = Array.from(timeUsages).sort((a, b) => new Date(b) - new Date(a));
-          
+
             for (const service in groupedData) {
               const entries = groupedData[service];
               const timeUsageSet = new Set(entries.map((entry) => entry.timeUsageStarted));
@@ -751,23 +754,23 @@ class Usage {
               });
               entries.sort((a, b) => new Date(b.timeUsageStarted) - new Date(a.timeUsageStarted));
             }
-          
+
             return groupedData;
           }
-          
+
           // Agrupa os objetos por "service"
           const groupedByService = groupByService(result.usageAggregation.items);
-          
+
           // Calcula a soma dos "computedAmount" por "timeUsageStarted"
           const summedComputedAmounts = sumComputedAmounts(groupedByService);
-          
+
           // Preenche com valores padrão caso não tenha "timeUsageStarted"
           const finalResult = fillMissingTimeUsage(summedComputedAmounts);
 
           function isStorage(name) {
             return name.toLowerCase().includes('storage') || name.toLowerCase().includes('store');
           }
-          
+
           // Função para calcular a soma dos valores do mesmo índice nos arrays de storage
           function calculateStorageSum(data) {
             const storageSum = [];
@@ -778,32 +781,32 @@ class Usage {
                 }
                 return acc;
               }, 0);
-          
+
               // Cria um objeto com os campos 'timeUsageStarted' e 'computedAmount'
               const storageObj = {
                 timeUsageStarted: data['Compute'][i].timeUsageStarted,
                 computedAmount: sum,
               };
-          
+
               storageSum.push(storageObj);
             }
             return storageSum;
           }
-          
+
           // Adiciona o novo array "storage" ao objeto "data"
           finalResult['Storage'] = calculateStorageSum(finalResult);
 
           for (const service in finalResult) {
             const serviceData = finalResult[service].slice(0, 2);
             const recentTwoValues = serviceData.map((item) => item.computedAmount);
-            finalResult[service].push({improvement: this.#calcImprovement(recentTwoValues[0], recentTwoValues[1]) }) 
+            finalResult[service].push({ improvement: this.#calcImprovement(recentTwoValues[0], recentTwoValues[1]) })
           }
 
-        
+
           resolve(finalResult);
-          
+
         })
-        
+
         /**
          * Habilita o console
          */
@@ -834,31 +837,32 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-      
+
       try {
         var today = new Date();
         var year = today.getFullYear();
-        var month = today.getMonth() 
+        var month = today.getMonth()
         var yearStart = new Date(year, 0, 1)
         var nextMonth = new Date(year, month + 1, 1)
 
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(yearStart),
-          timeUsageEnded: this.#dateToUTC(nextMonth),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"]
-        }}).then(result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(yearStart),
+            timeUsageEnded: this.#dateToUTC(nextMonth),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service", "tagNamespace", "tagValue", "tagKey"]
+          }
+        }).then(result => {
           var amount = 0
           result.usageAggregation.items.forEach(res => {
             amount += res.computedAmount
           })
-        
-          resolve({[year]: amount});
+
+          resolve({ [year]: amount });
         })
-        
+
         /**
          * Habilita o console
          */
@@ -888,44 +892,50 @@ class Usage {
       /**
        * Desabilita o console
        */
-      this.#util.disableConsole();
+      // this.#util.disableConsole();
 
       try {
         var today = new Date();
-        var year = today.getFullYear();
-        var month = today.getMonth() + 1
-        var monthEnd = new Date(year, month, 1)
-        var monthStart = new Date(year, month - 12, 1)
+        var monthStart = new Date(today.getFullYear(), today.getMonth() - 12, today.getDate())
+        var monthFinish = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
+
+        console.log(this.#dateToUTC(monthStart), this.#dateToUTC(monthFinish))
 
         /**
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"]}
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthFinish),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service", "tagNamespace", "tagValue", "tagKey"]
+          }
         }).then(async result => {
-          
+
           function groupAndSumByTimeUsageStarted(objects) {
             const groups = {};
             objects.forEach((obj) => {
-              const timeUsageStarted = obj.timeUsageStarted;
-              if (!groups[timeUsageStarted]) {
-                groups[timeUsageStarted] = {
-                  timeUsageStarted,
+              var refferDate = obj.timeUsageStarted.split('T')[0].split('-');
+              refferDate = refferDate[0] + "-" + refferDate[1] + "-01";
+
+              if (!groups[refferDate]) {
+                groups[refferDate] = {
+                  timeUsageStarted: refferDate,
                   computedAmountSum: 0,
                 };
               }
-              groups[timeUsageStarted].computedAmountSum += obj.computedAmount;
+              if (obj.computedAmount) {
+                groups[refferDate].computedAmountSum += obj.computedAmount;
+              }
             });
-          
-            const sortedGroups = Object.values(groups).sort((a, b) => {
-              return new Date(b.timeUsageStarted) - new Date(a.timeUsageStarted);
-            });
-          
+
+            const sortedGroups = Object.values(groups)
+              .sort((a, b) => new Date(b.timeUsageStarted).getTime() - new Date(a.timeUsageStarted).getTime());
+
+
             return sortedGroups;
           }
 
@@ -933,16 +943,14 @@ class Usage {
 
           var twoRecentCosts = resultParsed.slice(0, 2).map(item => item.computedAmountSum);
           var history = {
-            currentMonth:twoRecentCosts[0] || 0,
+            currentMonth: twoRecentCosts[0] || 0,
             lastMonth: twoRecentCosts[1] || 0,
           }
 
-          
-        
-          resolve({data: result, history });
-          
+          resolve({ data: resultParsed, history });
+
         })
-        
+
         /**
          * Habilita o console
          */
@@ -983,20 +991,21 @@ class Usage {
         const today = new Date();
         const firstDate = new Date(today)
         firstDate.setDate(today.getDate() - 90)
-        
+
         const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
         const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"],
-          
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service"],
+
+          }
+        }).then(async result => {
           const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
           const groupedSummedAndFilledData = {};
 
@@ -1012,23 +1021,23 @@ class Usage {
             if (!groupedSummedAndFilledData[service]) {
               groupedSummedAndFilledData[service] = []
             }
-            
-           
-              groupedSummedAndFilledData[service].push({
-                timeUsageStarted,
-                computedAmount: computedAmount || 0
-              })
-           
+
+
+            groupedSummedAndFilledData[service].push({
+              timeUsageStarted,
+              computedAmount: computedAmount || 0
+            })
+
             if (isStorageService) {
               if (!groupedSummedAndFilledData["Storage"]) {
                 groupedSummedAndFilledData["Storage"] = [];
               }
 
-              
-                groupedSummedAndFilledData["Storage"].push({
-                  timeUsageStarted,
-                  computedAmount: computedAmount || 0
-                })            
+
+              groupedSummedAndFilledData["Storage"].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
             }
           });
 
@@ -1037,31 +1046,31 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
               const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
-              
-              
+
+
               if (!entry) {
-                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+                groupedSummedAndFilledData[service].push({ timeUsageStarted: time, computedAmount: 0 });
               }
             }
           }
 
           // Sort the uniqueTimeUsageStarted values in descending order
-          
+
           // Sort the entries within each service based on timeUsageStarted
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const sortedServiceData = this.groupAndSum(serviceData);
-            
+
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
-          
+
           groupedSummedAndFilledData['Instance'] = await this.listCostDailyInstances()
-          
+
           resolve(groupedSummedAndFilledData)
         })
-      } catch (error) {        
-         this.#util.enableConsole();
-         reject(error.message || error)
+      } catch (error) {
+        this.#util.enableConsole();
+        reject(error.message || error)
       }
     })
   }
@@ -1069,15 +1078,15 @@ class Usage {
   listCostDailyWithTags() {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
-  
+
       try {
         const today = new Date();
         const firstDate = new Date(today);
         firstDate.setDate(today.getDate() - 90);
-  
+
         const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate());
         const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  
+
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: {
             tenantId: this.#provider.getTenantId(),
@@ -1098,27 +1107,27 @@ class Usage {
               tags: entry.tags
             });
           });
-  
+
           // Agrupar por data e por serviço
           const groupedItems = itens.reduce((acc, item) => {
             const day = item.timeUsageStarted.split('T')[0]; // Obtém apenas a parte da data
-  
+
             acc[day] = acc[day] || {};
             acc[day][item.service] = acc[day][item.service] || [];
             acc[day][item.service].push(item);
-  
+
             return acc;
           }, {});
-  
+
           // Obter e ordenar as chaves (datas)
           const sortedDates = Object.keys(groupedItems).sort();
-  
+
           // Criar um novo objeto ordenado
           const orderedGroupedItems = {};
           sortedDates.forEach(day => {
             orderedGroupedItems[day] = groupedItems[day];
           });
-  
+
           // Ordenar cada grupo por serviço e por data
           for (const day in orderedGroupedItems) {
             for (const service in orderedGroupedItems[day]) {
@@ -1129,7 +1138,7 @@ class Usage {
               });
             }
           }
-          
+
           resolve(orderedGroupedItems);
         });
       } catch (error) {
@@ -1185,32 +1194,34 @@ class Usage {
         const today = new Date();
         const firstDate = new Date(today)
         firstDate.setDate(today.getDate() - 90)
-        
+
         const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
         const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
         /**
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service", "resourceId"],
-          filter: {
-            operator: usageapi.models.Filter.Operator.And,
-            dimensions: [
-              {
-                key: "service",
-                value: "COMPUTE"
-              }
-            ]}
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service", "resourceId"],
+            filter: {
+              operator: usageapi.models.Filter.Operator.And,
+              dimensions: [
+                {
+                  key: "service",
+                  value: "COMPUTE"
+                }
+              ]
+            }
+          }
+        }).then(async result => {
           var x = []
           result.usageAggregation.items.forEach(i => {
-            if(i.resourceId.split('.')[1] == 'instance') {
+            if (i.resourceId.split('.')[1] == 'instance') {
               x.push(i)
             }
           })
@@ -1227,12 +1238,12 @@ class Usage {
             if (!groupedSummedAndFilledData["Instance"]) {
               groupedSummedAndFilledData["Instance"] = []
             }
-            
-              groupedSummedAndFilledData["Instance"].push({
-                timeUsageStarted,
-                computedAmount: computedAmount || 0
-              })
-           
+
+            groupedSummedAndFilledData["Instance"].push({
+              timeUsageStarted,
+              computedAmount: computedAmount || 0
+            })
+
           });
 
           uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
@@ -1240,10 +1251,10 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
               const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
-              
-              
+
+
               if (!entry) {
-                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+                groupedSummedAndFilledData[service].push({ timeUsageStarted: time, computedAmount: 0 });
               }
             }
           }
@@ -1251,12 +1262,12 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const sortedServiceData = this.groupAndSum(serviceData);
-            
+
             groupedSummedAndFilledData[service] = sortedServiceData;
-          }     
-          
+          }
+
           resolve(groupedSummedAndFilledData.Instance)
-      
+
         })
         /**
          * Habilita o console
@@ -1297,17 +1308,18 @@ class Usage {
         /**
          * Client
          */
-        
+
 
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service"]
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service"]
+          }
+        }).then(async result => {
 
           const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
 
@@ -1326,23 +1338,23 @@ class Usage {
             if (!groupedSummedAndFilledData[service]) {
               groupedSummedAndFilledData[service] = []
             }
-            
-           
-              groupedSummedAndFilledData[service].push({
-                timeUsageStarted,
-                computedAmount: computedAmount || 0
-              })
-           
+
+
+            groupedSummedAndFilledData[service].push({
+              timeUsageStarted,
+              computedAmount: computedAmount || 0
+            })
+
             if (isStorageService) {
               if (!groupedSummedAndFilledData["Storage"]) {
                 groupedSummedAndFilledData["Storage"] = [];
               }
 
-              
-                groupedSummedAndFilledData["Storage"].push({
-                  timeUsageStarted,
-                  computedAmount: computedAmount || 0
-                })            
+
+              groupedSummedAndFilledData["Storage"].push({
+                timeUsageStarted,
+                computedAmount: computedAmount || 0
+              })
             }
           });
 
@@ -1351,40 +1363,40 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
               const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
-              
-              
+
+
               if (!entry) {
-                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+                groupedSummedAndFilledData[service].push({ timeUsageStarted: time, computedAmount: 0 });
               }
             }
           }
 
           // Sort the uniqueTimeUsageStarted values in descending order
-          
+
           // Sort the entries within each service based on timeUsageStarted
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const sortedServiceData = this.groupAndSum(serviceData);
-            
+
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
-          
+
 
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const firstTwoValues = serviceData.slice(0, 2).map((entry) => entry.computedAmount);
             const processedResult = this.#calcImprovement(...firstTwoValues);
-            
+
             // Add the processed result at the end of the service entry
-            serviceData.push({improvement: processedResult});
+            serviceData.push({ improvement: processedResult });
           }
 
           groupedSummedAndFilledData['Instance'] = await this.getLast12MInstancesUsage()
-          
+
           resolve(groupedSummedAndFilledData)
         })
-        
-        
+
+
         /**
          * Habilita o console
          */
@@ -1426,25 +1438,27 @@ class Usage {
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["service", "resourceId"],
-          filter: {
-            operator: usageapi.models.Filter.Operator.And,
-            dimensions: [
-              {
-                key: "service",
-                value: "COMPUTE"
-              }
-            ]}
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service", "resourceId"],
+            filter: {
+              operator: usageapi.models.Filter.Operator.And,
+              dimensions: [
+                {
+                  key: "service",
+                  value: "COMPUTE"
+                }
+              ]
+            }
+          }
+        }).then(async result => {
           var x = []
           result.usageAggregation.items.forEach(i => {
-            if(i.resourceId.split('.')[1] == 'instance') {
+            if (i.resourceId.split('.')[1] == 'instance') {
               x.push(i)
             }
           })
@@ -1461,12 +1475,12 @@ class Usage {
             if (!groupedSummedAndFilledData["Instance"]) {
               groupedSummedAndFilledData["Instance"] = []
             }
-            
-              groupedSummedAndFilledData["Instance"].push({
-                timeUsageStarted,
-                computedAmount: computedAmount || 0
-              })
-           
+
+            groupedSummedAndFilledData["Instance"].push({
+              timeUsageStarted,
+              computedAmount: computedAmount || 0
+            })
+
           });
 
           uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
@@ -1474,10 +1488,10 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
               const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
-              
-              
+
+
               if (!entry) {
-                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+                groupedSummedAndFilledData[service].push({ timeUsageStarted: time, computedAmount: 0 });
               }
             }
           }
@@ -1485,21 +1499,21 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const sortedServiceData = this.groupAndSum(serviceData);
-            
+
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
-        
+
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const firstTwoValues = serviceData.slice(0, 2).map((entry) => entry.computedAmount);
             const processedResult = this.#calcImprovement(...firstTwoValues);
-            
+
             // Add the processed result at the end of the service entry
-            serviceData.push({improvement: processedResult});
+            serviceData.push({ improvement: processedResult });
           }
-          
+
           resolve(groupedSummedAndFilledData.Instance)
-      
+
         })
         /**
          * Habilita o console
@@ -1530,54 +1544,55 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-      
+
       var forecasts = [7, 15, 30, 60]
       var today = new Date();
       var monthEnd = new Date()
       monthEnd.setDate(today.getDate() - 1)
-      monthEnd.setHours(0,0,0,0)
+      monthEnd.setHours(0, 0, 0, 0)
       var monthStart = new Date(monthEnd)
       monthStart.setMonth(monthStart.getMonth() - 1)
       var forecastResults = []
 
       try {
-        for(const day of forecasts) {
+        for (const day of forecasts) {
           var forecastEnd = new Date(today)
           forecastEnd.setDate(today.getDate() + day)
-            /**
-           * Client
-           */
+          /**
+         * Client
+         */
           const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-            requestSummarizedUsagesDetails: { 
-            tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
-            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-            forecast: {
-              forecastType: usageapi.models.Forecast.ForecastType.Basic,
-              timeForecastStarted: this.#dateToUTC(monthEnd),
-              timeForecastEnded: this.#dateToUTC(forecastEnd)
-            },
-            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["resourceId"],
-            filter: {
-              operator: usageapi.models.Filter.Operator.And,
-              dimensions: [
-                {
-                  key: "service",
-                  value: "COMPUTE"
-                }
-              ]
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: this.#dateToUTC(monthStart),
+              timeUsageEnded: this.#dateToUTC(monthEnd),
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+              forecast: {
+                forecastType: usageapi.models.Forecast.ForecastType.Basic,
+                timeForecastStarted: this.#dateToUTC(monthEnd),
+                timeForecastEnded: this.#dateToUTC(forecastEnd)
+              },
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ["resourceId"],
+              filter: {
+                operator: usageapi.models.Filter.Operator.And,
+                dimensions: [
+                  {
+                    key: "service",
+                    value: "COMPUTE"
+                  }
+                ]
+              }
             }
-          }})
-            
+          })
+
           result.usageAggregation.items.forEach(i => {
-            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'instance') {
-              if(i.computedAmount == null) i.computedAmount = 0
+            if (i.isForecast === true && i.resourceId?.split(".")[1] === 'instance') {
+              if (i.computedAmount == null) i.computedAmount = 0
               const existingResource = forecastResults.find(
                 o => o.resourceId === i.resourceId
               );
-  
+
               if (existingResource) {
                 existingResource.forecast[day] =
                   (existingResource.forecast[day] || 0) + i.computedAmount;
@@ -1589,14 +1604,14 @@ class Usage {
               }
             }
           })
-            
+
         }
       } catch (error) {
         console.log(error)
       }
-    
+
       resolve(forecastResults)
-      
+
       /**
        * Habilita o console
        */
@@ -1614,54 +1629,55 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-      
+
       var forecasts = [7, 15, 30, 60]
       var today = new Date();
       var monthEnd = new Date()
       monthEnd.setDate(today.getDate() - 1)
-      monthEnd.setHours(0,0,0,0)
+      monthEnd.setHours(0, 0, 0, 0)
       var monthStart = new Date(monthEnd)
       monthStart.setMonth(monthStart.getMonth() - 1)
       var forecastResults = []
 
       try {
-        for(const day of forecasts) {
+        for (const day of forecasts) {
           var forecastEnd = new Date(today)
           forecastEnd.setDate(today.getDate() + day)
-            /**
-           * Client
-           */
+          /**
+         * Client
+         */
           const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-            requestSummarizedUsagesDetails: { 
-            tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
-            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-            forecast: {
-              forecastType: usageapi.models.Forecast.ForecastType.Basic,
-              timeForecastStarted: this.#dateToUTC(monthEnd),
-              timeForecastEnded: this.#dateToUTC(forecastEnd)
-            },
-            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["resourceId"],
-            filter: {
-              operator: usageapi.models.Filter.Operator.And,
-              dimensions: [
-                {
-                  key: "service",
-                  value: "BLOCK_STORAGE"
-                }
-              ]
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: this.#dateToUTC(monthStart),
+              timeUsageEnded: this.#dateToUTC(monthEnd),
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+              forecast: {
+                forecastType: usageapi.models.Forecast.ForecastType.Basic,
+                timeForecastStarted: this.#dateToUTC(monthEnd),
+                timeForecastEnded: this.#dateToUTC(forecastEnd)
+              },
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ["resourceId"],
+              filter: {
+                operator: usageapi.models.Filter.Operator.And,
+                dimensions: [
+                  {
+                    key: "service",
+                    value: "BLOCK_STORAGE"
+                  }
+                ]
+              }
             }
-          }})
-            
+          })
+
           result.usageAggregation.items.forEach(i => {
-            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'volume') {
-              if(i.computedAmount == null) i.computedAmount = 0
+            if (i.isForecast === true && i.resourceId?.split(".")[1] === 'volume') {
+              if (i.computedAmount == null) i.computedAmount = 0
               const existingResource = forecastResults.find(
                 o => o.resourceId === i.resourceId
               );
-  
+
               if (existingResource) {
                 existingResource.forecast[day] =
                   (existingResource.forecast[day] || 0) + i.computedAmount;
@@ -1673,14 +1689,14 @@ class Usage {
               }
             }
           })
-            
+
         }
       } catch (error) {
         console.log(error)
       }
-    
+
       resolve(forecastResults)
-      
+
       /**
        * Habilita o console
        */
@@ -1698,54 +1714,55 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-      
+
       var forecasts = [7, 15, 30, 60]
       var today = new Date();
       var monthEnd = new Date()
       monthEnd.setDate(today.getDate() - 1)
-      monthEnd.setHours(0,0,0,0)
+      monthEnd.setHours(0, 0, 0, 0)
       var monthStart = new Date(monthEnd)
       monthStart.setMonth(monthStart.getMonth() - 1)
       var forecastResults = []
 
       try {
-        for(const day of forecasts) {
+        for (const day of forecasts) {
           var forecastEnd = new Date(today)
           forecastEnd.setDate(today.getDate() + day)
-            /**
-           * Client
-           */
+          /**
+         * Client
+         */
           const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-            requestSummarizedUsagesDetails: { 
-            tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
-            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-            forecast: {
-              forecastType: usageapi.models.Forecast.ForecastType.Basic,
-              timeForecastStarted: this.#dateToUTC(monthEnd),
-              timeForecastEnded: this.#dateToUTC(forecastEnd)
-            },
-            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["resourceId"],
-            filter: {
-              operator: usageapi.models.Filter.Operator.And,
-              dimensions: [
-                {
-                  key: "service",
-                  value: "BLOCK_STORAGE"
-                }
-              ]
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: this.#dateToUTC(monthStart),
+              timeUsageEnded: this.#dateToUTC(monthEnd),
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+              forecast: {
+                forecastType: usageapi.models.Forecast.ForecastType.Basic,
+                timeForecastStarted: this.#dateToUTC(monthEnd),
+                timeForecastEnded: this.#dateToUTC(forecastEnd)
+              },
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ["resourceId"],
+              filter: {
+                operator: usageapi.models.Filter.Operator.And,
+                dimensions: [
+                  {
+                    key: "service",
+                    value: "BLOCK_STORAGE"
+                  }
+                ]
+              }
             }
-          }})
-            
+          })
+
           result.usageAggregation.items.forEach(i => {
-            if(i.isForecast === true && i.resourceId?.split(".")[1] === 'bootvolume') {
-              if(i.computedAmount == null) i.computedAmount = 0
+            if (i.isForecast === true && i.resourceId?.split(".")[1] === 'bootvolume') {
+              if (i.computedAmount == null) i.computedAmount = 0
               const existingResource = forecastResults.find(
                 o => o.resourceId === i.resourceId
               );
-  
+
               if (existingResource) {
                 existingResource.forecast[day] =
                   (existingResource.forecast[day] || 0) + i.computedAmount;
@@ -1757,14 +1774,14 @@ class Usage {
               }
             }
           })
-            
+
         }
       } catch (error) {
         console.log(error)
       }
-    
+
       resolve(forecastResults)
-      
+
       /**
        * Habilita o console
        */
@@ -1782,54 +1799,55 @@ class Usage {
        * Desabilita o console
        */
       this.#util.disableConsole();
-      
+
       var forecasts = [7, 15, 30, 60, 90, 180]
       var today = new Date();
       var monthEnd = new Date()
       monthEnd.setDate(today.getDate() - 1)
-      monthEnd.setHours(0,0,0,0)
+      monthEnd.setHours(0, 0, 0, 0)
       var monthStart = new Date(monthEnd)
       monthStart.setMonth(monthStart.getMonth() - 1)
       var forecast = {}
 
       try {
-        for(const day of forecasts) {
+        for (const day of forecasts) {
           var forecastEnd = new Date(today)
           forecastEnd.setDate(today.getDate() + day)
-            /**
-           * Client
-           */
+          /**
+         * Client
+         */
           const result = await new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-            requestSummarizedUsagesDetails: { 
-            tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
-            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-            forecast: {
-              forecastType: usageapi.models.Forecast.ForecastType.Basic,
-              timeForecastStarted: this.#dateToUTC(monthEnd),
-              timeForecastEnded: this.#dateToUTC(forecastEnd)
-            },
-            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["service"]
-          }})
-            
-          result.usageAggregation.items.forEach(i => {
-            
-            if(i.isForecast === true ) {
-              if(i.computedAmount == null) i.computedAmount = 0
-
-              forecast[day] = (forecast[day] || 0) + i.computedAmount;
-              
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: this.#dateToUTC(monthStart),
+              timeUsageEnded: this.#dateToUTC(monthEnd),
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+              forecast: {
+                forecastType: usageapi.models.Forecast.ForecastType.Basic,
+                timeForecastStarted: this.#dateToUTC(monthEnd),
+                timeForecastEnded: this.#dateToUTC(forecastEnd)
+              },
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ["service"]
             }
           })
-            
+
+          result.usageAggregation.items.forEach(i => {
+
+            if (i.isForecast === true) {
+              if (i.computedAmount == null) i.computedAmount = 0
+
+              forecast[day] = (forecast[day] || 0) + i.computedAmount;
+
+            }
+          })
+
         }
       } catch (error) {
         console.log(error)
       }
       resolve(forecast)
-      
+
       /**
        * Habilita o console
        */
@@ -1858,14 +1876,15 @@ class Usage {
          * Client
          */
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
-          requestSummarizedUsagesDetails: { 
-          tenantId: this.#provider.getTenantId(),
-          timeUsageStarted: this.#dateToUTC(monthStart),
-          timeUsageEnded: this.#dateToUTC(monthEnd),
-          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
-          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-          groupBy: ["region"]
-        }}).then(async result => {
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["region"]
+          }
+        }).then(async result => {
 
           const uniqueTimeUsageStarted = [...new Set(result.usageAggregation.items.map(entry => entry.timeUsageStarted))];
 
@@ -1881,13 +1900,13 @@ class Usage {
             if (!groupedSummedAndFilledData[region]) {
               groupedSummedAndFilledData[region] = []
             }
-            
-           
-              groupedSummedAndFilledData[region].push({
-                timeUsageStarted,
-                computedAmount: computedAmount || 0
-              })
-           
+
+
+            groupedSummedAndFilledData[region].push({
+              timeUsageStarted,
+              computedAmount: computedAmount || 0
+            })
+
           });
 
           uniqueTimeUsageStarted.sort((a, b) => new Date(b) - new Date(a));
@@ -1895,27 +1914,27 @@ class Usage {
           for (const service in groupedSummedAndFilledData) {
             for (const time of uniqueTimeUsageStarted) {
               const entry = groupedSummedAndFilledData[service].find(item => item.timeUsageStarted === time)
-              
-              
+
+
               if (!entry) {
-                groupedSummedAndFilledData[service].push({timeUsageStarted: time, computedAmount: 0});
+                groupedSummedAndFilledData[service].push({ timeUsageStarted: time, computedAmount: 0 });
               }
             }
           }
 
-          
+
           // Sort the entries within each service based on timeUsageStarted
           for (const service in groupedSummedAndFilledData) {
             const serviceData = groupedSummedAndFilledData[service];
             const sortedServiceData = this.groupAndSum(serviceData);
-            
+
             groupedSummedAndFilledData[service] = sortedServiceData;
           }
-        
-          
+
+
           resolve(groupedSummedAndFilledData)
         })
-        
+
         /**
          * Habilita o console
          */
