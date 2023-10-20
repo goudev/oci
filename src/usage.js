@@ -1101,7 +1101,7 @@ class Usage {
             var service = isStorageService ? "Storage" : entry.service
 
             itens.push({
-              service: service,
+              service: service == null ? " " : service,
               timeUsageStarted: entry.timeUsageStarted,
               currency: entry.currency,
               computedAmount: entry.computedAmount,
@@ -1164,8 +1164,11 @@ class Usage {
         }).then(async result => {
           var itens = [];
           result.usageAggregation.items.forEach(entry => {
+            const isStorageService = /storage|store/i.test(entry.service);
+            var service = isStorageService ? "Storage" : entry.service
+
             itens.push({
-              service: entry.service == null ? " " : entry.service,
+              service: service == null ? " " : service,
               timeUsageStarted: entry.timeUsageStarted,
               currency: entry.currency,
               computedAmount: entry.computedAmount,
