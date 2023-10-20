@@ -852,7 +852,7 @@ class Usage {
             timeUsageEnded: this.#dateToUTC(nextMonth),
             granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["service", "tagNamespace", "tagValue", "tagKey"]
+            groupBy: ["service"]
           }
         }).then(result => {
           var amount = 0
@@ -909,7 +909,7 @@ class Usage {
             timeUsageEnded: this.#dateToUTC(monthFinish),
             granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Monthly,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["service", "tagNamespace", "tagValue", "tagKey"]
+            groupBy: ["service"]
           }
         }).then(async result => {
 
