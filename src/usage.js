@@ -892,14 +892,12 @@ class Usage {
       /**
        * Desabilita o console
        */
-      // this.#util.disableConsole();
+      this.#util.disableConsole();
 
       try {
         var today = new Date();
         var monthStart = new Date(today.getFullYear(), today.getMonth() - 12, today.getDate())
         var monthFinish = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
-
-        console.log(this.#dateToUTC(monthStart), this.#dateToUTC(monthFinish))
 
         /**
          * Client
