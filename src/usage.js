@@ -981,6 +981,48 @@ class Usage {
       .value();
   }
 
+  listCostDailyWithoutFilter (today = new Date()) {
+    return new Promise(async (resolve, reject) => {
+      this.#util.disableConsole();
+
+      try {
+        const firstDate = new Date(today)
+        firstDate.setDate(today.getDate() - 90)
+
+        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
+        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+        
+        new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+          requestSummarizedUsagesDetails: {
+            tenantId: this.#provider.getTenantId(),
+            timeUsageStarted: this.#dateToUTC(monthStart),
+            timeUsageEnded: this.#dateToUTC(monthEnd),
+            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+            groupBy: ["service"],
+
+          }
+        }).then(async result => {
+          const items = result.usageAggregation.items.map(item => {
+             return {
+              amount: item.computedAmount || 0,
+              quantity: item.computedQuantity || 0,
+              service: item.service,
+              tags: item.tags,
+              timeUsageStarted: item.timeUsageStarted,
+              timeUsageEnded: item.timeUsageEnded
+             }
+          })
+
+          resolve(items)          
+        })
+      } catch (error) {
+        this.#util.enableConsole();
+        reject(error.message || error)
+      }
+    })
+  }
+
   listCostDaily() {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
