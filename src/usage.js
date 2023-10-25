@@ -981,23 +981,35 @@ class Usage {
       .value();
   }
 
-  listCostDailyWithoutFilter (today = new Date()) {
+  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY') {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
+      
 
       try {
-        const firstDate = new Date(today)
-        firstDate.setDate(today.getDate() - 90)
-
-        const monthStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate())
-        const monthEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+        let timeUsageStarted
+        let timeUsageEnded
+       
+        switch (granularity) {
+          case 'DAILY':
+            const startDate = new Date(baseDate)
+            startDate.setDate(baseDate.getDate() - 90)    
+            timeUsageStarted = this.#dateToUTC(new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()))
+            timeUsageEnded = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate()))
+            break
+          case 'MONTHLY':
+            timeUsageStarted = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() - 11, 1))
+            timeUsageEnded = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1))
+            break
+          
+        }
         
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: {
             tenantId: this.#provider.getTenantId(),
-            timeUsageStarted: this.#dateToUTC(monthStart),
-            timeUsageEnded: this.#dateToUTC(monthEnd),
-            granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+            timeUsageStarted,
+            timeUsageEnded,
+            granularity,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
             groupBy: ["service"],
 
@@ -1010,7 +1022,8 @@ class Usage {
               service: item.service,
               tags: item.tags,
               timeUsageStarted: item.timeUsageStarted,
-              timeUsageEnded: item.timeUsageEnded
+              timeUsageEnded: item.timeUsageEnded,
+              granularity
              }
           })
 
