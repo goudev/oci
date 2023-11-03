@@ -1011,7 +1011,7 @@ class Usage {
             timeUsageEnded,
             granularity,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["service"],
+            groupBy: ["tagKey", "tagValue", "service"],
 
           }
         }).then(async result => {
