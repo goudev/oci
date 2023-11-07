@@ -981,7 +981,7 @@ class Usage {
       .value();
   }
 
-  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY') {
+  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY', groupBy = ['service']) {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
       
@@ -1011,7 +1011,7 @@ class Usage {
             timeUsageEnded,
             granularity,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy: ["tagKey", "tagValue", "service"],
+            groupBy
 
           }
         }).then(async result => {

@@ -508,8 +508,8 @@ module.exports = class oci {
         return new Usage(this.#provider).listLast12MUsageByService()
     }
 
-    listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY') {
-        return new Usage(this.#provider).listCostWithoutFilter(baseDate, granularity)
+    listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY', groupBy = ['service']) {
+        return new Usage(this.#provider).listCostWithoutFilter(baseDate, granularity, groupBy)
     }
     
     listCostDaily() {
