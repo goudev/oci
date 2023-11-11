@@ -10,7 +10,7 @@ class ResourceSearchV2 {
   }
         
     
-  async allResources(startDate, endDate) {      
+  async allResources(startDate, endDate, limit = 10000) {      
     let items = [];
     let nextPage = null;
 
@@ -23,7 +23,7 @@ class ResourceSearchV2 {
 
     const structuredSearchRequest = {
       searchDetails: structuredSearch,
-      limit:5000,
+      limit,
       page: nextPage
     };
 
