@@ -4,6 +4,7 @@ var hash = require('object-hash');
 var BootVolumes = require("./bootVolumes")
 var BlockVolumes = require("./blockVolumes")
 var ResourceSearch = require("./resourceSearch")
+var ResourceSearchV2 = require("./v2/resourceSearch")
 var Compartments = require("./compartments")
 var Usage = require("./usage")
 var Cluster = require("./clusters")
@@ -24,6 +25,7 @@ var Policies = require("./policies")
 var Metrics = require('./metrics')
 var Subscription = require('./subscription')
 var Vulnerabilities = require('./vulnerabilities')
+var AuditEvent = require('./audit')
 
 module.exports = class oci {
 
@@ -508,7 +510,7 @@ module.exports = class oci {
         return new Usage(this.#provider).listLast12MUsageByService()
     }
 
-    listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY', groupBy = ['service']) {
+    listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY', groupBy = ['service', 'compartmentId']) {
         return new Usage(this.#provider).listCostWithoutFilter(baseDate, granularity, groupBy)
     }
     
@@ -543,5 +545,15 @@ module.exports = class oci {
     listLast12MUsageByRegion() {
         return new Usage(this.#provider).listLast12MUsageByRegion()
     }
+
+    retrieveAuditEvents() {
+         return new AuditEvent(this.#provider).retrieveAuditEvents();
+    }
+
+    resourcesGetAll(startDate, endDate) {  
+       return new ResourceSearchV2(this.#provider).allResources(startDate, endDate)
+    }
+
+    
 
 }

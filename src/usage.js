@@ -981,7 +981,7 @@ class Usage {
       .value();
   }
 
-  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY', groupBy = ['service']) {
+  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY', groupBy = ['service', 'compartmentId']) {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
       
@@ -1000,8 +1000,7 @@ class Usage {
           case 'MONTHLY':
             timeUsageStarted = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() - 11, 1))
             timeUsageEnded = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1))
-            break
-          
+            break          
         }
         
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
@@ -1011,7 +1010,8 @@ class Usage {
             timeUsageEnded,
             granularity,
             queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
-            groupBy
+            groupBy,
+            compartmentDepth: 6
 
           }
         }).then(async result => {
@@ -1023,7 +1023,8 @@ class Usage {
               tags: item.tags,
               timeUsageStarted: item.timeUsageStarted,
               timeUsageEnded: item.timeUsageEnded,
-              granularity
+              granularity,
+              compartmentId: item.compartmentId
              }
           })
 
