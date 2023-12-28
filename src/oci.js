@@ -574,12 +574,16 @@ module.exports = class oci {
     getCostsGroupedByServices(startAt, finishAt) {
         return new Usage(this.#provider).getCostsGroupedByServices(startAt, finishAt)
     }
-    
+
     getCostsGroupedByResourceId(startAt, finishAt) {
         return new Usage(this.#provider).getCostsGroupedByResourceId(startAt, finishAt)
     }
 
-    getInfoAboutTenancy(){
+    getInfoAboutTenancy() {
         return new IdentityEvent(this.#provider).getInfoAboutTenancy()
+    }
+
+    getInfoAboutResourcesId(resourceIds) {
+        return new ResourceSearch(this.#provider).find(`all resources where resourceId in [${resourceIds.map(id => `'${id}'`).join(',')}]`)
     }
 }

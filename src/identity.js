@@ -1,5 +1,6 @@
 const identity = require("oci-identity");
 
+
 class IdentityEvent {
     constructor(provider) {
         this.provider = provider
@@ -9,7 +10,7 @@ class IdentityEvent {
     }
 
     /**
-     * Retorna informações s
+     * Retorna informações sobre a tenancy
      * @returns 
      */
     async getInfoAboutTenancy() {
