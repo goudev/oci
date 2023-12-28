@@ -37,6 +37,7 @@
     "oci-optimizer": "^2.55.1",
     "oci-osuborganizationsubscription": "^2.69.0",
     "oci-osubsubscription": "^2.69.0",
+    "oci-resourcemanager": "^2.76.0",
     "oci-resourcesearch": "^2.50.0",
     "oci-sdk": "^2.73.1",
     "oci-usageapi": "^2.53.1",

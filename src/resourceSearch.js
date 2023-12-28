@@ -126,7 +126,7 @@ class RessourceSearch {
                     /**
                      * Rejeita a promise
                      */
-                    reject(error.message || error)
+                    reject(error)
                 }
 
                 /**

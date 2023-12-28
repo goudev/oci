@@ -25,7 +25,8 @@ var Policies = require("./policies")
 var Metrics = require('./metrics')
 var Subscription = require('./subscription')
 var Vulnerabilities = require('./vulnerabilities')
-var AuditEvent = require('./audit')
+var AuditEvent = require('./audit');
+const IdentityEvent = require('oci/src/identity');
 
 module.exports = class oci {
 
@@ -203,11 +204,11 @@ module.exports = class oci {
         return new Usage(this.#provider).listAccountConfig();
     }
 
-    listAccountOverview(){
+    listAccountOverview() {
         return new Usage(this.#provider).listAccountOverview();
     }
-    
-    listAccountOverviewByService(services){
+
+    listAccountOverviewByService(services) {
         return new Usage(this.#provider).listAccountOverviewByService(services);
     }
 
@@ -418,7 +419,7 @@ module.exports = class oci {
     }
 
     getMemoryMetrics(instanceData, days, interval) {
-        return new Monitoring(this.#provider).getMemoryMetrics(instanceData, days, interval);   
+        return new Monitoring(this.#provider).getMemoryMetrics(instanceData, days, interval);
     }
 
 
@@ -482,6 +483,10 @@ module.exports = class oci {
         return new Subscription(this.#provider).listSubscriptions()
     }
 
+    listOnlySubscriptions() {
+        return new Subscription(this.#provider).listOnlySubscriptions()
+    }
+
     getIndividualResourcesActualUsage(service, resource) {
         return new Usage(this.#provider).getIndividualResourcesActualUsage(service, resource)
     }
@@ -489,7 +494,7 @@ module.exports = class oci {
     getLast12MUsageByServices() {
         return new Usage(this.#provider).getLast12MUsageByServices()
     }
-    
+
     getActualYearTotalUsage() {
         return new Usage(this.#provider).getActualYearTotalUsage()
     }
@@ -513,7 +518,7 @@ module.exports = class oci {
     listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY', groupBy = ['service', 'compartmentId']) {
         return new Usage(this.#provider).listCostWithoutFilter(baseDate, granularity, groupBy)
     }
-    
+
     listCostDaily() {
         return new Usage(this.#provider).listCostDaily()
     }
@@ -533,7 +538,7 @@ module.exports = class oci {
     forecastBlockVolumes() {
         return new Usage(this.#provider).forecastBlockVolumes()
     }
-    
+
     forecastBootVolumes() {
         return new Usage(this.#provider).forecastBootVolumes()
     }
@@ -547,13 +552,34 @@ module.exports = class oci {
     }
 
     retrieveAuditEvents() {
-         return new AuditEvent(this.#provider).retrieveAuditEvents();
+        return new AuditEvent(this.#provider).retrieveAuditEvents();
     }
 
-    resourcesGetAll(startDate, endDate) {  
-       return new ResourceSearchV2(this.#provider).allResources(startDate, endDate)
+    resourcesGetAll(startDate, endDate) {
+        return new ResourceSearchV2(this.#provider).allResources(startDate, endDate)
     }
 
+    getCostByRangeDate(startAtUTC, finishAtUTC) {
+        return new Usage(this.#provider).getCostByRangeDate(startAtUTC, finishAtUTC)
+    }
+
+    totalCostOnPeriodFromResourcesId(startAt, finishAt, ocIds) {
+        return new Usage(this.#provider).getTotalCostByRangeDateFromResourcesId(startAt, finishAt, ocIds)
+    }
+
+    getResourcesCreatedOnPeriod(startDate, endDate) {
+        return new ResourceSearch(this.#provider).find(`all resources where timeCreated >= '${startDate.toUTCString()}' && timeCreated <= '${endDate.toUTCString()}'`)
+    }
+
+    getCostsGroupedByServices(startAt, finishAt) {
+        return new Usage(this.#provider).getCostsGroupedByServices(startAt, finishAt)
+    }
     
+    getCostsGroupedByResourceId(startAt, finishAt) {
+        return new Usage(this.#provider).getCostsGroupedByResourceId(startAt, finishAt)
+    }
 
+    getInfoAboutTenancy(){
+        return new IdentityEvent(this.#provider).getInfoAboutTenancy()
+    }
 }

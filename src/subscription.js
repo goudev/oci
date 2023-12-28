@@ -57,6 +57,18 @@ class Subscription {
         }
     }
 
+    async listOnlySubscriptions() {
+        try {
+            const client =  new subscription.OrganizationSubscriptionClient({authenticationDetailsProvider: this.#provider});
+
+            return await client.listOrganizationSubscriptions({
+                compartmentId: this.#provider.getTenantId(),
+            });
+        } catch (error) {
+            return [];
+        }
+    }
+
     listContracts(subscriptionId) {
         /**
          * Retorna a promise

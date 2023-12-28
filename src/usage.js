@@ -981,28 +981,28 @@ class Usage {
       .value();
   }
 
-  listCostWithoutFilter (baseDate = new Date(), granularity = 'DAILY', groupBy = ['service', 'compartmentId']) {
+  listCostWithoutFilter(baseDate = new Date(), granularity = 'DAILY', groupBy = ['service', 'compartmentId']) {
     return new Promise(async (resolve, reject) => {
       this.#util.disableConsole();
-      
+
 
       try {
         let timeUsageStarted
         let timeUsageEnded
-       
+
         switch (granularity) {
           case 'DAILY':
             const startDate = new Date(baseDate)
-            startDate.setDate(baseDate.getDate() - 90)    
+            startDate.setDate(baseDate.getDate() - 90)
             timeUsageStarted = this.#dateToUTC(new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()))
             timeUsageEnded = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate()))
             break
           case 'MONTHLY':
             timeUsageStarted = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() - 11, 1))
             timeUsageEnded = this.#dateToUTC(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1))
-            break          
+            break
         }
-        
+
         new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
           requestSummarizedUsagesDetails: {
             tenantId: this.#provider.getTenantId(),
@@ -1016,7 +1016,7 @@ class Usage {
           }
         }).then(async result => {
           const items = result.usageAggregation.items.map(item => {
-             return {
+            return {
               amount: item.computedAmount || 0,
               quantity: item.computedQuantity || 0,
               service: item.service,
@@ -1025,10 +1025,10 @@ class Usage {
               timeUsageEnded: item.timeUsageEnded,
               granularity,
               compartmentId: item.compartmentId
-             }
+            }
           })
 
-          resolve(items)          
+          resolve(items)
         })
       } catch (error) {
         this.#util.enableConsole();
@@ -2013,6 +2013,173 @@ class Usage {
         reject(error.message || error)
       }
     })
+  }
+
+  getCostByRangeDate(startAtUTC, finishAtUTC) {
+    this.#util.enableConsole();
+    return new Promise(async (resolve, reject) => {
+      new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+        requestSummarizedUsagesDetails: {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: startAtUTC,
+          timeUsageEnded: finishAtUTC,
+          compartmentDepth: 2,
+          isAggregateByTime: false,
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost
+        }
+      }).then(async result => {
+        var resultTotal = []
+        result.usageAggregation.items.map((item) => {
+          let total = item.computedAmount != null ? item.computedAmount : 0;
+          let resultItem = resultTotal.find(obj => obj.date) == item.timeUsageStarted;
+          if (resultItem == false) {
+            resultItem = {
+              date: item.timeUsageStarted,
+              total: total
+            }
+            resultTotal.push(resultItem)
+          } else {
+            resultItem.total += total;
+          }
+        })
+        resolve(resultTotal);
+      }).catch(error => {
+        reject(error)
+      });
+    });
+  }
+
+  getTotalCostByRangeDateFromResourcesId(startAtUTC, finishAtUTC, ocIds) {
+    this.#util.enableConsole();
+    const chunkSize = 50;
+
+    const filterDimensions = (startIdx) => {
+      return ocIds.slice(startIdx, startIdx + chunkSize).map((id) => {
+        return {
+          key: 'resourceId',
+          value: id,
+        };
+      });
+    };
+
+    const fetchChunk = async (startIndex) => {
+      const filterDims = filterDimensions(startIndex);
+
+      return new Promise(async (resolve, reject) => {
+        try {
+          const result = await new usageapi.UsageapiClient({
+            authenticationDetailsProvider: this.#provider,
+          }).requestSummarizedUsages({
+            requestSummarizedUsagesDetails: {
+              tenantId: this.#provider.getTenantId(),
+              timeUsageStarted: startAtUTC,
+              timeUsageEnded: finishAtUTC,
+              compartmentDepth: 2,
+              isAggregateByTime: false,
+              granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+              queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+              groupBy: ['resourceId'],
+              filter: {
+                operator: usageapi.models.Filter.Operator.Or,
+                dimensions: filterDims,
+              },
+            },
+          });
+
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    };
+
+    const processResults = (resultTotal, result) => {
+      result.usageAggregation.items.forEach((item) => {
+        let total = item.computedAmount != null ? item.computedAmount : 0;
+        let resultItem = resultTotal.find((obj) => obj.id === item.resourceId);
+
+        if (!resultItem) {
+          resultItem = {
+            id: item.resourceId,
+            total: total,
+          };
+          resultTotal.push(resultItem);
+        } else {
+          resultItem.total += total;
+        }
+      });
+
+      return resultTotal;
+    };
+
+    const recursiveFetch = async (startIndex, resultTotal) => {
+      try {
+        const result = await fetchChunk(startIndex);
+        resultTotal = processResults(resultTotal, result);
+
+        if (startIndex + chunkSize < ocIds.length) {
+          return recursiveFetch(startIndex + chunkSize, resultTotal);
+        } else {
+          return resultTotal;
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const resultTotal = await recursiveFetch(0, []);
+        resolve(resultTotal);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+
+  getCostsGroupedByServices(startAtUTC, finishAtUTC) {
+    this.#util.enableConsole();
+    return new Promise(async (resolve, reject) => {
+      new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+        requestSummarizedUsagesDetails: {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: startAtUTC,
+          timeUsageEnded: finishAtUTC,
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          isAggregateByTime: false,
+          groupBy: ["service"]
+        }
+      }).then(async result => {
+        resolve(result.usageAggregation.items || []);
+      }).catch(error => {
+        reject(error);
+      })
+    });
+  }
+
+  getCostsGroupedByResourceId(startAtUTC, finishAtUTC) {
+    this.#util.enableConsole();
+    return new Promise(async (resolve, reject) => {
+      new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+        requestSummarizedUsagesDetails: {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: startAtUTC,
+          timeUsageEnded: finishAtUTC,
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          compartmentDepth: 2,
+          isAggregateByTime: false,
+          groupBy: ["resourceId", "service"]
+        }
+      }).then(async result => {
+        resolve(result.usageAggregation.items || []);
+      }).catch(error => {
+        reject(error);
+      })
+    });
   }
 
 }
