@@ -579,6 +579,10 @@ module.exports = class oci {
         return new Usage(this.#provider).getCostsGroupedByResourceId(startAt, finishAt)
     }
 
+    getCostsGroupedByResourceIdAndTags(startAt, finishAt) {
+        return new Usage(this.#provider).getCostsGroupedByResourceIdAndTags(startAt, finishAt)
+    }
+
     getInfoAboutTenancy() {
         return new IdentityEvent(this.#provider).getInfoAboutTenancy()
     }

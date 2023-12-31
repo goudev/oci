@@ -2182,6 +2182,28 @@ class Usage {
     });
   }
 
+  getCostsGroupedByResourceIdAndTags(startAtUTC, finishAtUTC) {
+    this.#util.enableConsole();
+    return new Promise(async (resolve, reject) => {
+      new usageapi.UsageapiClient({ authenticationDetailsProvider: this.#provider }).requestSummarizedUsages({
+        requestSummarizedUsagesDetails: {
+          tenantId: this.#provider.getTenantId(),
+          timeUsageStarted: startAtUTC,
+          timeUsageEnded: finishAtUTC,
+          granularity: usageapi.models.RequestSummarizedUsagesDetails.Granularity.Daily,
+          queryType: usageapi.models.RequestSummarizedUsagesDetails.QueryType.Cost,
+          compartmentDepth: 2,
+          isAggregateByTime: false,
+          groupBy: ["resourceId", "service", "tagKey", "tagValue"]
+        }
+      }).then(async result => {
+        resolve(result.usageAggregation.items || []);
+      }).catch(error => {
+        reject(error);
+      })
+    });
+  }
+
 }
 
 module.exports = Usage
