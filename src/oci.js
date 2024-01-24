@@ -350,6 +350,10 @@ module.exports = class oci {
         return new Database(this.#provider).listDbSystems();
     }
 
+    listAutonomousDatabases() {
+        return new Database(this.#provider).listAutonomousDatabases();
+    }
+
     getDbSystem(dbSystemId) {
         return new Database(this.#provider).getDbSystem(dbSystemId);
     }
